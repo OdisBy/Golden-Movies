@@ -8,7 +8,7 @@ plugins {
 buildscript {
     extra.apply {
         set("compileSdk", 34)
-        set("minSdk", 25)
+        set("minSdk", 26)
         set("targetSdk", 34)
     }
 }
