@@ -6,6 +6,18 @@ plugins {
 android {
     namespace = "com.odisby.goldentomatoes.core.ui"
     compileSdk = rootProject.extra.get("compileSdk") as Int
+
+    defaultConfig {
+        minSdk = rootProject.extra.get("minSdk") as Int
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {

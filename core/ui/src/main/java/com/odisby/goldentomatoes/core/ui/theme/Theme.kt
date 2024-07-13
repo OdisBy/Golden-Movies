@@ -1,4 +1,4 @@
-package com.odisby.goldentomatoes.ui.theme
+package com.odisby.goldentomatoes.core.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
