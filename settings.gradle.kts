@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Golden Tomatoes"
 include(":app")
- 
+include(":core:ui")

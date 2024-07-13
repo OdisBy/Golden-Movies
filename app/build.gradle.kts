@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.odisby.goldentomatoes"
-    compileSdk = 34
+    compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
         applicationId = "com.odisby.goldentomatoes"
-        minSdk = 26
-        targetSdk = 34
+        minSdk = rootProject.extra.get("minSdk") as Int
+        targetSdk = rootProject.extra.get("targetSdk") as Int
         versionCode = 1
         versionName = "1.0"
 
