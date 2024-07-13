@@ -1,5 +1,6 @@
 package com.odisby.goldentomatoes.feature.home.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -24,7 +24,7 @@ import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 fun HomeRoot(
     navController: NavController,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = HomeViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -51,28 +51,29 @@ fun HomeScreen(
     val searchedMovieList = uiState.searchedMovieList
 
     // Top search bar
-    SearchBar(
-        query = searchText,
-        onQueryChange = { },
-        onSearch = { },
-        active = isSearching,
-        onActiveChange = { },
-        placeholder = { },
-    ) {
-        LazyColumn {
-            items(searchedMovieList) { movie ->
-                Text(
-                    text = "",
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 4.dp,
-                        end = 8.dp,
-                        bottom = 4.dp
-                    )
-                )
-            }
-        }
-    }
+//    SearchBar(
+//        query = searchText,
+//        onQueryChange = { },
+//        onSearch = { },
+//        active = isSearching,
+//        onActiveChange = { },
+//        placeholder = { },
+//    ) {
+//        LazyColumn {
+//            items(searchedMovieList) { movie ->
+//                Text(
+//                    text = "",
+//                    modifier = Modifier.padding(
+//                        start = 8.dp,
+//                        top = 4.dp,
+//                        end = 8.dp,
+//                        bottom = 4.dp
+//                    )
+//                )
+//            }
+//        }
+//    }
+
 
     // discover
     // carrossel + text + navigation

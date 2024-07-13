@@ -1,7 +1,6 @@
 package com.odisby.goldentomatoes.feature.home.ui
 
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -15,8 +14,7 @@ data class HomeUiState(
     val searchedMovieList: List<Unit> = emptyList()
 )
 
-@HiltViewModel
-class HomeViewModel() : ViewModel() {
+class HomeViewModel : ViewModel() {
 
     private val _state = MutableStateFlow<HomeUiState>(HomeUiState())
 
