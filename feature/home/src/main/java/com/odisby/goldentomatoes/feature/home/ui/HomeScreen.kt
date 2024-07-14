@@ -49,7 +49,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
-import com.odisby.goldentomatoes.feature.search.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.model.Movie
 
 private val moviesDumb = listOf(
     Movie(
@@ -109,7 +109,7 @@ private val moviesDumb2 = listOf(
 
 @Composable
 fun HomeRoot(
-    navigateToSearchScreen: () -> Unit,
+    navigateToMovieList: (String) -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
@@ -141,6 +141,7 @@ fun HomeRoot(
             uiState = uiState,
             onSearchButtonClick = { viewModel.runSearch(it) },
             goToMovieDetails = navigateToDetailsScreen,
+            navigateToMovieList = navigateToMovieList,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -153,6 +154,7 @@ fun HomeScreen(
     uiState: HomeUiState,
     onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
+    navigateToMovieList: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -175,12 +177,12 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        DiscoverNewMovies(goToMovieDetails)
+        DiscoverNewMovies(goToMovieDetails, navigateToMovieList)
 
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ScheduledMovies(goToMovieDetails)
+        ScheduledMovies(goToMovieDetails, navigateToMovieList)
 
     }
 
@@ -188,7 +190,8 @@ fun HomeScreen(
 
 @Composable
 private fun DiscoverNewMovies(
-    goToMovieDetails: (Long) -> Unit
+    goToMovieDetails: (Long) -> Unit,
+    navigateToMovieList: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -199,7 +202,7 @@ private fun DiscoverNewMovies(
         RowTextAndGoButton(
             text = "Descubra novos filmes",
             onButtonClick = {
-                // go to discover screen
+                navigateToMovieList("discover")
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -209,7 +212,8 @@ private fun DiscoverNewMovies(
 
 @Composable
 private fun ScheduledMovies(
-    goToMovieDetails: (Long) -> Unit
+    goToMovieDetails: (Long) -> Unit,
+    navigateToMovieList: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -220,7 +224,7 @@ private fun ScheduledMovies(
         RowTextAndGoButton(
             text = "Filmes agendados",
             onButtonClick = {
-                // go to discover screen
+                navigateToMovieList("scheduled")
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -310,6 +314,7 @@ fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
         onSearchButtonClick = {},
+        navigateToMovieList = { },
         goToMovieDetails = {}
     )
 }

@@ -40,7 +40,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary500
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
-import com.odisby.goldentomatoes.feature.search.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.model.Movie
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
