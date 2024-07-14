@@ -22,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -61,7 +62,7 @@ fun SearchBarApp(
             onSearchButtonClick(it)
         },
         placeholder = {
-            Text(text = stringResource(R.string.search_movie_placeholder))
+            Text(text = stringResource(R.string.search_movie_placeholder), style = MaterialTheme.typography.labelLarge)
         },
         active = searchBarActive,
         onActiveChange = { onChangeSearchBarActive(it) },
@@ -159,6 +160,7 @@ private fun UnexpectedBehaviorSad(
     Text(
         text = text,
         color = TextColor,
+        style = MaterialTheme.typography.bodyMedium
     )
 }
 
@@ -193,7 +195,7 @@ fun MovieSearchListItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier.fillMaxWidth(),
         ) {
-            Text(text = movie.name, color = TextColor)
+            Text(text = movie.name, color = TextColor, style = MaterialTheme.typography.bodyMedium)
             if (movie.rating != null) {
                 Icon(
                     imageVector = Icons.Default.Star,
