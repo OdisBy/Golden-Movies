@@ -39,8 +39,8 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary400
 import com.odisby.goldentomatoes.core.ui.theme.Primary500
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
-import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
 import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -196,20 +196,20 @@ fun MovieSearchListItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier.fillMaxWidth(),
         ) {
-//            Text(text = movie.name, color = TextColor, style = MaterialTheme.typography.bodyMedium)
-//            if (movie.rating != null) {
-//                Icon(
-//                    painter = rememberVectorPainter(Icons.Default.Star),
-//                    contentDescription = null,
-//                    tint = Primary400
-//                )
-//            } else {
-//                Icon(
-//                    painter = rememberVectorPainter(Icons.Default.Star),
-//                    contentDescription = null,
-//                    tint = TextColor
-//                )
-//            } // TODO Refactor new movie class
+            Text(text = movie.title, color = TextColor, style = MaterialTheme.typography.bodyMedium)
+            if (movie.scheduled) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Default.Star),
+                    contentDescription = null,
+                    tint = Primary400
+                )
+            } else {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Default.Star),
+                    contentDescription = null,
+                    tint = TextColor
+                )
+            }
         }
     }
 }

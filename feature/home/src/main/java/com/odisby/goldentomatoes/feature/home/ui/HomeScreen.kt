@@ -50,6 +50,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.components.NoMoviesFounded
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 
 @Composable
@@ -123,7 +124,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (uiState.isLoadingDiscover) {
-            MoviesListLoading()
+            MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else {
             DiscoverNewMovies(goToMovieDetails, navigateToMovieList, movies = uiState.discoverList)
         }
@@ -131,7 +132,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (uiState.isLoadingScheduled) {
-            MoviesListLoading()
+            MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
         } else {
             ScheduledMovies(goToMovieDetails, navigateToMovieList, movies = uiState.scheduledList)
         }
@@ -141,8 +142,8 @@ fun HomeScreen(
 }
 
 @Composable
-fun MoviesListLoading() {
-    CircularProgressIndicator()
+fun MoviesListLoading(modifier: Modifier) {
+    CircularProgressIndicator(modifier = modifier)
 }
 
 @Composable
@@ -151,23 +152,28 @@ private fun DiscoverNewMovies(
     navigateToMovieList: (String) -> Unit,
     movies: List<Movie>,
 ) {
-    if (movies.isEmpty()) {
-        return
-    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .semantics { isTraversalGroup = true }
     ) {
+
         RowTextAndGoButton(
             text = stringResource(R.string.discover_movies_title),
             onButtonClick = {
                 navigateToMovieList("discover")
-            }
+            },
+            buttonVisible = movies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DiscoverCarousel(movies, goToMovieDetails)
+
+        if (movies.isEmpty()) {
+            NoMoviesFounded(modifier = Modifier.height(200.dp))
+        } else {
+            DiscoverCarousel(movies, goToMovieDetails)
+
+        }
     }
 }
 
@@ -177,10 +183,6 @@ private fun ScheduledMovies(
     navigateToMovieList: (String) -> Unit,
     movies: List<Movie>,
 ) {
-    if (movies.isEmpty()) {
-        return
-    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,10 +193,16 @@ private fun ScheduledMovies(
             text = stringResource(R.string.schedules_movies_title),
             onButtonClick = {
                 navigateToMovieList("scheduled")
-            }
+            },
+            buttonVisible = movies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
-        ScheduledCarousel(movies, goToMovieDetails)
+
+        if (movies.isEmpty()) {
+            NoMoviesScheduled()
+        } else {
+            ScheduledCarousel(movies, goToMovieDetails)
+        }
     }
 }
 
@@ -247,7 +255,19 @@ private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit
 }
 
 @Composable
-private fun RowTextAndGoButton(text: String, onButtonClick: () -> Unit) {
+fun NoMoviesScheduled(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.no_movies_scheduled),
+        color = TextColor,
+    )
+}
+
+@Composable
+private fun RowTextAndGoButton(
+    text: String,
+    onButtonClick: () -> Unit,
+    buttonVisible: Boolean = true
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -259,14 +279,16 @@ private fun RowTextAndGoButton(text: String, onButtonClick: () -> Unit) {
             color = TextColor
         )
 
-        IconButton(
-            onClick = onButtonClick
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = TextColor
-            )
+        if (buttonVisible) {
+            IconButton(
+                onClick = onButtonClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = TextColor
+                )
+            }
         }
     }
 }

@@ -12,4 +12,5 @@
     <string name="home_fab_label">Descubra filmes aleatórios</string>
     <string name="schedules_movies_title">Filmes agendados</string>
     <string name="discover_movies_title">Descubra novos filmes</string>
+    <string name="no_movies_scheduled">Você ainda não agendou nenhum filme :)</string>
 </resources>

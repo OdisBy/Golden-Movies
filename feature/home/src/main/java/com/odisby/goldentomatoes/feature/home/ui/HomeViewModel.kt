@@ -75,10 +75,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getMovies(searchQuery: String): List<Movie> {
-        val movieWithRating = mutableListOf<Movie>()
-        val movieWithoutRating = mutableListOf<Movie>()
-
+    private fun getSearchMovies(searchQuery: String): List<Movie> {
+//        val movieWithRating = mutableListOf<Movie>()
+//        val movieWithoutRating = mutableListOf<Movie>()
+//
 //        for (movie in movieDumb) { // todo refactor
 //            if (movie.name.contains(searchQuery, ignoreCase = true)) {
 //                if (movie.rating != null) {
@@ -100,7 +100,7 @@ class HomeViewModel @Inject constructor(
 
                 val getMovies = viewModelScope.runCatching {
                     delay(2000)
-                    getMovies(query)
+                    getSearchMovies(query)
                 }.getOrElse {
                     emptyList()
                 }
