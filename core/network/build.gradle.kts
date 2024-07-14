@@ -61,14 +61,14 @@ fun getApiKey(): String {
         val apikeyProperties = Properties()
         try {
             apikeyProperties.load(apiKeyFile.inputStream())
-            apikeyProperties.getProperty("API_KEY", "")
+            apikeyProperties.getProperty("API_KEY", "null")
         } catch (e: IOException) {
             println("API Key não encontrada. Verifique o arquivo apikey.properties.")
-            ""
+            "null"
         }
     } else {
         println("API Key não encontrada. Verifique o arquivo apikey.properties.")
-        ""
+        "null"
     }
 }
 
