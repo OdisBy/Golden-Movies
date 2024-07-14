@@ -2,7 +2,7 @@ package com.odisby.goldentomatoes.feature.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.odisby.goldentomatoes.feature.search.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.model.Movie
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
