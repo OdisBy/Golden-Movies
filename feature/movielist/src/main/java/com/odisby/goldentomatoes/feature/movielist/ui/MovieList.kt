@@ -2,6 +2,7 @@ package com.odisby.goldentomatoes.feature.movielist.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,18 +44,17 @@ import com.odisby.goldentomatoes.feature.movielist.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieListRoot(
+    modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
     listType: String = "discover",
-    modifier: Modifier = Modifier,
-    viewModel: MovieListViewModel = MovieListViewModel()
+    viewModel: MovieListViewModel = MovieListViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
 
     Scaffold(
-        modifier = Modifier
-            .background(BackgroundColor)
+        modifier = modifier
             .statusBarsPadding()
             .navigationBarsPadding()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -97,7 +97,7 @@ fun MovieListRoot(
 }
 
 @Composable
-fun MovieListScreen(
+private fun MovieListScreen(
     uiState: MovieListUiState,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier
@@ -112,7 +112,7 @@ fun MovieListScreen(
             verticalItemSpacing = 16.dp,
         ) {
             item {
-                Column() {
+                Column {
                     Image(
                         painter = painterResource(R.drawable.test_banner),
                         contentDescription = null,
@@ -120,6 +120,11 @@ fun MovieListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .clickable(
+                                onClick = {
+                                    navigateToDetailsScreen(1)
+                                }
+                            )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -139,6 +144,11 @@ fun MovieListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .clickable(
+                                onClick = {
+                                    navigateToDetailsScreen(1)
+                                }
+                            )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -158,6 +168,11 @@ fun MovieListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .clickable(
+                                onClick = {
+                                    navigateToDetailsScreen(1)
+                                }
+                            )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -177,6 +192,11 @@ fun MovieListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .clickable(
+                                onClick = {
+                                    navigateToDetailsScreen(1)
+                                }
+                            )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -196,6 +216,11 @@ fun MovieListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .clickable(
+                                onClick = {
+                                    navigateToDetailsScreen(1)
+                                }
+                            )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -215,6 +240,11 @@ fun MovieListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
+                            .clickable(
+                                onClick = {
+                                    navigateToDetailsScreen(1)
+                                }
+                            )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 

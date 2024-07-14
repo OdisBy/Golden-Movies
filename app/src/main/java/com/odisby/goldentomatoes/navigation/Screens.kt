@@ -8,3 +8,6 @@ object HomeScreen
 
 @Serializable
 data class DetailsScreen(val id: Long)
+
+@Serializable
+data class MovieListScreen(val type: String) // Change to Type
