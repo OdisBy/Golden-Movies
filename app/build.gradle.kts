@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -54,7 +55,6 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":feature:home"))
-    implementation(project(":feature:search"))
 
 
     implementation(libs.androidx.core.ktx)
