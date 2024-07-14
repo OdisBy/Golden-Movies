@@ -11,16 +11,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColorAccent
+import com.odisby.goldentomatoes.core.ui.theme.Black_50
 import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.details.R
@@ -50,15 +55,22 @@ fun DetailsRoot(
     Scaffold(
         modifier = Modifier
             .background(BackgroundColor)
-//            .statusBarsPadding()
             .navigationBarsPadding(),
-//        topBar = {
-//            CenterAlignedTopAppBar(
-//                title = {
-//                    Text("Movie Name")
-//                }
-//            )
-//        }
+        topBar = {
+            IconButton(
+                onClick = navigateUp,
+                modifier = Modifier.statusBarsPadding(),
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = TextColor,
+                    containerColor = Black_50,
+                )
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                    contentDescription = "Voltar"
+                )
+            }
+        }
     ) { contentPadding ->
         DetailsScreen(
             uiState = DetailsUiState(),
