@@ -108,6 +108,7 @@ private val moviesDumb2 = listOf(
 @Composable
 fun HomeRoot(
     navigateToSearchScreen: () -> Unit,
+    navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = HomeViewModel()
 ) {
@@ -134,6 +135,7 @@ fun HomeRoot(
         HomeScreen(
             uiState = uiState,
             onSearchButtonClick = { viewModel.runSearch(it) },
+            goToMovieDetails = navigateToDetailsScreen,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -145,6 +147,7 @@ fun HomeRoot(
 fun HomeScreen(
     uiState: HomeUiState,
     onSearchButtonClick: (String) -> Unit,
+    goToMovieDetails: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -167,19 +170,21 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        DiscoverNewMovies()
+        DiscoverNewMovies(goToMovieDetails)
 
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ScheduledMovies()
+        ScheduledMovies(goToMovieDetails)
 
     }
 
 }
 
 @Composable
-private fun DiscoverNewMovies() {
+private fun DiscoverNewMovies(
+    goToMovieDetails: (Long) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -193,12 +198,14 @@ private fun DiscoverNewMovies() {
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DiscoverCarousel(moviesDumb)
+        DiscoverCarousel(moviesDumb, goToMovieDetails)
     }
 }
 
 @Composable
-private fun ScheduledMovies() {
+private fun ScheduledMovies(
+    goToMovieDetails: (Long) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -212,23 +219,29 @@ private fun ScheduledMovies() {
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        ScheduledCarousel(moviesDumb2)
+        ScheduledCarousel(moviesDumb2, goToMovieDetails)
     }
 }
 
 @Composable
-fun ScheduledCarousel(movies: List<Movie>) {
+fun ScheduledCarousel(
+    movies: List<Movie>,
+    goToMovieDetails: (Long) -> Unit
+) {
     MoviesCarousel(
         movies = movies,
-        goToMovieDetails = { }
+        goToMovieDetails = goToMovieDetails
     )
 }
 
 @Composable
-fun DiscoverCarousel(movies: List<Movie>) {
+fun DiscoverCarousel(
+    movies: List<Movie>,
+    goToMovieDetails: (Long) -> Unit
+) {
     MoviesCarousel(
         movies = movies,
-        goToMovieDetails = { }
+        goToMovieDetails = goToMovieDetails
     )
 }
 
@@ -291,6 +304,7 @@ private fun RowTextAndGoButton(text: String, onButtonClick: () -> Unit) {
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
-        onSearchButtonClick = {}
+        onSearchButtonClick = {},
+        goToMovieDetails = {}
     )
 }
