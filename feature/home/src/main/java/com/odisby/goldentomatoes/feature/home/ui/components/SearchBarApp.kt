@@ -109,8 +109,8 @@ fun SearchBarApp(
             NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
             return@SearchBar
         }
-        if (uiState.moviesList.isNotEmpty()) {
-            ListWithMovies(uiState.moviesList)
+        if (uiState.movieList.isNotEmpty()) {
+            ListWithMovies(uiState.movieList)
         }
     }
 }
@@ -196,20 +196,20 @@ fun MovieSearchListItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier.fillMaxWidth(),
         ) {
-            Text(text = movie.name, color = TextColor, style = MaterialTheme.typography.bodyMedium)
-            if (movie.rating != null) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Default.Star),
-                    contentDescription = null,
-                    tint = Primary400
-                )
-            } else {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Default.Star),
-                    contentDescription = null,
-                    tint = TextColor
-                )
-            }
+//            Text(text = movie.name, color = TextColor, style = MaterialTheme.typography.bodyMedium)
+//            if (movie.rating != null) {
+//                Icon(
+//                    painter = rememberVectorPainter(Icons.Default.Star),
+//                    contentDescription = null,
+//                    tint = Primary400
+//                )
+//            } else {
+//                Icon(
+//                    painter = rememberVectorPainter(Icons.Default.Star),
+//                    contentDescription = null,
+//                    tint = TextColor
+//                )
+//            } // TODO Refactor new movie class
         }
     }
 }

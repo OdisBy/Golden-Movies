@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.data.GetSchedulesMoviesUseCase
 import com.odisby.goldentomatoes.feature.home.model.Movie
-import com.odisby.goldentomatoes.feature.home.model.Movies
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -19,46 +19,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase
+    private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
+    private val getScheduledMoviesUseCase: GetSchedulesMoviesUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
 
     val state: StateFlow<HomeUiState>
         get() = _state
 
-
-    private val moviesDumb = listOf(
-        Movie(
-            id = 1,
-            name = "Inception",
-            rating = null
-        ),
-        Movie(
-            id = 2,
-            name = "The Prestige",
-            rating = null
-        ),
-        Movie(
-            id = 3,
-            name = "Interstellar",
-            rating = null,
-        ),
-        Movie(
-            id = 4,
-            name = "Interworlds",
-            rating = 9
-        ),
-        Movie(
-            id = 5,
-            name = "Intertest",
-            rating = null
-        )
-    )
-
     init {
         viewModelScope.launch {
             _state.update {
-                it.copy(isLoadingDiscover = true)
+                it.copy(isLoadingDiscover = true, isLoadingScheduled = true)
             }
 
             when (val result = getDiscoverMoviesUseCase()) {
@@ -81,24 +53,44 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
+
+            try {
+                val result = getScheduledMoviesUseCase()
+                _state.update {
+                    it.copy(
+                        isLoadingScheduled = false,
+                        scheduledList = result
+                    )
+
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoadingScheduled = false,
+                        scheduledList = emptyList(),
+                        searchErrorMessage = e.localizedMessage ?: "Error"
+                    )
+                }
+            }
         }
     }
 
     private fun getMovies(searchQuery: String): List<Movie> {
-        val moviesWithRating = mutableListOf<Movie>()
-        val moviesWithoutRating = mutableListOf<Movie>()
+        val movieWithRating = mutableListOf<Movie>()
+        val movieWithoutRating = mutableListOf<Movie>()
 
-        for (movie in moviesDumb) {
-            if (movie.name.contains(searchQuery, ignoreCase = true)) {
-                if (movie.rating != null) {
-                    moviesWithRating.add(movie)
-                } else {
-                    moviesWithoutRating.add(movie)
-                }
-            }
-        }
-        moviesWithRating.sortByDescending { it.rating }
-        return moviesWithRating + moviesWithoutRating
+//        for (movie in movieDumb) { // todo refactor
+//            if (movie.name.contains(searchQuery, ignoreCase = true)) {
+//                if (movie.rating != null) {
+//                    movieWithRating.add(movie)
+//                } else {
+//                    movieWithoutRating.add(movie)
+//                }
+//            }
+//        }
+//        movieWithRating.sortByDescending { it.rating }
+//        return movieWithRating + movieWithoutRating
+        return emptyList()
     }
 
     fun runSearch(query: String) {
@@ -117,7 +109,7 @@ class HomeViewModel @Inject constructor(
 
                 _state.update {
                     it.copy(
-                        moviesList = result,
+                        movieList = result,
                         queryHasNoResults = result.isEmpty(),
                         isSearching = false,
                         searchErrorMessage = null
@@ -126,7 +118,7 @@ class HomeViewModel @Inject constructor(
             } else {
                 _state.update {
                     it.copy(
-                        moviesList = persistentListOf(),
+                        movieList = persistentListOf(),
                         queryHasNoResults = false,
                         isSearching = false,
                         searchErrorMessage = null
@@ -140,10 +132,10 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
-    val isLoadingSaved: Boolean = false,
-    val discoverList: List<Movies> = emptyList(),
-    val scheduledList: List<Unit> = emptyList(),
-    val moviesList: ImmutableList<Movie> = persistentListOf(),
+    val isLoadingScheduled: Boolean = false,
+    val discoverList: List<Movie> = emptyList(),
+    val scheduledList: List<Movie> = emptyList(),
+    val movieList: ImmutableList<Movie> = persistentListOf(),
     val queryHasNoResults: Boolean = false,
     val isSearching: Boolean = false,
     val searchErrorMessage: String? = null,

@@ -1,8 +1,8 @@
-package com.odisby.goldentomatoes.data.discover.di
+package com.odisby.goldentomatoes.data.discover.remote.di
 
-import com.odisby.goldentomatoes.data.discover.data_source.DiscoverApi
-import com.odisby.goldentomatoes.data.discover.repository.DiscoverRepository
-import com.odisby.goldentomatoes.data.discover.repository.DiscoverRepositoryImpl
+import com.odisby.goldentomatoes.data.discover.remote.api.DiscoverApi
+import com.odisby.goldentomatoes.data.discover.repositories.DiscoverRepository
+import com.odisby.goldentomatoes.data.discover.remote.repositories.DiscoverRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal object DiscoverModule {
+internal object RemoteModule {
 
     @Provides
     @Singleton

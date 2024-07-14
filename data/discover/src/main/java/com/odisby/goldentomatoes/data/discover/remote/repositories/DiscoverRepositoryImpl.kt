@@ -1,8 +1,9 @@
-package com.odisby.goldentomatoes.data.discover.repository
+package com.odisby.goldentomatoes.data.discover.remote.repositories
 
 import com.odisby.goldentomatoes.core.network.model.Resource
-import com.odisby.goldentomatoes.data.discover.data_source.DiscoverApi
-import com.odisby.goldentomatoes.data.discover.model.MoviesRemote
+import com.odisby.goldentomatoes.data.discover.remote.api.DiscoverApi
+import com.odisby.goldentomatoes.data.discover.remote.model.MoviesRemote
+import com.odisby.goldentomatoes.data.discover.repositories.DiscoverRepository
 import timber.log.Timber
 
 internal class DiscoverRepositoryImpl(

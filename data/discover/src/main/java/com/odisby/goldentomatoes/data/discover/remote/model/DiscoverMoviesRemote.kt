@@ -1,4 +1,4 @@
-package com.odisby.goldentomatoes.data.discover.model
+package com.odisby.goldentomatoes.data.discover.remote.model
 
 import com.google.gson.annotations.SerializedName
 

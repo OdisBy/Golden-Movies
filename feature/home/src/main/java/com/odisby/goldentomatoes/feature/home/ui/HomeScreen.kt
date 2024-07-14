@@ -50,45 +50,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.model.Movie
-import com.odisby.goldentomatoes.feature.home.model.Movies
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
-
-private val moviesDumb = listOf(
-    Movie(
-        id = 1,
-        name = "Inception",
-        rating = null
-    ),
-    Movie(
-        id = 2,
-        name = "The Prestige",
-        rating = null
-    ),
-    Movie(
-        id = 3,
-        name = "Interstellar",
-        rating = null,
-    ),
-    Movie(
-        id = 4,
-        name = "Interworlds",
-        rating = 9
-    ),
-    Movie(
-        id = 5,
-        name = "Intertest",
-        rating = null
-    )
-)
-
-private val moviesDumb2 = listOf(
-    Movies(
-        id = 1,
-        title = "ASASAS",
-        description = "ASASAS",
-        posterPath = "ASASAS"
-    ),
-)
 
 @Composable
 fun HomeRoot(
@@ -168,7 +130,11 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ScheduledMovies(goToMovieDetails, navigateToMovieList)
+        if (uiState.isLoadingScheduled) {
+            MoviesListLoading()
+        } else {
+            ScheduledMovies(goToMovieDetails, navigateToMovieList, movies = uiState.scheduledList)
+        }
 
     }
 
@@ -183,7 +149,7 @@ fun MoviesListLoading() {
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (String) -> Unit,
-    movies: List<Movies>,
+    movies: List<Movie>,
 ) {
     if (movies.isEmpty()) {
         return
@@ -195,7 +161,7 @@ private fun DiscoverNewMovies(
             .semantics { isTraversalGroup = true }
     ) {
         RowTextAndGoButton(
-            text = "Descubra novos filmes",
+            text = stringResource(R.string.discover_movies_title),
             onButtonClick = {
                 navigateToMovieList("discover")
             }
@@ -209,7 +175,12 @@ private fun DiscoverNewMovies(
 private fun ScheduledMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (String) -> Unit,
+    movies: List<Movie>,
 ) {
+    if (movies.isEmpty()) {
+        return
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -217,19 +188,19 @@ private fun ScheduledMovies(
             .semantics { isTraversalGroup = true }
     ) {
         RowTextAndGoButton(
-            text = "Filmes agendados",
+            text = stringResource(R.string.schedules_movies_title),
             onButtonClick = {
                 navigateToMovieList("scheduled")
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        ScheduledCarousel(moviesDumb2, goToMovieDetails)
+        ScheduledCarousel(movies, goToMovieDetails)
     }
 }
 
 @Composable
 fun ScheduledCarousel(
-    movies: List<Movies>,
+    movies: List<Movie>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
@@ -240,7 +211,7 @@ fun ScheduledCarousel(
 
 @Composable
 fun DiscoverCarousel(
-    movies: List<Movies>,
+    movies: List<Movie>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
@@ -251,7 +222,7 @@ fun DiscoverCarousel(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun MoviesCarousel(movies: List<Movies>, goToMovieDetails: (Long) -> Unit) {
+private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit) {
     HorizontalMultiBrowseCarousel(
         state = rememberCarouselState { movies.count() },
         modifier = Modifier

@@ -1,6 +1,6 @@
-package com.odisby.goldentomatoes.data.discover.data_source
+package com.odisby.goldentomatoes.data.discover.remote.api
 
-import com.odisby.goldentomatoes.data.discover.model.DiscoverMoviesRemote
+import com.odisby.goldentomatoes.data.discover.remote.model.DiscoverMoviesRemote
 import retrofit2.Response
 import retrofit2.http.GET
 

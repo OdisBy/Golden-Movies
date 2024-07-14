@@ -1,15 +1,14 @@
 package com.odisby.goldentomatoes.feature.home.data
 
 import com.odisby.goldentomatoes.core.network.model.Resource
-import com.odisby.goldentomatoes.data.discover.model.MoviesRemote
-import com.odisby.goldentomatoes.data.discover.repository.DiscoverRepository
-import com.odisby.goldentomatoes.feature.home.model.Movies
+import com.odisby.goldentomatoes.data.discover.repositories.DiscoverRepository
+import com.odisby.goldentomatoes.feature.home.model.Movie
 import javax.inject.Inject
 
 class GetDiscoverMoviesUseCase @Inject constructor(
     private val discoverRepository: DiscoverRepository
 ) {
-    suspend operator fun invoke(): Resource<List<Movies>> {
+    suspend operator fun invoke(): Resource<List<Movie>> {
         return discoverRepository.getDiscoverMovies().let {
             when (it) {
                 is Resource.Success -> Resource.Success(it.data.map { it.toMovie() })
@@ -17,13 +16,4 @@ class GetDiscoverMoviesUseCase @Inject constructor(
             }
         }
     }
-}
-
-fun MoviesRemote.toMovie(): Movies {
-    return Movies(
-        id = this.id,
-        title = this.title,
-        description = this.overview,
-        posterPath = this.posterPath
-    )
 }
