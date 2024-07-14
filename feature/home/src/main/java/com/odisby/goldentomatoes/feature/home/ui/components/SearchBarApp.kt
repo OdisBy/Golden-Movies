@@ -30,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -71,7 +72,7 @@ fun SearchBarApp(
             if (searchQuery.isNotBlank() && searchBarActive) {
                 IconButton(onClick = { onChangeQuery("") }) {
                     Icon(
-                        imageVector = Icons.Default.Close,
+                        painter = rememberVectorPainter(Icons.Default.Close),
                         tint = TextColor,
                         contentDescription = stringResource(R.string.clear_query)
                     )
@@ -80,7 +81,7 @@ fun SearchBarApp(
         },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search,
+                painter = rememberVectorPainter(Icons.Default.Search),
                 tint = TextColor,
                 contentDescription = null
             )
@@ -198,13 +199,13 @@ fun MovieSearchListItem(
             Text(text = movie.name, color = TextColor, style = MaterialTheme.typography.bodyMedium)
             if (movie.rating != null) {
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    painter = rememberVectorPainter(Icons.Default.Star),
                     contentDescription = null,
                     tint = Primary400
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    painter = rememberVectorPainter(Icons.Default.Star),
                     contentDescription = null,
                     tint = TextColor
                 )

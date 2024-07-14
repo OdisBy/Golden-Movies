@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -128,7 +129,10 @@ fun HomeRoot(
                 contentColor = Primary900,
                 shape = FloatingActionButtonDefaults.largeShape,
             ) {
-                Icon(Icons.Filled.Star, "Descubra filmes aleatórios")
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Star),
+                    contentDescription = "Descubra filmes aleatórios"
+                )
             }
         }
     ) { contentPadding ->
