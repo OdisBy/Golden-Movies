@@ -63,9 +63,11 @@ fun getApiKey(): String {
             apikeyProperties.load(apiKeyFile.inputStream())
             apikeyProperties.getProperty("API_KEY", "")
         } catch (e: IOException) {
+            println("API Key não encontrada. Verifique o arquivo apikey.properties.")
             ""
         }
     } else {
+        println("API Key não encontrada. Verifique o arquivo apikey.properties.")
         ""
     }
 }
