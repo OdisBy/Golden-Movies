@@ -1,6 +1,5 @@
 package com.odisby.goldentomatoes.feature.home.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -45,14 +43,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.Primary200
 import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
-import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 import com.odisby.goldentomatoes.feature.home.model.Movie
 import com.odisby.goldentomatoes.feature.home.model.Movies
+import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 
 private val moviesDumb = listOf(
     Movie(
@@ -161,11 +160,10 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if(uiState.isLoadingDiscover) {
+        if (uiState.isLoadingDiscover) {
             MoviesListLoading()
         } else {
             DiscoverNewMovies(goToMovieDetails, navigateToMovieList, movies = uiState.discoverList)
-
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -187,6 +185,9 @@ private fun DiscoverNewMovies(
     navigateToMovieList: (String) -> Unit,
     movies: List<Movies>,
 ) {
+    if (movies.isEmpty()) {
+        return
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -260,16 +261,16 @@ private fun MoviesCarousel(movies: List<Movies>, goToMovieDetails: (Long) -> Uni
         itemSpacing = 8.dp,
     ) { index ->
         val movie = movies[index]
-        Image(
+        AsyncImage(
+            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .height(205.dp)
                 .maskClip(MaterialTheme.shapes.extraLarge)
                 .clickable {
                     goToMovieDetails(movie.id)
                 },
-            painter = painterResource(R.drawable.test_banner),
-            contentDescription = "temporary content descirption",
-            contentScale = ContentScale.Crop
         )
     }
 }
