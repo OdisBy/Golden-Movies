@@ -28,6 +28,8 @@ val TertiaryMain = Color(0xFFFFFFFF)
 val White_80 = Color(0xCCFFFFFF)
 val White_50 = Color(0x80FFFFFF)
 
+val Black_50 = Color(0x80000000)
+
 val BackgroundColor = Color(0xFF181818)
 val BackgroundColorAccent = Color(0x80424242)
 

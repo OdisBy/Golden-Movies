@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -108,6 +109,7 @@ private val moviesDumb2 = listOf(
 @Composable
 fun HomeRoot(
     navigateToSearchScreen: () -> Unit,
+    navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = HomeViewModel()
 ) {
@@ -127,13 +129,17 @@ fun HomeRoot(
                 contentColor = Primary900,
                 shape = FloatingActionButtonDefaults.largeShape,
             ) {
-                Icon(Icons.Filled.Star, "Descubra filmes aleatórios")
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Star),
+                    contentDescription = "Descubra filmes aleatórios"
+                )
             }
         }
     ) { contentPadding ->
         HomeScreen(
             uiState = uiState,
             onSearchButtonClick = { viewModel.runSearch(it) },
+            goToMovieDetails = navigateToDetailsScreen,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -145,6 +151,7 @@ fun HomeRoot(
 fun HomeScreen(
     uiState: HomeUiState,
     onSearchButtonClick: (String) -> Unit,
+    goToMovieDetails: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -167,19 +174,21 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        DiscoverNewMovies()
+        DiscoverNewMovies(goToMovieDetails)
 
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ScheduledMovies()
+        ScheduledMovies(goToMovieDetails)
 
     }
 
 }
 
 @Composable
-private fun DiscoverNewMovies() {
+private fun DiscoverNewMovies(
+    goToMovieDetails: (Long) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -193,12 +202,14 @@ private fun DiscoverNewMovies() {
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DiscoverCarousel(moviesDumb)
+        DiscoverCarousel(moviesDumb, goToMovieDetails)
     }
 }
 
 @Composable
-private fun ScheduledMovies() {
+private fun ScheduledMovies(
+    goToMovieDetails: (Long) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -212,23 +223,29 @@ private fun ScheduledMovies() {
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        ScheduledCarousel(moviesDumb2)
+        ScheduledCarousel(moviesDumb2, goToMovieDetails)
     }
 }
 
 @Composable
-fun ScheduledCarousel(movies: List<Movie>) {
+fun ScheduledCarousel(
+    movies: List<Movie>,
+    goToMovieDetails: (Long) -> Unit
+) {
     MoviesCarousel(
         movies = movies,
-        goToMovieDetails = { }
+        goToMovieDetails = goToMovieDetails
     )
 }
 
 @Composable
-fun DiscoverCarousel(movies: List<Movie>) {
+fun DiscoverCarousel(
+    movies: List<Movie>,
+    goToMovieDetails: (Long) -> Unit
+) {
     MoviesCarousel(
         movies = movies,
-        goToMovieDetails = { }
+        goToMovieDetails = goToMovieDetails
     )
 }
 
@@ -291,6 +308,7 @@ private fun RowTextAndGoButton(text: String, onButtonClick: () -> Unit) {
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
-        onSearchButtonClick = {}
+        onSearchButtonClick = {},
+        goToMovieDetails = {}
     )
 }
