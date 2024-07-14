@@ -23,3 +23,4 @@ rootProject.name = "Golden Tomatoes"
 include(":app")
 include(":core:ui")
 include(":feature:home")
+include(":feature:details")
