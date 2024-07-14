@@ -48,7 +48,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
-import com.odisby.goldentomatoes.feature.search.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.model.Movie
 
 private val moviesDumb = listOf(
     Movie(
