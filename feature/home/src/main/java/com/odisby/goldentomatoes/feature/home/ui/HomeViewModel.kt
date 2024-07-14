@@ -2,7 +2,10 @@ package com.odisby.goldentomatoes.feature.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.odisby.goldentomatoes.feature.home.ui.model.Movie
+import com.odisby.goldentomatoes.core.network.model.Resource
+import com.odisby.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.Movies
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -15,7 +18,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase
+) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
 
     val state: StateFlow<HomeUiState>
@@ -49,6 +54,35 @@ class HomeViewModel @Inject constructor() : ViewModel() {
             rating = null
         )
     )
+
+    init {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoadingDiscover = true)
+            }
+
+            when (val result = getDiscoverMoviesUseCase()) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            isLoadingDiscover = false,
+                            discoverList = result.data
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoadingDiscover = false,
+                            discoverList = emptyList(),
+                            searchErrorMessage = result.message ?: "Error"
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     private fun getMovies(searchQuery: String): List<Movie> {
         val moviesWithRating = mutableListOf<Movie>()
@@ -107,7 +141,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
     val isLoadingSaved: Boolean = false,
-    val discoverList: List<Unit> = emptyList(),
+    val discoverList: List<Movies> = emptyList(),
     val scheduledList: List<Unit> = emptyList(),
     val moviesList: ImmutableList<Movie> = persistentListOf(),
     val queryHasNoResults: Boolean = false,

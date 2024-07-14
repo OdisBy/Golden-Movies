@@ -1,4 +1,4 @@
-package com.odisby.goldentomatoes.feature.home.ui.model
+package com.odisby.goldentomatoes.feature.home.model
 
 data class Movie(
     val id: Long,

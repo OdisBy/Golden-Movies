@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +51,8 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
-import com.odisby.goldentomatoes.feature.home.ui.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.Movies
 
 private val moviesDumb = listOf(
     Movie(
@@ -80,31 +83,12 @@ private val moviesDumb = listOf(
 )
 
 private val moviesDumb2 = listOf(
-    Movie(
+    Movies(
         id = 1,
-        name = "Inceptiasaon",
-        rating = null
+        title = "ASASAS",
+        description = "ASASAS",
+        posterPath = "ASASAS"
     ),
-    Movie(
-        id = 2,
-        name = "The Prestasige",
-        rating = null
-    ),
-    Movie(
-        id = 3,
-        name = "Interstasllar",
-        rating = null,
-    ),
-    Movie(
-        id = 4,
-        name = "Interwasorlds",
-        rating = 9
-    ),
-    Movie(
-        id = 5,
-        name = "Interasatest",
-        rating = null
-    )
 )
 
 @Composable
@@ -132,7 +116,7 @@ fun HomeRoot(
             ) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.Star),
-                    contentDescription = "Descubra filmes aleatórios"
+                    contentDescription = stringResource(R.string.home_fab_label)
                 )
             }
         }
@@ -177,8 +161,12 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        DiscoverNewMovies(goToMovieDetails, navigateToMovieList)
+        if(uiState.isLoadingDiscover) {
+            MoviesListLoading()
+        } else {
+            DiscoverNewMovies(goToMovieDetails, navigateToMovieList, movies = uiState.discoverList)
 
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -189,9 +177,15 @@ fun HomeScreen(
 }
 
 @Composable
+fun MoviesListLoading() {
+    CircularProgressIndicator()
+}
+
+@Composable
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (String) -> Unit,
+    movies: List<Movies>,
 ) {
     Column(
         modifier = Modifier
@@ -206,7 +200,7 @@ private fun DiscoverNewMovies(
             }
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DiscoverCarousel(moviesDumb, goToMovieDetails)
+        DiscoverCarousel(movies, goToMovieDetails)
     }
 }
 
@@ -234,7 +228,7 @@ private fun ScheduledMovies(
 
 @Composable
 fun ScheduledCarousel(
-    movies: List<Movie>,
+    movies: List<Movies>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
@@ -245,7 +239,7 @@ fun ScheduledCarousel(
 
 @Composable
 fun DiscoverCarousel(
-    movies: List<Movie>,
+    movies: List<Movies>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
@@ -256,7 +250,7 @@ fun DiscoverCarousel(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit) {
+private fun MoviesCarousel(movies: List<Movies>, goToMovieDetails: (Long) -> Unit) {
     HorizontalMultiBrowseCarousel(
         state = rememberCarouselState { movies.count() },
         modifier = Modifier

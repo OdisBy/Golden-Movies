@@ -44,6 +44,22 @@ internal object RetrofitModule{
             chain.proceed(newRequest)
         }
 
+        val regionAndLanguageInterceptor = Interceptor { chain ->
+            val originalRequest = chain.request()
+            val originalUrl = originalRequest.url
+
+            val newUrl = originalUrl.newBuilder()
+                .addQueryParameter("language", "pt-BR")
+                .addQueryParameter("region", "BR")
+                .build()
+
+            val newRequest = originalRequest.newBuilder()
+                .url(newUrl)
+                .build()
+
+            chain.proceed(newRequest)
+        }
+
         val loggingInterceptor = HttpLoggingInterceptor()
 
         if (BuildConfig.DEBUG) {
@@ -55,6 +71,7 @@ internal object RetrofitModule{
 
         return OkHttpClient.Builder()
             .addInterceptor(apiKeyInterceptor)
+            .addInterceptor(regionAndLanguageInterceptor)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(chuckerInterceptor)
             .build()

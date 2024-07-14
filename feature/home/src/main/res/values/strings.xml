@@ -9,4 +9,5 @@
     <!--    Content Descriptions-->
     <!--    Serach Bar-->
     <string name="clear_query">Limpar busca</string>
+    <string name="home_fab_label">Descubra filmes aleatórios</string>
 </resources>
