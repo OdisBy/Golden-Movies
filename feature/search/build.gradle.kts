@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.feature.home"
+    namespace = "com.odisby.goldentomatoes.feature.search"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-
     implementation(project(":core:ui"))
 
     implementation(libs.androidx.core.ktx)

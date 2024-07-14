@@ -4,15 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.activity.viewModels
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
-import com.odisby.goldentomatoes.feature.home.ui.HomeScreen
-import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
+import com.odisby.goldentomatoes.feature.search.ui.SearchScreenRoot
+import com.odisby.goldentomatoes.feature.search.ui.SearchViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,10 +20,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GoldenTomatoesTheme {
-                HomeScreen(
-                    uiState = HomeUiState(),
+                val viewModel by viewModels<SearchViewModel>()
+
+                SearchScreenRoot(
                     navController = rememberNavController(),
-                    modifier = Modifier.fillMaxSize()
+                    viewModel = viewModel
                 )
             }
         }

@@ -9,16 +9,16 @@ data class HomeUiState(
     val isLoadingSaved: Boolean = false,
     val discoverList: List<Unit> = emptyList(),
     val scheduledList: List<Unit> = emptyList(),
-    val searchText: String = "",
-    val isSearching: Boolean = false,
-    val searchedMovieList: List<Unit> = emptyList()
 )
 
 class HomeViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow<HomeUiState>(HomeUiState())
+    private val searchText = MutableStateFlow("")
+    private val isSearching = MutableStateFlow("")
 
-    val uiState: StateFlow<HomeUiState>
+
+    private val _state = MutableStateFlow(HomeUiState())
+
+    val state: StateFlow<HomeUiState>
         get() = _state
-
 }
