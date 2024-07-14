@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,6 +48,62 @@ import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 import com.odisby.goldentomatoes.feature.search.model.Movie
+
+private val moviesDumb = listOf(
+    Movie(
+        id = 1,
+        name = "Inception",
+        rating = null
+    ),
+    Movie(
+        id = 2,
+        name = "The Prestige",
+        rating = null
+    ),
+    Movie(
+        id = 3,
+        name = "Interstellar",
+        rating = null,
+    ),
+    Movie(
+        id = 4,
+        name = "Interworlds",
+        rating = 9
+    ),
+    Movie(
+        id = 5,
+        name = "Intertest",
+        rating = null
+    )
+)
+
+private val moviesDumb2 = listOf(
+    Movie(
+        id = 1,
+        name = "Inceptiasaon",
+        rating = null
+    ),
+    Movie(
+        id = 2,
+        name = "The Prestasige",
+        rating = null
+    ),
+    Movie(
+        id = 3,
+        name = "Interstasllar",
+        rating = null,
+    ),
+    Movie(
+        id = 4,
+        name = "Interwasorlds",
+        rating = 9
+    ),
+    Movie(
+        id = 5,
+        name = "Interasatest",
+        rating = null
+    )
+)
 
 @Composable
 fun HomeRoot(
@@ -121,7 +176,6 @@ fun HomeScreen(
 
     }
 
-
 }
 
 @Composable
@@ -161,62 +215,6 @@ private fun ScheduledMovies() {
         ScheduledCarousel(moviesDumb2)
     }
 }
-
-private val moviesDumb = listOf(
-    Movie(
-        id = 1,
-        name = "Inception",
-        rating = null
-    ),
-    Movie(
-        id = 2,
-        name = "The Prestige",
-        rating = null
-    ),
-    Movie(
-        id = 3,
-        name = "Interstellar",
-        rating = null,
-    ),
-    Movie(
-        id = 4,
-        name = "Interworlds",
-        rating = 9
-    ),
-    Movie(
-        id = 5,
-        name = "Intertest",
-        rating = null
-    )
-)
-
-private val moviesDumb2 = listOf(
-    Movie(
-        id = 1,
-        name = "Inceptiasaon",
-        rating = null
-    ),
-    Movie(
-        id = 2,
-        name = "The Prestasige",
-        rating = null
-    ),
-    Movie(
-        id = 3,
-        name = "Interstasllar",
-        rating = null,
-    ),
-    Movie(
-        id = 4,
-        name = "Interwasorlds",
-        rating = 9
-    ),
-    Movie(
-        id = 5,
-        name = "Interasatest",
-        rating = null
-    )
-)
 
 @Composable
 fun ScheduledCarousel(movies: List<Movie>) {

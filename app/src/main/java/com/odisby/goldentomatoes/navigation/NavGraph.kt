@@ -15,22 +15,8 @@ fun SetupNavGraph(navController: NavHostController) {
     ) {
         composable<HomeScreen> {
             HomeRoot(
-                navigateToSearchScreen = {
-//                    navController.navigate(SearchScreen)
-                }
+                navigateToSearchScreen = {}
             )
         }
-//        composable<SearchScreen> {
-//            val viewModel = SearchViewModel()
-//            SearchRoot(
-////                navigateToDetailsScreen = { id ->
-////
-////                }
-//                viewModel = viewModel,
-//                navigateToHomeScreen = {
-//                    navController.navigateUp()
-//                }
-//            )
-//        }
     }
 }

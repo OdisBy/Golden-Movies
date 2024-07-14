@@ -30,16 +30,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColorAccent
 import com.odisby.goldentomatoes.core.ui.theme.Primary400
 import com.odisby.goldentomatoes.core.ui.theme.Primary500
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
-import com.odisby.goldentomatoes.core.ui.theme.White_80
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
 import com.odisby.goldentomatoes.feature.search.model.Movie
@@ -62,7 +59,10 @@ fun SearchBarApp(
             onSearchButtonClick(it)
         },
         placeholder = {
-            Text(text = stringResource(R.string.search_movie_placeholder), style = MaterialTheme.typography.labelLarge)
+            Text(
+                text = stringResource(R.string.search_movie_placeholder),
+                style = MaterialTheme.typography.labelLarge
+            )
         },
         active = searchBarActive,
         onActiveChange = { onChangeSearchBarActive(it) },
