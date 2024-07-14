@@ -1,6 +1,7 @@
 package com.odisby.goldentomatoes.feature.home.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,11 +11,16 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +42,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
+import com.odisby.goldentomatoes.core.ui.theme.Primary200
+import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
@@ -50,7 +59,22 @@ fun HomeRoot(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        modifier = Modifier
+            .background(BackgroundColor)
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+//                goToRandomMovie()
+                },
+                containerColor = Primary200,
+                contentColor = Primary900,
+                shape = FloatingActionButtonDefaults.largeShape,
+            ) {
+                Icon(Icons.Filled.Star, "Descubra filmes aleatórios")
+            }
+        }
     ) { contentPadding ->
         HomeScreen(
             uiState = uiState,
@@ -84,19 +108,7 @@ fun HomeScreen(
             onChangeQuery = { searchQuery = it },
             onChangeSearchBarActive = { searchBarActive = it },
         )
-
-
-        // discover
-        // carrossel + text + navigation
         // carrosel loading surface
-
-
-        // scheduled
-        // carrossel + text + navigation
-        // carrosel loading surface
-
-
-        // fab button: rate random movies
 
         Spacer(modifier = Modifier.height(24.dp))
 
