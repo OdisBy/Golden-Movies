@@ -1,3 +1,4 @@
+import java.io.IOException
 import java.util.Properties
 
 plugins {
@@ -53,13 +54,19 @@ dependencies {
     releaseImplementation(libs.chucker.library.noop)
 }
 
-// TODO Tratar mais tarde o default caso não tenha
 fun getApiKey(): String {
     val apiKeyFile = rootProject.file("apikey.properties")
 
-    val apikeyProperties = Properties()
-    apikeyProperties.load(apiKeyFile.inputStream())
-
-    return apikeyProperties.getProperty("API_KEY")
+    return if (apiKeyFile.exists()) {
+        val apikeyProperties = Properties()
+        try {
+            apikeyProperties.load(apiKeyFile.inputStream())
+            apikeyProperties.getProperty("API_KEY", "")
+        } catch (e: IOException) {
+            ""
+        }
+    } else {
+        ""
+    }
 }
 
