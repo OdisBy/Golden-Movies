@@ -23,8 +23,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-        buildConfigField("String", "API_KEY", getApiKey())
     }
 
     buildTypes {
@@ -100,14 +98,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}
-
-// TODO Tratar mais tarde o default caso não tenha
-fun getApiKey(): String {
-    val apiKeyFile = rootProject.file("apikey.properties")
-
-    val apikeyProperties = Properties()
-    apikeyProperties.load(apiKeyFile.inputStream())
-
-    return apikeyProperties.getProperty("API_KEY")
 }

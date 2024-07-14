@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -10,10 +12,14 @@ android {
 
     defaultConfig {
         minSdk = rootProject.extra.get("minSdk") as Int
+
+        buildConfigField("String", "API_KEY", getApiKey())
+
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
@@ -33,10 +39,27 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)
+
+    // Chucker
+    debugImplementation(libs.chucker.library)
+    releaseImplementation(libs.chucker.library.noop)
 }
+
+// TODO Tratar mais tarde o default caso não tenha
+fun getApiKey(): String {
+    val apiKeyFile = rootProject.file("apikey.properties")
+
+    val apikeyProperties = Properties()
+    apikeyProperties.load(apiKeyFile.inputStream())
+
+    return apikeyProperties.getProperty("API_KEY")
+}
+
