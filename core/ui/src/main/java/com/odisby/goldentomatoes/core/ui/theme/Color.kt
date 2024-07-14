@@ -29,5 +29,6 @@ val White_80 = Color(0xCCFFFFFF)
 val White_50 = Color(0x80FFFFFF)
 
 val BackgroundColor = Color(0xFF181818)
+val BackgroundColorAccent = Color(0x80424242)
 
 val TextColor = Color(0xFFFFFFFF)
