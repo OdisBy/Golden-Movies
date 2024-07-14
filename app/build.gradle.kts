@@ -54,6 +54,7 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:network"))
     implementation(project(":feature:home"))
     implementation(project(":feature:details"))
 
