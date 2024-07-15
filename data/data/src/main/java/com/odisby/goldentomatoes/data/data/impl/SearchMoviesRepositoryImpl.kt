@@ -1,15 +1,15 @@
 package com.odisby.goldentomatoes.data.data.impl
 
 import com.odisby.goldentomatoes.data.data.model.SearchMovieRemote
-import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepositoryNew
+import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepository
 import com.odisby.goldentomatoes.data.data.source.SearchMoviesSource
 import timber.log.Timber
 import javax.inject.Inject
 
-class SearchMoviesRepositoryNewImpl @Inject constructor(
+class SearchMoviesRepositoryImpl @Inject constructor(
     private val remoteDataSource: SearchMoviesSource.Remote,
     private val localDataSource: SearchMoviesSource.Local
-) : SearchMoviesRepositoryNew {
+) : SearchMoviesRepository {
     override suspend fun searchMovies(query: String): List<SearchMovieRemote> {
         return try {
             val resultRemote = remoteDataSource.searchMovies(query)

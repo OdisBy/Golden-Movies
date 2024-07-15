@@ -2,14 +2,14 @@ package com.odisby.goldentomatoes.feature.movielist.data
 
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
-import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepositoryNew
-import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepositoryNew
+import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
+import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
 import com.odisby.goldentomatoes.feature.movielist.model.MovieListItem
 import javax.inject.Inject
 
 class GetDiscoverMoviesUseCase @Inject constructor(
-    private val discoverRepository: DiscoverRepositoryNew,
-    private val scheduledRepository: ScheduledRepositoryNew,
+    private val discoverRepository: DiscoverRepository,
+    private val scheduledRepository: ScheduledRepository,
 ) {
     suspend operator fun invoke(type: ListTypes): Resource<List<MovieListItem>> {
         return when (type) {

@@ -1,13 +1,13 @@
 package com.odisby.goldentomatoes.data.data.di
 
-import com.odisby.goldentomatoes.data.data.impl.DetailsRepositoryNewImpl
-import com.odisby.goldentomatoes.data.data.impl.DiscoverRepositoryNewImpl
-import com.odisby.goldentomatoes.data.data.impl.ScheduledRepositoryNewImpl
-import com.odisby.goldentomatoes.data.data.impl.SearchMoviesRepositoryNewImpl
-import com.odisby.goldentomatoes.data.data.repositories.DetailsRepositoryNew
-import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepositoryNew
-import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepositoryNew
-import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepositoryNew
+import com.odisby.goldentomatoes.data.data.impl.DetailsRepositoryImpl
+import com.odisby.goldentomatoes.data.data.impl.DiscoverRepositoryImpl
+import com.odisby.goldentomatoes.data.data.impl.ScheduledRepositoryImpl
+import com.odisby.goldentomatoes.data.data.impl.SearchMoviesRepositoryImpl
+import com.odisby.goldentomatoes.data.data.repositories.DetailsRepository
+import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
+import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
+import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -19,17 +19,17 @@ import javax.inject.Singleton
 interface DataModule {
     @Singleton
     @Binds
-    fun providesDetailsRepositoryNew(impl: DetailsRepositoryNewImpl): DetailsRepositoryNew
+    fun providesDetailsRepositoryNew(impl: DetailsRepositoryImpl): DetailsRepository
 
     @Singleton
     @Binds
-    fun providesScheduledRepositoryNew(impl: ScheduledRepositoryNewImpl): ScheduledRepositoryNew
+    fun providesScheduledRepositoryNew(impl: ScheduledRepositoryImpl): ScheduledRepository
 
     @Singleton
     @Binds
-    fun providesDiscoverRepositoryNew(impl: DiscoverRepositoryNewImpl): DiscoverRepositoryNew
+    fun providesDiscoverRepositoryNew(impl: DiscoverRepositoryImpl): DiscoverRepository
 
     @Singleton
     @Binds
-    fun providesSearchMoviesRepositoryNew(impl: SearchMoviesRepositoryNewImpl): SearchMoviesRepositoryNew
+    fun providesSearchMoviesRepositoryNew(impl: SearchMoviesRepositoryImpl): SearchMoviesRepository
 }

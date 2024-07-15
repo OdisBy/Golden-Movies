@@ -1,12 +1,12 @@
 package com.odisby.goldentomatoes.feature.home.data
 
 import com.odisby.goldentomatoes.core.network.model.Resource
-import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepositoryNew
+import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
 import com.odisby.goldentomatoes.feature.home.model.Movie
 import javax.inject.Inject
 
 class GetDiscoverMoviesUseCase @Inject constructor(
-    private val discoverRepository: DiscoverRepositoryNew
+    private val discoverRepository: DiscoverRepository
 ) {
     suspend operator fun invoke(): Resource<List<Movie>> {
         return discoverRepository.getDiscoverMovies().let {

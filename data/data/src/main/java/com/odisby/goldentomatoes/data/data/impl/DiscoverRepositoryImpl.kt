@@ -2,14 +2,14 @@ package com.odisby.goldentomatoes.data.data.impl
 
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
-import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepositoryNew
+import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
 import com.odisby.goldentomatoes.data.data.source.DiscoverSource
 import timber.log.Timber
 import javax.inject.Inject
 
-class DiscoverRepositoryNewImpl @Inject constructor(
+class DiscoverRepositoryImpl @Inject constructor(
     private val remoteSource: DiscoverSource.Remote
-) : DiscoverRepositoryNew {
+) : DiscoverRepository {
     override suspend fun getDiscoverMovies(): Resource<List<MovieGlobal>> {
         return remoteSource.getDiscoverMovies().toMovieGlobal()
     }

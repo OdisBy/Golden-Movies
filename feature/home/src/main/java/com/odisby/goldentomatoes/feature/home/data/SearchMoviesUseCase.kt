@@ -1,11 +1,11 @@
 package com.odisby.goldentomatoes.feature.home.data
 
-import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepositoryNew
+import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepository
 import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import javax.inject.Inject
 
 class SearchMoviesUseCase @Inject constructor(
-    private val searchMoviesRepository: SearchMoviesRepositoryNew
+    private val searchMoviesRepository: SearchMoviesRepository
 ) {
     suspend operator fun invoke(query: String): List<SearchMovie> {
         val result = searchMoviesRepository.searchMovies(query).map {

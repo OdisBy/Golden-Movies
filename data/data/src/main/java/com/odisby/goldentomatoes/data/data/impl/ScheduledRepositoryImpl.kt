@@ -1,13 +1,13 @@
 package com.odisby.goldentomatoes.data.data.impl
 
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
-import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepositoryNew
+import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
 import com.odisby.goldentomatoes.data.data.source.ScheduledMoviesSource
 import javax.inject.Inject
 
-class ScheduledRepositoryNewImpl @Inject constructor(
+class ScheduledRepositoryImpl @Inject constructor(
     private val localDataSource: ScheduledMoviesSource.Local
-) : ScheduledRepositoryNew {
+) : ScheduledRepository {
 
     private val scheduledMovies = mutableListOf<MovieGlobal>()
 
