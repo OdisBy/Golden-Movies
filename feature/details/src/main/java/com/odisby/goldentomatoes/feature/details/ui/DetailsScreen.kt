@@ -1,5 +1,6 @@
 package com.odisby.goldentomatoes.feature.details.ui
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,6 +56,7 @@ import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.details.R
 import com.odisby.goldentomatoes.feature.details.model.Movie
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Composable
 fun DetailsRoot(
@@ -62,6 +64,7 @@ fun DetailsRoot(
     movieId: Long,
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = hiltViewModel(),
+    @ApplicationContext context: Context
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="back_button_description">Botão de voltar</string>
+
+    <string name="ask_notification_title">Permissão necessária!</string>
+    <string name="ask_notification_debug_content">Para utilizar o Chucker no modo de Debug, e para receber notificações, é necessário ativar as notificações do aplicativo no Android 13+</string>
+    <string name="ask_notification_content">É necessário ativar as notificações do aplicativo para que possamos te lembrar de assistir o filme!</string>
 </resources>
