@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat.startActivity
-import com.odisby.goldentomatoes.core.ui.BuildConfig
 
 @Composable
 fun PermissionDialog(context: Context, title: String = "", content: String = "") {
@@ -41,7 +40,7 @@ fun PermissionDialog(context: Context, title: String = "", content: String = "")
             },
             confirmButton = {
                 TextButton(onClick = {
-                    val uri: Uri = Uri.fromParts("package", BuildConfig.LIBRARY_PACKAGE_NAME, null)
+                    val uri: Uri = Uri.fromParts("package", "com.odisby.goldentomatoes", null)
                     val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         data = uri

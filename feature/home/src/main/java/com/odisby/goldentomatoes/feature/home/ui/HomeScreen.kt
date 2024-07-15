@@ -59,6 +59,7 @@ fun HomeRoot(
     navigateToMovieList: (ListTypes) -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    hasInternetConnection: Boolean,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -69,18 +70,20 @@ fun HomeRoot(
             .statusBarsPadding()
             .navigationBarsPadding(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navigateToDetailsScreen(-1)
-                },
-                containerColor = Primary200,
-                contentColor = Primary900,
-                shape = FloatingActionButtonDefaults.largeShape,
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Filled.Star),
-                    contentDescription = stringResource(R.string.home_fab_label)
-                )
+            if (hasInternetConnection) {
+                FloatingActionButton(
+                    onClick = {
+                        navigateToDetailsScreen(-1)
+                    },
+                    containerColor = Primary200,
+                    contentColor = Primary900,
+                    shape = FloatingActionButtonDefaults.largeShape,
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Filled.Star),
+                        contentDescription = stringResource(R.string.home_fab_label)
+                    )
+                }
             }
         }
     ) { contentPadding ->
@@ -89,6 +92,7 @@ fun HomeRoot(
             onSearchButtonClick = { viewModel.runSearch(it) },
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
+            hasInternetConnection = hasInternetConnection,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -102,6 +106,7 @@ fun HomeScreen(
     onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
+    hasInternetConnection: Boolean,
     modifier: Modifier = Modifier
 ) {
 
@@ -125,19 +130,20 @@ fun HomeScreen(
                 .padding(horizontal = 12.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
+            if (hasInternetConnection) {
+                if (uiState.isLoadingDiscover) {
+                    MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    DiscoverNewMovies(
+                        goToMovieDetails,
+                        navigateToMovieList,
+                        movies = uiState.discoverList
+                    )
+                }
 
-            if (uiState.isLoadingDiscover) {
-                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
-                DiscoverNewMovies(
-                    goToMovieDetails,
-                    navigateToMovieList,
-                    movies = uiState.discoverList
-                )
+                Spacer(modifier = Modifier.height(24.dp))
+
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
             if (uiState.isLoadingScheduled) {
                 MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
@@ -315,6 +321,7 @@ fun HomeScreenPreview() {
         uiState = HomeUiState(),
         onSearchButtonClick = {},
         navigateToMovieList = { },
+        hasInternetConnection = true,
         goToMovieDetails = {}
     )
 }

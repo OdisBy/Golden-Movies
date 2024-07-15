@@ -2,6 +2,7 @@ package com.odisby.goldentomatoes
 
 import android.app.NotificationManager
 import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,6 +24,13 @@ class MainActivity : ComponentActivity() {
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+        val connectivityManager
+                = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val activeNetworkInfo = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+
+        val hasInternet = activeNetworkInfo?.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
+
 
         enableEdgeToEdge()
         setContent {
@@ -43,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     context = this
                 )
 
-                SetupNavGraph(navController = navHostController)
+                SetupNavGraph(navController = navHostController, hasInternetConnection = hasInternet)
             }
         }
     }

@@ -34,6 +34,7 @@ class DetailsViewModel @Inject constructor(
     Movie Id -1 Is being treated as random movie
     */
     fun getMovieDetails(movieId: Long) = runBlocking {
+
         if (movieId == -1L) {
             getRandomMovieDetails()
         } else {
