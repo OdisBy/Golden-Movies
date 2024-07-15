@@ -81,7 +81,7 @@ fun DetailsRoot(
             ) {
                 Icon(
                     painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                    contentDescription = stringResource(R.string.back_button_description)
+                    contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
                 )
             }
         }
@@ -107,7 +107,9 @@ fun DetailsRoot(
 
         DetailsScreen(
             movie = uiState.movie!!,
-            modifier = Modifier.windowInsetsPadding(WindowInsets.ime),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding),
         )
     }
 }
@@ -238,7 +240,7 @@ private fun DetailsScreenPreview() {
                 ) {
                     Icon(
                         painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(R.string.back_button_description)
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
                     )
                 }
             }
@@ -272,7 +274,7 @@ private fun DetailsErrorPreview() {
                 ) {
                     Icon(
                         painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(R.string.back_button_description)
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
                     )
                 }
             }
@@ -309,7 +311,7 @@ private fun DetailsLoadingPreview() {
                 ) {
                     Icon(
                         painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(R.string.back_button_description)
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
                     )
                 }
             }
