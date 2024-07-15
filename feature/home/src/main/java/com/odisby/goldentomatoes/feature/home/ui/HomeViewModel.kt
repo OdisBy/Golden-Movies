@@ -2,12 +2,16 @@ package com.odisby.goldentomatoes.feature.home.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.odisby.goldentomatoes.feature.home.ui.model.Movie
+import com.odisby.goldentomatoes.core.network.model.Resource
+import com.odisby.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.data.GetSchedulesMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.data.SearchMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -15,84 +19,102 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
+    private val getScheduledMoviesUseCase: GetSchedulesMoviesUseCase,
+    private val searchMoviesUseCase: SearchMoviesUseCase,
+) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
 
     val state: StateFlow<HomeUiState>
         get() = _state
 
+    init {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoadingDiscover = true, isLoadingScheduled = true)
+            }
 
-    private val moviesDumb = listOf(
-        Movie(
-            id = 1,
-            name = "Inception",
-            rating = null
-        ),
-        Movie(
-            id = 2,
-            name = "The Prestige",
-            rating = null
-        ),
-        Movie(
-            id = 3,
-            name = "Interstellar",
-            rating = null,
-        ),
-        Movie(
-            id = 4,
-            name = "Interworlds",
-            rating = 9
-        ),
-        Movie(
-            id = 5,
-            name = "Intertest",
-            rating = null
-        )
-    )
+            when (val result = getDiscoverMoviesUseCase()) {
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            isLoadingDiscover = false,
+                            discoverList = result.data
+                        )
+                    }
+                }
 
-    private fun getMovies(searchQuery: String): List<Movie> {
-        val moviesWithRating = mutableListOf<Movie>()
-        val moviesWithoutRating = mutableListOf<Movie>()
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoadingDiscover = false,
+                            discoverList = emptyList(),
+                            searchErrorMessage = result.message ?: "Error"
+                        )
+                    }
+                }
+            }
 
-        for (movie in moviesDumb) {
-            if (movie.name.contains(searchQuery, ignoreCase = true)) {
-                if (movie.rating != null) {
-                    moviesWithRating.add(movie)
-                } else {
-                    moviesWithoutRating.add(movie)
+            try {
+                val result = getScheduledMoviesUseCase()
+                _state.update {
+                    it.copy(
+                        isLoadingScheduled = false,
+                        scheduledList = result
+                    )
+
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoadingScheduled = false,
+                        scheduledList = emptyList(),
+                        searchErrorMessage = e.localizedMessage ?: "Error"
+                    )
                 }
             }
         }
-        moviesWithRating.sortByDescending { it.rating }
-        return moviesWithRating + moviesWithoutRating
+    }
+
+    private fun getSearchMovies(searchQuery: String) {
+        viewModelScope.launch {
+            try {
+                _state.value = _state.value.copy(isSearching = true)
+
+                val getMovies = searchMoviesUseCase.invoke(searchQuery)
+
+                val persistent = getMovies.toPersistentList()
+
+                _state.update {
+                    it.copy(
+                        movieList = persistent,
+                        queryHasNoResults = persistent.isEmpty(),
+                        isSearching = false,
+                        searchErrorMessage = null
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        movieList = persistentListOf(),
+                        queryHasNoResults = false,
+                        isSearching = false,
+                        searchErrorMessage = e.localizedMessage ?: "Error"
+                    )
+                }
+            }
+        }
     }
 
     fun runSearch(query: String) {
         viewModelScope.launch {
             if (query.length > 3) {
-                _state.value = _state.value.copy(isSearching = true)
-
-                val getMovies = viewModelScope.runCatching {
-                    delay(2000)
-                    getMovies(query)
-                }.getOrElse {
-                    emptyList()
-                }
-
-                val result = getMovies.toPersistentList()
-
-                _state.update {
-                    it.copy(
-                        moviesList = result,
-                        queryHasNoResults = result.isEmpty(),
-                        isSearching = false,
-                        searchErrorMessage = null
-                    )
-                }
+                getSearchMovies(query)
             } else {
                 _state.update {
                     it.copy(
-                        moviesList = persistentListOf(),
+                        movieList = persistentListOf(),
                         queryHasNoResults = false,
                         isSearching = false,
                         searchErrorMessage = null
@@ -106,10 +128,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
 data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
-    val isLoadingSaved: Boolean = false,
-    val discoverList: List<Unit> = emptyList(),
-    val scheduledList: List<Unit> = emptyList(),
-    val moviesList: ImmutableList<Movie> = persistentListOf(),
+    val isLoadingScheduled: Boolean = false,
+    val discoverList: List<Movie> = emptyList(),
+    val scheduledList: List<Movie> = emptyList(),
+    val movieList: ImmutableList<SearchMovie> = persistentListOf(),
     val queryHasNoResults: Boolean = false,
     val isSearching: Boolean = false,
     val searchErrorMessage: String? = null,

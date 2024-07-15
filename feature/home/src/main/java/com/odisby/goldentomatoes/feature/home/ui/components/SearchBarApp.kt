@@ -4,20 +4,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,16 +29,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.odisby.goldentomatoes.core.ui.common.ErrorItem
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColorAccent
+import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.Primary400
 import com.odisby.goldentomatoes.core.ui.theme.Primary500
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
+import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
-import com.odisby.goldentomatoes.feature.home.ui.model.Movie
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -109,8 +109,8 @@ fun SearchBarApp(
             NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
             return@SearchBar
         }
-        if (uiState.moviesList.isNotEmpty()) {
-            ListWithMovies(uiState.moviesList)
+        if (uiState.movieList.isNotEmpty()) {
+            ListWithMovies(uiState.movieList)
         }
     }
 }
@@ -130,43 +130,12 @@ fun NoMoviesFounded(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         modifier = modifier.fillMaxSize()
     ) {
-        UnexpectedBehaviorSad(text = stringResource(R.string.no_movies_founded))
+        ErrorItem(message = stringResource(R.string.no_movies_founded))
     }
 }
 
 @Composable
-fun ErrorItem(message: String, modifier: Modifier = Modifier) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
-    ) {
-        UnexpectedBehaviorSad(text = message)
-    }
-}
-
-@Composable
-private fun UnexpectedBehaviorSad(
-    text: String,
-) {
-    Icon(
-        painter = painterResource(id = com.odisby.goldentomatoes.core.ui.R.drawable.ic_sad_face),
-        contentDescription = null,
-        tint = TextColor,
-        modifier = Modifier
-            .height(120.dp)
-            .width(120.dp)
-    )
-    Spacer(modifier = Modifier.height(24.dp))
-    Text(
-        text = text,
-        color = TextColor,
-        style = MaterialTheme.typography.bodyMedium
-    )
-}
-
-@Composable
-private fun ListWithMovies(movies: ImmutableList<Movie>) {
+private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(16.dp),
@@ -184,7 +153,7 @@ private fun ListWithMovies(movies: ImmutableList<Movie>) {
 
 @Composable
 fun MovieSearchListItem(
-    movie: Movie,
+    movie: SearchMovie,
     modifier: Modifier = Modifier
 ) {
     TextButton(
@@ -196,20 +165,35 @@ fun MovieSearchListItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = modifier.fillMaxWidth(),
         ) {
-            Text(text = movie.name, color = TextColor, style = MaterialTheme.typography.bodyMedium)
-            if (movie.rating != null) {
+            Text(text = movie.title, color = TextColor, style = MaterialTheme.typography.bodyMedium)
+            if (movie.scheduled) {
                 Icon(
-                    painter = rememberVectorPainter(Icons.Default.Star),
+                    painter = rememberVectorPainter(Icons.Filled.Notifications),
                     contentDescription = null,
                     tint = Primary400
                 )
             } else {
                 Icon(
-                    painter = rememberVectorPainter(Icons.Default.Star),
+                    painter = rememberVectorPainter(Icons.Outlined.Notifications),
                     contentDescription = null,
                     tint = TextColor
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SearchBarAppPreview() {
+    GoldenTomatoesTheme {
+        SearchBarApp(
+            searchQuery = "",
+            onSearchButtonClick = {},
+            searchBarActive = false,
+            uiState = HomeUiState(),
+            onChangeQuery = {},
+            onChangeSearchBarActive = {}
+        )
     }
 }

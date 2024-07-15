@@ -1,6 +1,5 @@
 package com.odisby.goldentomatoes.feature.home.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -36,80 +36,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.Primary200
 import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
+import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.ui.components.NoMoviesFounded
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
-import com.odisby.goldentomatoes.feature.home.ui.model.Movie
-
-private val moviesDumb = listOf(
-    Movie(
-        id = 1,
-        name = "Inception",
-        rating = null
-    ),
-    Movie(
-        id = 2,
-        name = "The Prestige",
-        rating = null
-    ),
-    Movie(
-        id = 3,
-        name = "Interstellar",
-        rating = null,
-    ),
-    Movie(
-        id = 4,
-        name = "Interworlds",
-        rating = 9
-    ),
-    Movie(
-        id = 5,
-        name = "Intertest",
-        rating = null
-    )
-)
-
-private val moviesDumb2 = listOf(
-    Movie(
-        id = 1,
-        name = "Inceptiasaon",
-        rating = null
-    ),
-    Movie(
-        id = 2,
-        name = "The Prestasige",
-        rating = null
-    ),
-    Movie(
-        id = 3,
-        name = "Interstasllar",
-        rating = null,
-    ),
-    Movie(
-        id = 4,
-        name = "Interwasorlds",
-        rating = 9
-    ),
-    Movie(
-        id = 5,
-        name = "Interasatest",
-        rating = null
-    )
-)
 
 @Composable
 fun HomeRoot(
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
@@ -124,7 +71,7 @@ fun HomeRoot(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-//                goToRandomMovie()
+                    navigateToDetailsScreen(-1)
                 },
                 containerColor = Primary200,
                 contentColor = Primary900,
@@ -132,7 +79,7 @@ fun HomeRoot(
             ) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.Star),
-                    contentDescription = "Descubra filmes aleatórios"
+                    contentDescription = stringResource(R.string.home_fab_label)
                 )
             }
         }
@@ -154,17 +101,15 @@ fun HomeScreen(
     uiState: HomeUiState,
     onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     var searchBarActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
-    Column(
-        modifier = modifier
-            .padding(horizontal = 12.dp)
-    ) {
+    Column {
+        // Search bar should have max size, so I'll have to break this in two Columns zzzz
         SearchBarApp(
             searchQuery = searchQuery,
             onSearchButtonClick = onSearchButtonClick,
@@ -175,23 +120,49 @@ fun HomeScreen(
         )
         // carrosel loading surface
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Column(
+            modifier = modifier
+                .padding(horizontal = 12.dp)
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
 
-        DiscoverNewMovies(goToMovieDetails, navigateToMovieList)
+            if (uiState.isLoadingDiscover) {
+                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                DiscoverNewMovies(
+                    goToMovieDetails,
+                    navigateToMovieList,
+                    movies = uiState.discoverList
+                )
+            }
 
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+            if (uiState.isLoadingScheduled) {
+                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                ScheduledMovies(
+                    goToMovieDetails,
+                    navigateToMovieList,
+                    movies = uiState.scheduledList
+                )
+            }
 
-        ScheduledMovies(goToMovieDetails, navigateToMovieList)
-
+        }
     }
 
 }
 
 @Composable
+fun MoviesListLoading(modifier: Modifier) {
+    CircularProgressIndicator(modifier = modifier)
+}
+
+@Composable
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
+    movies: List<Movie>,
 ) {
     Column(
         modifier = Modifier
@@ -199,21 +170,30 @@ private fun DiscoverNewMovies(
             .padding(horizontal = 16.dp)
             .semantics { isTraversalGroup = true }
     ) {
+
         RowTextAndGoButton(
-            text = "Descubra novos filmes",
+            text = stringResource(R.string.discover_movies_title),
             onButtonClick = {
-                navigateToMovieList("discover")
-            }
+                navigateToMovieList(ListTypes.DISCOVER)
+            },
+            buttonVisible = movies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DiscoverCarousel(moviesDumb, goToMovieDetails)
+
+        if (movies.isEmpty()) {
+            NoMoviesFounded(modifier = Modifier.height(200.dp))
+        } else {
+            DiscoverCarousel(movies, goToMovieDetails)
+
+        }
     }
 }
 
 @Composable
 private fun ScheduledMovies(
     goToMovieDetails: (Long) -> Unit,
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
+    movies: List<Movie>,
 ) {
     Column(
         modifier = Modifier
@@ -222,13 +202,19 @@ private fun ScheduledMovies(
             .semantics { isTraversalGroup = true }
     ) {
         RowTextAndGoButton(
-            text = "Filmes agendados",
+            text = stringResource(R.string.schedules_movies_title),
             onButtonClick = {
-                navigateToMovieList("scheduled")
-            }
+                navigateToMovieList(ListTypes.SCHEDULED)
+            },
+            buttonVisible = movies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
-        ScheduledCarousel(moviesDumb2, goToMovieDetails)
+
+        if (movies.isEmpty()) {
+            NoMoviesScheduled()
+        } else {
+            ScheduledCarousel(movies, goToMovieDetails)
+        }
     }
 }
 
@@ -266,22 +252,34 @@ private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit
         itemSpacing = 8.dp,
     ) { index ->
         val movie = movies[index]
-        Image(
+        AsyncImage(
+            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .height(205.dp)
                 .maskClip(MaterialTheme.shapes.extraLarge)
                 .clickable {
                     goToMovieDetails(movie.id)
                 },
-            painter = painterResource(R.drawable.test_banner),
-            contentDescription = "temporary content descirption",
-            contentScale = ContentScale.Crop
         )
     }
 }
 
 @Composable
-private fun RowTextAndGoButton(text: String, onButtonClick: () -> Unit) {
+fun NoMoviesScheduled(modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(R.string.no_movies_scheduled),
+        color = TextColor,
+    )
+}
+
+@Composable
+private fun RowTextAndGoButton(
+    text: String,
+    onButtonClick: () -> Unit,
+    buttonVisible: Boolean = true
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -293,14 +291,16 @@ private fun RowTextAndGoButton(text: String, onButtonClick: () -> Unit) {
             color = TextColor
         )
 
-        IconButton(
-            onClick = onButtonClick
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = TextColor
-            )
+        if (buttonVisible) {
+            IconButton(
+                onClick = onButtonClick
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = TextColor
+                )
+            }
         }
     }
 }
