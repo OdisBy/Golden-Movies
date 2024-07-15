@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +65,12 @@ fun DetailsRoot(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    viewModel.getMovieDetails(movieId)
+    /*
+    Movie Id -1 Is being treated as random movie
+    */
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getMovieDetails(movieId)
+    }
 
     Scaffold(
         modifier = Modifier
@@ -107,6 +113,9 @@ fun DetailsRoot(
 
         DetailsScreen(
             movie = uiState.movie!!,
+            onNextMovieClick = {
+                viewModel.getMovieDetails(-1)
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding),
@@ -127,6 +136,7 @@ fun ErrorScreen(modifier: Modifier) {
 @Composable
 fun DetailsScreen(
     movie: Movie,
+    onNextMovieClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -166,7 +176,7 @@ fun DetailsScreen(
         BottomButtons(
             scheduled = movie.scheduled,
             onNotificationButtonClick = { },
-            onNextMovieClick = { },
+            onNextMovieClick = onNextMovieClick,
         )
     }
 }
@@ -247,6 +257,7 @@ private fun DetailsScreenPreview() {
         ) { contentPadding ->
             DetailsScreen(
                 movie = Movie(1, "Title", "Description", ""),
+                onNextMovieClick = { },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),

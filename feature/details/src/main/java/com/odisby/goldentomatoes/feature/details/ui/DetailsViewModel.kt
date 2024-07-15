@@ -22,12 +22,34 @@ class DetailsViewModel @Inject constructor(
 
     init {
         _state.value = _state.value.copy(isLoading = true)
+
+
     }
 
-
+    /*
+    Movie Id -1 Is being treated as random movie
+    */
     fun getMovieDetails(movieId: Long) = runBlocking {
+        if (movieId == -1L) {
+            getRandomMovieDetails()
+        } else {
+            try {
+                val movie = getDetailsUseCase(movieId)
+                _state.value = _state.value.copy(movie = movie, isLoading = false)
+            } catch (e: Exception) {
+                Timber.e(e)
+                _state.value =
+                    _state.value.copy(
+                        errorMessage = e.localizedMessage ?: "Error",
+                        isLoading = false
+                    )
+            }
+        }
+    }
+
+    suspend fun getRandomMovieDetails() {
         try {
-            val movie = getDetailsUseCase(movieId)
+            val movie = getDetailsUseCase.randomMovieId()
             _state.value = _state.value.copy(movie = movie, isLoading = false)
         } catch (e: Exception) {
             Timber.e(e)

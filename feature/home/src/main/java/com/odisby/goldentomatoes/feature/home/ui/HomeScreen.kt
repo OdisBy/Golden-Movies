@@ -71,7 +71,7 @@ fun HomeRoot(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-//                goToRandomMovie()
+                    navigateToDetailsScreen(-1)
                 },
                 containerColor = Primary200,
                 contentColor = Primary900,

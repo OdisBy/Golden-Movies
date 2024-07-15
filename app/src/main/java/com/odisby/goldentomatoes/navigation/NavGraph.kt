@@ -23,7 +23,7 @@ fun SetupNavGraph(navController: NavHostController) {
                 },
                 navigateToMovieList = { type ->
                     navController.navigate(MovieListScreen(type.toRoute()))
-                }
+                },
             )
         }
         composable<DetailsScreen> { backStackEntry ->

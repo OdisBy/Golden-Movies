@@ -24,4 +24,21 @@ internal class DiscoverRepositoryImpl(
             Resource.Error(e.message)
         }
     }
+
+    override suspend fun randomMovieId(): Long? {
+        return try {
+            val page = (1..40).random()
+            val itemIndex = (1..19).random()
+
+            val result = discoverApi.getRandomMovie(page)
+
+            if (result.isSuccessful) {
+                return result.body()?.results?.get(itemIndex)?.id
+            }
+            null
+        } catch (e: Exception) {
+            Timber.e("Failed to get random movies id from api. It get an exception. Message: ${e.message}")
+            null
+        }
+    }
 }
