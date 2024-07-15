@@ -17,4 +17,8 @@ internal class ScheduledRepositoryImpl @Inject constructor(
     override suspend fun addScheduledMovie(movie: MovieEntity) {
         dao.insert(movie)
     }
+
+    override suspend fun removeScheduledMovie(movieId: Long) {
+        dao.deleteById(movieId)
+    }
 }

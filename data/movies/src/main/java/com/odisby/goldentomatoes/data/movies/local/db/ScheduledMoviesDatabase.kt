@@ -7,7 +7,7 @@ import com.odisby.goldentomatoes.data.movies.local.model.MovieEntity
 
 @Database(
     entities = [MovieEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class ScheduledMoviesDatabase : RoomDatabase() {
