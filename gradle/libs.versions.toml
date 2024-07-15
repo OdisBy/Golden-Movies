@@ -26,6 +26,7 @@ ksp = "1.9.24-1.0.20"
 hiltNavigationCompose = "1.2.0"
 chucker = "4.0.0"
 workRuntimeVersion = "2.9.0"
+accompanistPermissions = "0.33.1-alpha"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -69,6 +70,8 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 chucker-library = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker"}
 chucker-library-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker"}
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeVersion" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions"}
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
