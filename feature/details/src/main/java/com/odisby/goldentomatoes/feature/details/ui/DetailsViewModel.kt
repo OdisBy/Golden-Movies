@@ -1,21 +1,22 @@
 package com.odisby.goldentomatoes.feature.details.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.feature.details.data.GetDetailsUseCase
 import com.odisby.goldentomatoes.feature.details.data.NotificationsUseCase
 import com.odisby.goldentomatoes.feature.details.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
-    private val notificationsUseCase: NotificationsUseCase,
+    private val scheduleMovieUseCase: NotificationsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailsUiState())
@@ -25,8 +26,6 @@ class DetailsViewModel @Inject constructor(
 
     init {
         _state.value = _state.value.copy(isLoading = true)
-
-
     }
 
     /*
@@ -62,11 +61,14 @@ class DetailsViewModel @Inject constructor(
     }
 
     fun onNotificationButtonClick() {
-        val movie = state.value.movie ?: return
-        if (movie.scheduled) {
-            notificationsUseCase.cancel(movie.id)
-        } else {
-            notificationsUseCase.create(movie.id, movie.title, LocalDateTime.now().plusMinutes(1))
+        viewModelScope.launch {
+            try {
+                val movie = state.value.movie ?: return@launch
+                scheduleMovieUseCase.invoke(movie)
+                _state.value = _state.value.copy(movie = movie.copy(scheduled = !movie.scheduled))
+            } catch (e: Exception) {
+                Timber.e("Não foi possível agendar o filme ${e.localizedMessage}")
+            }
         }
     }
 }

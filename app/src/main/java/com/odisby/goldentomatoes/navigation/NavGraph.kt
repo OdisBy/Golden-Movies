@@ -11,7 +11,7 @@ import com.odisby.goldentomatoes.feature.home.ui.HomeRoot
 import com.odisby.goldentomatoes.feature.movielist.ui.MovieListRoot
 
 @Composable
-fun SetupNavGraph(navController: NavHostController) {
+fun SetupNavGraph(navController: NavHostController, hasInternetConnection: Boolean) {
     NavHost(
         navController = navController,
         startDestination = HomeScreen,
@@ -24,6 +24,7 @@ fun SetupNavGraph(navController: NavHostController) {
                 navigateToMovieList = { type ->
                     navController.navigate(MovieListScreen(type.toRoute()))
                 },
+                hasInternetConnection = hasInternetConnection
             )
         }
         composable<DetailsScreen> { backStackEntry ->

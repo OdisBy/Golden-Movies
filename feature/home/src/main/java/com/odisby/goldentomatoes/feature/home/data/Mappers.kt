@@ -16,8 +16,9 @@ fun MovieRemote.toMovie(): Movie {
 fun MovieEntity.toMovie(): Movie {
     return Movie(
         id = this.id,
-        title = this.name,
+        title = this.title,
         description = this.description,
-        posterPath = this.posterUrl
+        posterPath = this.posterUrl,
+        scheduled = true
     )
 }

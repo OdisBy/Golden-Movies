@@ -42,8 +42,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.odisby.goldentomatoes.core.ui.AppEventListener
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.Primary200
@@ -59,9 +61,19 @@ fun HomeRoot(
     navigateToMovieList: (ListTypes) -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    hasInternetConnection: Boolean,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    AppEventListener {
+        when (it) {
+            Lifecycle.Event.ON_RESUME -> {
+                viewModel.getScheduledMovies()
+            }
+            else -> {}
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -69,18 +81,20 @@ fun HomeRoot(
             .statusBarsPadding()
             .navigationBarsPadding(),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navigateToDetailsScreen(-1)
-                },
-                containerColor = Primary200,
-                contentColor = Primary900,
-                shape = FloatingActionButtonDefaults.largeShape,
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Filled.Star),
-                    contentDescription = stringResource(R.string.home_fab_label)
-                )
+            if (hasInternetConnection) {
+                FloatingActionButton(
+                    onClick = {
+                        navigateToDetailsScreen(-1)
+                    },
+                    containerColor = Primary200,
+                    contentColor = Primary900,
+                    shape = FloatingActionButtonDefaults.largeShape,
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Filled.Star),
+                        contentDescription = stringResource(R.string.home_fab_label)
+                    )
+                }
             }
         }
     ) { contentPadding ->
@@ -89,6 +103,7 @@ fun HomeRoot(
             onSearchButtonClick = { viewModel.runSearch(it) },
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
+            hasInternetConnection = hasInternetConnection,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding)
@@ -102,6 +117,7 @@ fun HomeScreen(
     onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
+    hasInternetConnection: Boolean,
     modifier: Modifier = Modifier
 ) {
 
@@ -125,19 +141,20 @@ fun HomeScreen(
                 .padding(horizontal = 12.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
+            if (hasInternetConnection) {
+                if (uiState.isLoadingDiscover) {
+                    MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    DiscoverNewMovies(
+                        goToMovieDetails,
+                        navigateToMovieList,
+                        movies = uiState.discoverList
+                    )
+                }
 
-            if (uiState.isLoadingDiscover) {
-                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
-                DiscoverNewMovies(
-                    goToMovieDetails,
-                    navigateToMovieList,
-                    movies = uiState.discoverList
-                )
+                Spacer(modifier = Modifier.height(24.dp))
+
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
             if (uiState.isLoadingScheduled) {
                 MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
@@ -315,6 +332,7 @@ fun HomeScreenPreview() {
         uiState = HomeUiState(),
         onSearchButtonClick = {},
         navigateToMovieList = { },
+        hasInternetConnection = true,
         goToMovieDetails = {}
     )
 }

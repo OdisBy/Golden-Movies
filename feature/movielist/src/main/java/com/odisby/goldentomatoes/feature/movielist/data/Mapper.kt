@@ -14,6 +14,6 @@ fun MovieRemote.toMovieListItem(): MovieListItem {
 
 fun MovieEntity.toMovieListItem() = MovieListItem(
     id = this.id,
-    title = this.name,
+    title = this.title,
     posterPath = this.posterUrl
 )
