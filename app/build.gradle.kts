@@ -63,6 +63,9 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:details"))
     implementation(project(":feature:movielist"))
+    implementation(project(":data:local"))
+    implementation(project(":data:remote"))
+    implementation(project(":data:data"))
 
 
     implementation(libs.androidx.core.ktx)

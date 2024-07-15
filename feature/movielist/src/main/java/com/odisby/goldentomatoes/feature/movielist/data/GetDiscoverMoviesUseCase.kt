@@ -2,8 +2,8 @@ package com.odisby.goldentomatoes.feature.movielist.data
 
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
-import com.odisby.goldentomatoes.data.movies.repositories.DiscoverRepository
-import com.odisby.goldentomatoes.data.movies.repositories.ScheduledRepository
+import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
+import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
 import com.odisby.goldentomatoes.feature.movielist.model.MovieListItem
 import javax.inject.Inject
 
