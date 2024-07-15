@@ -8,4 +8,6 @@ interface ScheduledRepository {
     suspend fun addScheduledMovie(movie: MovieEntity)
 
     suspend fun removeScheduledMovie(movieId: Long)
+
+    suspend fun getMoviesById(movieId: Long): MovieEntity?
 }

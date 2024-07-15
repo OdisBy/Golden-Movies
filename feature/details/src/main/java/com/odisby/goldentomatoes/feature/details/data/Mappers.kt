@@ -21,3 +21,12 @@ fun Movie.toMovieEntity(): MovieEntity {
         posterUrl = this.posterPath
     )
 }
+
+fun MovieEntity.toMovie(): Movie {
+    return Movie(
+        id = this.id,
+        title = this.title,
+        description = this.description,
+        posterPath = this.posterUrl
+    )
+}

@@ -26,15 +26,12 @@ class DetailsViewModel @Inject constructor(
 
     init {
         _state.value = _state.value.copy(isLoading = true)
-
-
     }
 
     /*
     Movie Id -1 Is being treated as random movie
     */
     fun getMovieDetails(movieId: Long) = runBlocking {
-
         if (movieId == -1L) {
             getRandomMovieDetails()
         } else {

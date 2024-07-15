@@ -91,6 +91,9 @@ dependencies {
     // Timber
     implementation(libs.timber)
 
+    // Coil
+    implementation(libs.coil.compose)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

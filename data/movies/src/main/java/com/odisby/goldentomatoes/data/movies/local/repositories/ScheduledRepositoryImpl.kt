@@ -21,4 +21,8 @@ internal class ScheduledRepositoryImpl @Inject constructor(
     override suspend fun removeScheduledMovie(movieId: Long) {
         dao.deleteById(movieId)
     }
+
+    override suspend fun getMoviesById(movieId: Long): MovieEntity? {
+        return dao.getById(movieId)
+    }
 }
