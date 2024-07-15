@@ -25,8 +25,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.CarouselState
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
-import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +71,7 @@ fun HomeRoot(
             Lifecycle.Event.ON_RESUME -> {
                 viewModel.getScheduledMovies()
             }
+
             else -> {}
         }
     }
@@ -257,11 +258,20 @@ fun DiscoverCarousel(
     )
 }
 
+/*
+    Aqui tem um bug desse carousel no Compose, quando  se usa o rememberCarouselState
+
+    O bug é: quando a lista atualiza, e ele ainda não tem filmes...
+    o suficiente para preencher a tela o app crasha ou não atualiza.
+
+    Nesse caso então por exemplo se adicionarmos um filme, e o carousel não estiver preenchido e voltar ele não atualiza
+    Outro caso é caso tenha 1 filme adicionado, retira ele e volte, nesse caso ele crasha
+ */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit) {
     HorizontalMultiBrowseCarousel(
-        state = rememberCarouselState { movies.count() },
+        state = CarouselState(itemCount = { movies.count() }),
         modifier = Modifier
             .width(412.dp)
             .height(221.dp),

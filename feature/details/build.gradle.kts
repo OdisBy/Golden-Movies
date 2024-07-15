@@ -36,7 +36,7 @@ dependencies {
 
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
-    implementation(project(":data:movies"))
+    implementation(project(":data:data"))
     implementation(project(":notification-scheduler"))
 
     implementation(libs.androidx.core.ktx)
