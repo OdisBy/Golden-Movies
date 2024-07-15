@@ -5,10 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.feature.details.ui.DetailsRoot
 import com.odisby.goldentomatoes.feature.home.ui.HomeRoot
 import com.odisby.goldentomatoes.feature.movielist.ui.MovieListRoot
-
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -22,7 +22,7 @@ fun SetupNavGraph(navController: NavHostController) {
                     navController.navigate(DetailsScreen(id))
                 },
                 navigateToMovieList = { type ->
-                    navController.navigate(MovieListScreen(type))
+                    navController.navigate(MovieListScreen(type.toRoute()))
                 }
             )
         }
@@ -35,14 +35,16 @@ fun SetupNavGraph(navController: NavHostController) {
                 },
             )
         }
-        composable<MovieListScreen> {
+        composable<MovieListScreen> { backStackEntry ->
+            val movieListScreen: MovieListScreen = backStackEntry.toRoute()
             MovieListRoot(
                 navigateUp = {
                     navController.navigateUp()
                 },
                 navigateToDetailsScreen = { id ->
                     navController.navigate(DetailsScreen(id))
-                }
+                },
+                listType = ListTypes.fromRoute(movieListScreen.type)
             )
         }
     }

@@ -3,6 +3,7 @@ package com.odisby.goldentomatoes.feature.movielist.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
+import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.feature.movielist.data.GetDiscoverMoviesUseCase
 import com.odisby.goldentomatoes.feature.movielist.model.MovieListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,10 +26,14 @@ class MovieListViewModel @Inject constructor(
 
     init {
         _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+    }
 
+    fun getDiscoverMovies(type: ListTypes) {
         viewModelScope.launch {
             try {
-                when (val result = getDiscoverMoviesUseCase()) {
+                val result: Resource<List<MovieListItem>> = getDiscoverMoviesUseCase.invoke(type)
+
+                when (result) {
                     is Resource.Error -> {
                         _state.value =
                             _state.value.copy(errorMessage = result.message, isLoading = false)

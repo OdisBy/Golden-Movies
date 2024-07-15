@@ -1,6 +1,5 @@
 package com.odisby.goldentomatoes.feature.movielist.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.odisby.goldentomatoes.core.ui.common.ErrorItem
+import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
@@ -60,12 +59,24 @@ fun MovieListRoot(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
-    listType: String = "discover",
+    listType: ListTypes = ListTypes.DISCOVER,
     viewModel: MovieListViewModel = hiltViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    viewModel.getDiscoverMovies(listType)
+
+    val screenTitle = when (listType) {
+        ListTypes.DISCOVER -> {
+            "Descobrir Filmes"
+        }
+        ListTypes.SCHEDULED -> {
+            "Filmes Agendados"
+        }
+        else -> "Descobrir Filmes"
+    }
 
     Scaffold(
         modifier = modifier
@@ -77,7 +88,7 @@ fun MovieListRoot(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Descobrir Filmes",
+                        text = screenTitle,
                         color = TextColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

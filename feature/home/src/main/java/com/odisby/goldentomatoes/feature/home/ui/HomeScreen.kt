@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.Primary200
 import com.odisby.goldentomatoes.core.ui.theme.Primary900
@@ -55,7 +56,7 @@ import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 
 @Composable
 fun HomeRoot(
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
@@ -100,7 +101,7 @@ fun HomeScreen(
     uiState: HomeUiState,
     onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -160,7 +161,7 @@ fun MoviesListLoading(modifier: Modifier) {
 @Composable
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
     movies: List<Movie>,
 ) {
     Column(
@@ -173,7 +174,7 @@ private fun DiscoverNewMovies(
         RowTextAndGoButton(
             text = stringResource(R.string.discover_movies_title),
             onButtonClick = {
-                navigateToMovieList("discover")
+                navigateToMovieList(ListTypes.DISCOVER)
             },
             buttonVisible = movies.size > 3
         )
@@ -191,7 +192,7 @@ private fun DiscoverNewMovies(
 @Composable
 private fun ScheduledMovies(
     goToMovieDetails: (Long) -> Unit,
-    navigateToMovieList: (String) -> Unit,
+    navigateToMovieList: (ListTypes) -> Unit,
     movies: List<Movie>,
 ) {
     Column(
@@ -203,7 +204,7 @@ private fun ScheduledMovies(
         RowTextAndGoButton(
             text = stringResource(R.string.schedules_movies_title),
             onButtonClick = {
-                navigateToMovieList("scheduled")
+                navigateToMovieList(ListTypes.SCHEDULED)
             },
             buttonVisible = movies.size > 3
         )
