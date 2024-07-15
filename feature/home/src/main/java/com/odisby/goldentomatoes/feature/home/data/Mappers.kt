@@ -1,7 +1,7 @@
 package com.odisby.goldentomatoes.feature.home.data
 
-import com.odisby.goldentomatoes.data.discover.local.model.MovieEntity
-import com.odisby.goldentomatoes.data.discover.remote.model.MovieRemote
+import com.odisby.goldentomatoes.data.movies.local.model.MovieEntity
+import com.odisby.goldentomatoes.data.movies.remote.model.MovieRemote
 import com.odisby.goldentomatoes.feature.home.model.Movie
 
 fun MovieRemote.toMovie(): Movie {

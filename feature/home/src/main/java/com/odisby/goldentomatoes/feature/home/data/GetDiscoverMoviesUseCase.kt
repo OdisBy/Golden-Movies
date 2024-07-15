@@ -1,7 +1,7 @@
 package com.odisby.goldentomatoes.feature.home.data
 
 import com.odisby.goldentomatoes.core.network.model.Resource
-import com.odisby.goldentomatoes.data.discover.repositories.DiscoverRepository
+import com.odisby.goldentomatoes.data.movies.repositories.DiscoverRepository
 import com.odisby.goldentomatoes.feature.home.model.Movie
 import javax.inject.Inject
 

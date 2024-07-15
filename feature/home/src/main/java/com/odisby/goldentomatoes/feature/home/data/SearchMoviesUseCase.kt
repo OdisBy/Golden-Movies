@@ -1,6 +1,6 @@
 package com.odisby.goldentomatoes.feature.home.data
 
-import com.odisby.goldentomatoes.data.discover.repositories.SearchMoviesRepository
+import com.odisby.goldentomatoes.data.movies.repositories.SearchMoviesRepository
 import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import javax.inject.Inject
 

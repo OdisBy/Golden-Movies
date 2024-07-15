@@ -36,7 +36,7 @@ dependencies {
 
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
-    implementation(project(":data:discover"))
+    implementation(project(":data:movies"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
