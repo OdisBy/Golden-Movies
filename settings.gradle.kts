@@ -21,4 +21,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "Golden Tomatoes"
 include(":app")
- 
+include(":core:ui")
+include(":core:network")
+include(":feature:home")
+include(":feature:details")
+include(":feature:movielist")
+include(":data:data")
+include(":notification-scheduler")
+include(":data:remote")
+include(":data:local")
