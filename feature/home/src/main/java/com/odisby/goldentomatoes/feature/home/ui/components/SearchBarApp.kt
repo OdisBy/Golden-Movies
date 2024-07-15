@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,13 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColorAccent
+import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.Primary400
 import com.odisby.goldentomatoes.core.ui.theme.Primary500
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
-import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
 
@@ -166,7 +170,7 @@ private fun UnexpectedBehaviorSad(
 }
 
 @Composable
-private fun ListWithMovies(movies: ImmutableList<Movie>) {
+private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(16.dp),
@@ -184,7 +188,7 @@ private fun ListWithMovies(movies: ImmutableList<Movie>) {
 
 @Composable
 fun MovieSearchListItem(
-    movie: Movie,
+    movie: SearchMovie,
     modifier: Modifier = Modifier
 ) {
     TextButton(
@@ -199,17 +203,32 @@ fun MovieSearchListItem(
             Text(text = movie.title, color = TextColor, style = MaterialTheme.typography.bodyMedium)
             if (movie.scheduled) {
                 Icon(
-                    painter = rememberVectorPainter(Icons.Default.Star),
+                    painter = rememberVectorPainter(Icons.Filled.Notifications),
                     contentDescription = null,
                     tint = Primary400
                 )
             } else {
                 Icon(
-                    painter = rememberVectorPainter(Icons.Default.Star),
+                    painter = rememberVectorPainter(Icons.Outlined.Notifications),
                     contentDescription = null,
                     tint = TextColor
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SearchBarAppPreview() {
+    GoldenTomatoesTheme {
+        SearchBarApp(
+            searchQuery = "",
+            onSearchButtonClick = {},
+            searchBarActive = false,
+            uiState = HomeUiState(),
+            onChangeQuery = {},
+            onChangeSearchBarActive = {}
+        )
     }
 }

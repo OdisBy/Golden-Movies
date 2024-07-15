@@ -107,10 +107,8 @@ fun HomeScreen(
     var searchBarActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
-    Column(
-        modifier = modifier
-            .padding(horizontal = 12.dp)
-    ) {
+    Column {
+        // Search bar should have max size, so I'll have to break this in two Columns zzzz
         SearchBarApp(
             searchQuery = searchQuery,
             onSearchButtonClick = onSearchButtonClick,
@@ -121,22 +119,35 @@ fun HomeScreen(
         )
         // carrosel loading surface
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Column(
+            modifier = modifier
+                .padding(horizontal = 12.dp)
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
 
-        if (uiState.isLoadingDiscover) {
-            MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            DiscoverNewMovies(goToMovieDetails, navigateToMovieList, movies = uiState.discoverList)
+            if (uiState.isLoadingDiscover) {
+                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                DiscoverNewMovies(
+                    goToMovieDetails,
+                    navigateToMovieList,
+                    movies = uiState.discoverList
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (uiState.isLoadingScheduled) {
+                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                ScheduledMovies(
+                    goToMovieDetails,
+                    navigateToMovieList,
+                    movies = uiState.scheduledList
+                )
+            }
+
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (uiState.isLoadingScheduled) {
-            MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-        } else {
-            ScheduledMovies(goToMovieDetails, navigateToMovieList, movies = uiState.scheduledList)
-        }
-
     }
 
 }

@@ -2,14 +2,14 @@ package com.odisby.goldentomatoes.data.discover.remote.repositories
 
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.data.discover.remote.api.DiscoverApi
-import com.odisby.goldentomatoes.data.discover.remote.model.MoviesRemote
+import com.odisby.goldentomatoes.data.discover.remote.model.MovieRemote
 import com.odisby.goldentomatoes.data.discover.repositories.DiscoverRepository
 import timber.log.Timber
 
 internal class DiscoverRepositoryImpl(
     private val discoverApi: DiscoverApi
 ) : DiscoverRepository {
-    override suspend fun getDiscoverMovies(): Resource<List<MoviesRemote>> {
+    override suspend fun getDiscoverMovies(): Resource<List<MovieRemote>> {
         return try {
             val result = discoverApi.getDiscoverMovies()
 

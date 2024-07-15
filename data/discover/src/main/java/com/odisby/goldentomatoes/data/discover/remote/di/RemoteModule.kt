@@ -1,6 +1,7 @@
 package com.odisby.goldentomatoes.data.discover.remote.di
 
 import com.odisby.goldentomatoes.data.discover.remote.api.DiscoverApi
+import com.odisby.goldentomatoes.data.discover.remote.api.SearchApi
 import com.odisby.goldentomatoes.data.discover.repositories.DiscoverRepository
 import com.odisby.goldentomatoes.data.discover.remote.repositories.DiscoverRepositoryImpl
 import dagger.Module
@@ -23,4 +24,9 @@ internal object RemoteModule {
     @Singleton
     fun providesDiscoverRepository(discoverApi: DiscoverApi): DiscoverRepository =
         DiscoverRepositoryImpl(discoverApi)
+
+    @Provides
+    @Singleton
+    fun provideSearchApi(retrofit: Retrofit): SearchApi =
+        retrofit.create(SearchApi::class.java)
 }

@@ -11,7 +11,7 @@ interface MoviesSchedulesDao : BaseDao<MovieEntity> {
     suspend fun getAll(): List<MovieEntity>
 
     @Query("SELECT * FROM ${MovieEntity.TABLE_NAME} WHERE id = :id")
-    suspend fun getById(id: Long): MovieEntity
+    suspend fun getById(id: Long): MovieEntity?
 
     @Query("DELETE FROM ${MovieEntity.TABLE_NAME} WHERE id = :id")
     suspend fun deleteById(id: Long)
