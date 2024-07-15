@@ -53,5 +53,8 @@ Pode encontrar tudo nesse link do excalidraw https://excalidraw.com/#json=CDJ4n7
 
 Pode encontrar algumas escritas também nesse projeto do Notion https://www.notion.so/Golden-Tomatoes-2bd879e700c341b2b034f6f4d66ba732?pvs=4
 
+Postman consumindo a API: https://www.postman.com/grey-comet-197365/workspace/golden-tomatoes
+
+
 
 
