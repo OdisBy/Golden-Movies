@@ -72,6 +72,10 @@ fun DetailsRoot(
         viewModel.getMovieDetails(movieId)
     }
 
+    fun onNotificationButtonClick() {
+        viewModel.onNotificationButtonClick()
+    }
+
     Scaffold(
         modifier = Modifier
             .background(BackgroundColor)
@@ -116,6 +120,7 @@ fun DetailsRoot(
             onNextMovieClick = {
                 viewModel.getMovieDetails(-1)
             },
+            onNotificationButtonClick = { onNotificationButtonClick() },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding),
@@ -137,6 +142,7 @@ fun ErrorScreen(modifier: Modifier) {
 fun DetailsScreen(
     movie: Movie,
     onNextMovieClick: () -> Unit,
+    onNotificationButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -175,7 +181,7 @@ fun DetailsScreen(
 
         BottomButtons(
             scheduled = movie.scheduled,
-            onNotificationButtonClick = { },
+            onNotificationButtonClick = onNotificationButtonClick,
             onNextMovieClick = onNextMovieClick,
         )
     }
@@ -258,6 +264,7 @@ private fun DetailsScreenPreview() {
             DetailsScreen(
                 movie = Movie(1, "Title", "Description", ""),
                 onNextMovieClick = { },
+                onNotificationButtonClick = { },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),

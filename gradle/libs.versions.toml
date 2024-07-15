@@ -25,6 +25,7 @@ coil = "2.6.0"
 ksp = "1.9.24-1.0.20"
 hiltNavigationCompose = "1.2.0"
 chucker = "4.0.0"
+workRuntimeVersion = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +68,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 chucker-library = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker"}
 chucker-library-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker"}
+work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

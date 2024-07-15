@@ -2,17 +2,20 @@ package com.odisby.goldentomatoes.feature.details.ui
 
 import androidx.lifecycle.ViewModel
 import com.odisby.goldentomatoes.feature.details.data.GetDetailsUseCase
+import com.odisby.goldentomatoes.feature.details.data.NotificationsUseCase
 import com.odisby.goldentomatoes.feature.details.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
+    private val notificationsUseCase: NotificationsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailsUiState())
@@ -47,7 +50,7 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    suspend fun getRandomMovieDetails() {
+    private suspend fun getRandomMovieDetails() {
         try {
             val movie = getDetailsUseCase.randomMovieId()
             _state.value = _state.value.copy(movie = movie, isLoading = false)
@@ -55,6 +58,15 @@ class DetailsViewModel @Inject constructor(
             Timber.e(e)
             _state.value =
                 _state.value.copy(errorMessage = e.localizedMessage ?: "Error", isLoading = false)
+        }
+    }
+
+    fun onNotificationButtonClick() {
+        val movie = state.value.movie ?: return
+        if (movie.scheduled) {
+            notificationsUseCase.cancel(movie.id)
+        } else {
+            notificationsUseCase.create(movie.id, movie.title, LocalDateTime.now().plusMinutes(1))
         }
     }
 }
