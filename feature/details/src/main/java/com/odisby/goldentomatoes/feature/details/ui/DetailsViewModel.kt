@@ -65,6 +65,7 @@ class DetailsViewModel @Inject constructor(
             try {
                 val movie = state.value.movie ?: return@launch
                 scheduleMovieUseCase.invoke(movie)
+                _state.value = _state.value.copy(movie = movie.copy(scheduled = !movie.scheduled))
             } catch (e: Exception) {
                 Timber.e("Não foi possível agendar o filme ${e.localizedMessage}")
             }

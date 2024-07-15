@@ -35,25 +35,6 @@ class HomeViewModel @Inject constructor(
                 it.copy(isLoadingDiscover = true, isLoadingScheduled = true)
             }
 
-            try {
-                val result = getScheduledMoviesUseCase()
-                _state.update {
-                    it.copy(
-                        isLoadingScheduled = false,
-                        scheduledList = result
-                    )
-
-                }
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        isLoadingScheduled = false,
-                        scheduledList = emptyList(),
-                        searchErrorMessage = e.localizedMessage ?: "Error"
-                    )
-                }
-            }
-
             when (val result = getDiscoverMoviesUseCase()) {
                 is Resource.Success -> {
                     _state.update {
@@ -73,6 +54,28 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    fun getScheduledMovies() = viewModelScope.launch {
+        try {
+            val result = getScheduledMoviesUseCase()
+
+            _state.update {
+                it.copy(
+                    isLoadingScheduled = false,
+                    scheduledList = result.toPersistentList()
+                )
+
+            }
+        } catch (e: Exception) {
+            _state.update {
+                it.copy(
+                    isLoadingScheduled = false,
+                    scheduledList = persistentListOf(),
+                    searchErrorMessage = e.localizedMessage ?: "Error"
+                )
             }
         }
     }
@@ -130,7 +133,7 @@ data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
     val isLoadingScheduled: Boolean = false,
     val discoverList: List<Movie> = emptyList(),
-    val scheduledList: List<Movie> = emptyList(),
+    val scheduledList: ImmutableList<Movie> = persistentListOf(),
     val movieList: ImmutableList<SearchMovie> = persistentListOf(),
     val queryHasNoResults: Boolean = false,
     val isSearching: Boolean = false,

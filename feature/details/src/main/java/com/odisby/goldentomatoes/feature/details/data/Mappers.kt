@@ -27,6 +27,7 @@ fun MovieEntity.toMovie(): Movie {
         id = this.id,
         title = this.title,
         description = this.description,
-        posterPath = this.posterUrl
+        posterPath = this.posterUrl,
+        scheduled = true
     )
 }
