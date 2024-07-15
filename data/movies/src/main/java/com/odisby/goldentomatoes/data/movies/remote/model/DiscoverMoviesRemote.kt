@@ -10,11 +10,3 @@ data class DiscoverMoviesRemote(
     @SerializedName("total_results")
     val totalResults: Long
 )
-
-data class MovieRemote(
-    val id: Long,
-    val title: String,
-    val overview: String,
-    @SerializedName("poster_path")
-    val posterPath: String,
-)

@@ -19,12 +19,3 @@ class SearchMoviesUseCase @Inject constructor(
         return result.sortedByDescending { it.scheduled }
     }
 }
-
-/*
-return discoverRepository.getDiscoverMovies().let {
-            when (it) {
-                is Resource.Success -> Resource.Success(it.data.map { it.toMovie() })
-                is Resource.Error -> Resource.Error(it.message)
-            }
-        }
- */

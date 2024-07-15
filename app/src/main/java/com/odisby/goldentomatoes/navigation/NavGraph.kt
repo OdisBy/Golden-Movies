@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.odisby.goldentomatoes.feature.details.ui.DetailsRoot
-import com.odisby.goldentomatoes.feature.details.ui.DetailsViewModel
 import com.odisby.goldentomatoes.feature.home.ui.HomeRoot
 import com.odisby.goldentomatoes.feature.movielist.ui.MovieListRoot
 
@@ -26,12 +26,13 @@ fun SetupNavGraph(navController: NavHostController) {
                 }
             )
         }
-        composable<DetailsScreen> {
+        composable<DetailsScreen> { backStackEntry ->
+            val detailsScreen: DetailsScreen = backStackEntry.toRoute()
             DetailsRoot(
+                movieId = detailsScreen.id,
                 navigateUp = {
                     navController.navigateUp()
                 },
-                viewModel = DetailsViewModel()
             )
         }
         composable<MovieListScreen> {
