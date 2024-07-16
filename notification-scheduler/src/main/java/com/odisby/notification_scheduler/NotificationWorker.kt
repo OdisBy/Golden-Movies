@@ -40,7 +40,7 @@ class NotificationWorker(
     }
 
     companion object {
-        fun start(context: Context, movieId: Long, movieName: String, reminderDate: LocalDateTime) {
+        fun start(context: Context, movieId: Long, movieName: String, reminderDate: LocalDateTime,) {
 
             val initialDelayEarly =
                 Duration.between(LocalDateTime.now(), reminderDate).minusMinutes(20)

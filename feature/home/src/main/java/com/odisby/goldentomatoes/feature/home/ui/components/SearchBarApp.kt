@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -179,7 +181,7 @@ fun MovieSearchListItem(
 
             Icon(
                 painter = rememberVectorPainter(
-                    image = if (movie.favorite) Icons.Filled.Notifications else Icons.Outlined.Notifications
+                    image = if (movie.favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
                 ),
                 contentDescription = null,
                 tint = if (movie.favorite) Primary400 else TextColor

@@ -6,6 +6,7 @@ import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.odisby.goldentomatoes.feature.details.data.GetDetailsUseCase
 import com.odisby.goldentomatoes.feature.details.data.NotificationsUseCase
+import com.odisby.goldentomatoes.feature.details.data.SaveMoviesUseCase
 import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
     private val notificationsUseCase: NotificationsUseCase,
+    private val saveMoviesUseCase: SaveMoviesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailsUiState())
@@ -127,11 +129,11 @@ class DetailsViewModel @Inject constructor(
         getMovieDetails(RANDOM_MOVIE_ID)
     }
 
-    fun onSaveMovieButtonClick() {
+    fun onFavoriteButtonClick() {
         viewModelScope.launch {
             try {
                 val movie = state.value.movieDetails ?: return@launch
-                notificationsUseCase.invoke(movie)
+                saveMoviesUseCase.invoke(movie)
                 _state.update {
                     it.copy(movieDetails = movie.copy(favorite = !movie.favorite))
                 }
@@ -145,9 +147,14 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val movie = state.value.movieDetails ?: return@launch
+
+                if(!movie.favorite) {
+                    saveMoviesUseCase.invoke(movie)
+                }
+
                 notificationsUseCase.invoke(movie)
                 _state.value =
-                    _state.value.copy(movieDetails = movie.copy(scheduled = !movie.scheduled))
+                    _state.value.copy(movieDetails = movie.copy(scheduled = !movie.scheduled, favorite = !movie.favorite))
             } catch (e: Exception) {
                 Timber.e("Não foi possível agendar o filme ${e.localizedMessage}")
             }

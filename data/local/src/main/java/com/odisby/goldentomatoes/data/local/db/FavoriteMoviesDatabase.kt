@@ -7,7 +7,7 @@ import com.odisby.goldentomatoes.data.data.model.MovieEntity
 
 @Database(
     entities = [MovieEntity::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class FavoriteMoviesDatabase : RoomDatabase() {

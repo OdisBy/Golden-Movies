@@ -21,7 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -71,10 +72,6 @@ fun DetailsRoot(
         viewModel.loadMovieDetails(movieId)
     }
 
-    fun onNotificationButtonClick() {
-        viewModel.onNotificationButtonClick()
-    }
-
     Scaffold(
         modifier = Modifier
             .background(BackgroundColor)
@@ -101,6 +98,9 @@ fun DetailsRoot(
                     )
                 }
 
+                val notificationButtonIcon: ImageVector =
+                    if (uiState.movieDetails?.scheduled == true) Icons.Filled.Notifications else Icons.Outlined.Notifications
+
                 IconButton(
                     onClick = {
                         viewModel.onNotificationButtonClick()
@@ -112,8 +112,8 @@ fun DetailsRoot(
                     )
                 ) {
                     Icon(
-                        painter = rememberVectorPainter(Icons.Outlined.Notifications),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        painter = rememberVectorPainter(notificationButtonIcon),
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.notification_button_description)
                     )
                 }
             }
@@ -145,7 +145,7 @@ fun DetailsRoot(
                 onNextMovieClick = {
                     viewModel.onNextRandomMovieClick()
                 },
-                onNotificationButtonClick = { onNotificationButtonClick() },
+                onFavoriteButtonClick = { viewModel.onFavoriteButtonClick() },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),
@@ -168,7 +168,7 @@ fun ErrorScreen(modifier: Modifier) {
 fun DetailsScreen(
     movieDetails: MovieDetails,
     onNextMovieClick: () -> Unit,
-    onNotificationButtonClick: () -> Unit,
+    onFavoriteButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -206,8 +206,8 @@ fun DetailsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         BottomButtons(
-            scheduled = movieDetails.scheduled,
-            onNotificationButtonClick = onNotificationButtonClick,
+            favorite = movieDetails.favorite,
+            onNotificationButtonClick = onFavoriteButtonClick,
             onNextMovieClick = onNextMovieClick,
         )
     }
@@ -215,7 +215,7 @@ fun DetailsScreen(
 
 @Composable
 private fun BottomButtons(
-    scheduled: Boolean,
+    favorite: Boolean,
     onNotificationButtonClick: () -> Unit,
     onNextMovieClick: () -> Unit,
 ) {
@@ -224,9 +224,9 @@ private fun BottomButtons(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier.fillMaxWidth()
     ) {
-        var favoriteButtonIcon: ImageVector = Icons.Outlined.Favorite
+        var favoriteButtonIcon: ImageVector = Icons.Outlined.FavoriteBorder
 
-        if (scheduled) favoriteButtonIcon = Icons.Filled.Favorite
+        if (favorite) favoriteButtonIcon = Icons.Filled.Favorite
 
 
         Button(
@@ -291,6 +291,9 @@ private fun DetailsScreenPreview() {
                         )
                     }
 
+                    val notificationButtonIcon: ImageVector =
+                        if (true) Icons.Filled.Notifications else Icons.Outlined.Notifications
+
                     IconButton(
                         onClick = { },
                         modifier = Modifier.statusBarsPadding(),
@@ -300,7 +303,7 @@ private fun DetailsScreenPreview() {
                         )
                     ) {
                         Icon(
-                            painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                            painter = rememberVectorPainter(notificationButtonIcon),
                             contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
                         )
                     }
@@ -313,11 +316,11 @@ private fun DetailsScreenPreview() {
                     "Title",
                     "Description",
                     "",
-                    scheduled = false,
+                    scheduled = true,
                     favorite = false
                 ),
                 onNextMovieClick = { },
-                onNotificationButtonClick = { },
+                onFavoriteButtonClick = { },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),

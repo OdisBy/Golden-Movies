@@ -20,14 +20,24 @@ class NotificationsUseCase @Inject constructor(
             cancelNotification(movieDetails.id)
         } else {
             favoriteRepository.setScheduledStatus(movieDetails.id, true)
-            createNotification(movieDetails.id, movieDetails.title, LocalDateTime.now().plusMinutes(1))
+            createNotification(
+                movieDetails.id,
+                movieDetails.title,
+                LocalDateTime.now().plusMinutes(1)
+            )
         }
     }
 
     private fun createNotification(movieId: Long, movieName: String, reminderDate: LocalDateTime) {
         try {
             Timber.d("Creating notification to movie: $movieId")
-            NotificationWorker.start(context, movieId, movieName, reminderDate)
+            NotificationWorker.start(
+                context,
+                movieId,
+                movieName,
+                reminderDate,
+//                action = { favoriteRepository.setScheduledStatus(movieId, false) }
+            )
         } catch (e: Exception) {
             Timber.e("Failed to create notification to movie. Error ${e.localizedMessage}")
         }
