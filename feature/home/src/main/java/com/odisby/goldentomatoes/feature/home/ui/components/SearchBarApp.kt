@@ -179,10 +179,10 @@ fun MovieSearchListItem(
 
             Icon(
                 painter = rememberVectorPainter(
-                    image = if (movie.saved) Icons.Filled.Notifications else Icons.Outlined.Notifications
+                    image = if (movie.favorite) Icons.Filled.Notifications else Icons.Outlined.Notifications
                 ),
                 contentDescription = null,
-                tint = if (movie.saved) Primary400 else TextColor
+                tint = if (movie.favorite) Primary400 else TextColor
             )
         }
     }
@@ -216,7 +216,7 @@ private fun SearchBarAppActivePreview() {
                     SearchMovie(
                         id = 1,
                         title = "Meu malvado favorito numero 4 ou 5 ou 6 ou 7 ou 8",
-                        saved = true
+                        favorite = true
                     )
                 ).toPersistentList()
             ),

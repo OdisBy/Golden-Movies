@@ -76,7 +76,7 @@ fun MovieListRoot(
             "Descobrir Filmes"
         }
 
-        ListTypes.SAVED -> {
+        ListTypes.FAVORITE -> {
             "Filmes Agendados"
         }
 

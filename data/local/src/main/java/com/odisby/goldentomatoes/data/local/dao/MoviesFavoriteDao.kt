@@ -6,7 +6,7 @@ import com.odisby.goldentomatoes.core.network.local.BaseDao
 import com.odisby.goldentomatoes.data.data.model.MovieEntity
 
 @Dao
-interface MoviesSavedDao : BaseDao<MovieEntity> {
+interface MoviesFavoriteDao : BaseDao<MovieEntity> {
     @Query("SELECT * FROM ${MovieEntity.TABLE_NAME}")
     suspend fun getAll(): List<MovieEntity>
 

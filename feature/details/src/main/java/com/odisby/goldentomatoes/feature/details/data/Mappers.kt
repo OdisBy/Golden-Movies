@@ -10,7 +10,7 @@ fun MovieGlobal.toMovieDetails(): MovieDetails {
         title = this.title,
         description = this.description,
         posterPath = this.posterPath,
-        saved = this.saved,
+        favorite = this.favorite,
         scheduled = this.scheduled
     )
 }
@@ -31,7 +31,7 @@ fun MovieEntity.toMovieDetails(): MovieDetails {
         title = this.title,
         description = this.description,
         posterPath = this.posterUrl,
-        saved = true,
+        favorite = true,
         scheduled = this.scheduled
     )
 }
@@ -42,7 +42,7 @@ fun MovieDetails.toGlobalMovie(): MovieGlobal {
         title = this.title,
         description = this.description,
         posterPath = this.posterPath,
-        saved = this.saved,
+        favorite = this.favorite,
         scheduled = this.scheduled
     )
 }

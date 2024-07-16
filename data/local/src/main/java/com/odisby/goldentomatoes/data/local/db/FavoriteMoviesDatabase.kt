@@ -2,14 +2,14 @@ package com.odisby.goldentomatoes.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.odisby.goldentomatoes.data.local.dao.MoviesSavedDao
+import com.odisby.goldentomatoes.data.local.dao.MoviesFavoriteDao
 import com.odisby.goldentomatoes.data.data.model.MovieEntity
 
 @Database(
     entities = [MovieEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
-abstract class SavedMoviesDatabase : RoomDatabase() {
-    abstract fun getMoviesSavedDao(): MoviesSavedDao
+abstract class FavoriteMoviesDatabase : RoomDatabase() {
+    abstract fun getMoviesFavoriteDao(): MoviesFavoriteDao
 }

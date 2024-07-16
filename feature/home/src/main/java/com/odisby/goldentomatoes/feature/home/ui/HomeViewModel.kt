@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
-import com.odisby.goldentomatoes.feature.home.data.GetSavedMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
 import com.odisby.goldentomatoes.feature.home.data.SearchMoviesUseCase
 import com.odisby.goldentomatoes.feature.home.model.HomeMovie
 import com.odisby.goldentomatoes.feature.home.model.SearchMovie
@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
-    private val getSavedMoviesUseCase: GetSavedMoviesUseCase,
+    private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
     private val searchMoviesUseCase: SearchMoviesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _state.update {
-                it.copy(isLoadingDiscover = true, isLoadingSaved = true)
+                it.copy(isLoadingDiscover = true, isLoadingFavorite = true)
             }
 
             getDiscoverMovies()
@@ -116,32 +116,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getSavedMovies() = viewModelScope.launch {
+    fun getFavoriteMovies() = viewModelScope.launch {
         try {
-            getSavedMoviesUseCase()
+            getFavoriteMoviesUseCase()
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
                     Timber.e("Unexpected catch error ${e.message}")
                     _state.value =
                         _state.value.copy(
-                            isLoadingSaved = false,
-                            savedList = persistentListOf(),
+                            isLoadingFavorite = false,
+                            favoriteList = persistentListOf(),
                             searchErrorMessage = e.localizedMessage ?: "Error"
                         )
                 }
                 .collect { result ->
                     _state.value =
                         _state.value.copy(
-                            savedList = result.toPersistentList(),
-                            isLoadingSaved = false
+                            favoriteList = result.toPersistentList(),
+                            isLoadingFavorite = false
                         )
                 }
 
         } catch (e: Exception) {
             _state.value =
                 _state.value.copy(
-                    isLoadingSaved = false,
-                    savedList = persistentListOf(),
+                    isLoadingFavorite = false,
+                    favoriteList = persistentListOf(),
                     searchErrorMessage = e.localizedMessage ?: "Error"
                 )
         }
@@ -211,9 +211,9 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
-    val isLoadingSaved: Boolean = false,
+    val isLoadingFavorite: Boolean = false,
     val discoverList: ImmutableList<HomeMovie> = persistentListOf(),
-    val savedList: ImmutableList<HomeMovie> = persistentListOf(),
+    val favoriteList: ImmutableList<HomeMovie> = persistentListOf(),
     val searchMovieList: ImmutableList<SearchMovie> = persistentListOf(),
     val searchQuery: String = "",
     val queryHasNoResults: Boolean = false,

@@ -3,7 +3,7 @@ package com.odisby.goldentomatoes.feature.movielist.data
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
-import com.odisby.goldentomatoes.data.data.repositories.SavedRepository
+import com.odisby.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.odisby.goldentomatoes.feature.movielist.model.MovieListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -12,12 +12,12 @@ import javax.inject.Inject
 
 class GetDiscoverMoviesUseCase @Inject constructor(
     private val discoverRepository: DiscoverRepository,
-    private val savedRepository: SavedRepository,
+    private val favoriteRepository: FavoriteRepository,
 ) {
     suspend operator fun invoke(type: ListTypes): Flow<Resource<List<MovieListItem>>> {
         return when (type) {
             ListTypes.DISCOVER -> getDiscoverMovies()
-            ListTypes.SAVED -> getSavedMovies()
+            ListTypes.FAVORITE -> getFavoriteMovies()
         }
     }
 
@@ -30,8 +30,8 @@ class GetDiscoverMoviesUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getSavedMovies(): Flow<Resource<List<MovieListItem>>> = flow {
-        savedRepository.getSavedMovies().map {
+    private suspend fun getFavoriteMovies(): Flow<Resource<List<MovieListItem>>> = flow {
+        favoriteRepository.getFavoriteMovies().map {
             emit(Resource.Success(it.map { it.toMovieListItem() }))
         }
     }

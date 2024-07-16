@@ -15,9 +15,9 @@ class SearchMoviesUseCase @Inject constructor(
                 SearchMovie(
                     id = movie.id,
                     title = movie.title,
-                    saved = movie.saved
+                    favorite = movie.favorite
                 )
             }
-                .sortedByDescending { it.saved }
+                .sortedByDescending { it.favorite }
         }
 }

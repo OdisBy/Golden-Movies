@@ -9,6 +9,6 @@ fun MovieGlobal.toMovie(): HomeMovie {
         title = this.title,
         description = this.description,
         posterPath = this.posterPath,
-        saved = this.saved,
+        favorite = this.favorite,
     )
 }

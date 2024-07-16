@@ -133,7 +133,7 @@ class DetailsViewModel @Inject constructor(
                 val movie = state.value.movieDetails ?: return@launch
                 notificationsUseCase.invoke(movie)
                 _state.update {
-                    it.copy(movieDetails = movie.copy(saved = !movie.saved))
+                    it.copy(movieDetails = movie.copy(favorite = !movie.favorite))
                 }
             } catch (e: Exception) {
                 Timber.e("Não foi possível salvar o filme ${e.localizedMessage}")

@@ -24,7 +24,7 @@ class SearchMoviesRepositoryImpl @Inject constructor(
                     SearchMovieRemote(
                         id = movieRemote.id,
                         title = movieRemote.title,
-                        saved = resultLocal.any { it?.id == movieRemote.id }
+                        favorite = resultLocal.any { it?.id == movieRemote.id }
                     )
                 }
             )

@@ -2,25 +2,25 @@ package com.odisby.goldentomatoes.data.local.source
 
 import com.odisby.goldentomatoes.data.data.model.MovieEntity
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
-import com.odisby.goldentomatoes.data.data.source.SavedMoviesSource
-import com.odisby.goldentomatoes.data.local.db.SavedMoviesDatabase
+import com.odisby.goldentomatoes.data.data.source.FavoriteMoviesSource
+import com.odisby.goldentomatoes.data.local.db.FavoriteMoviesDatabase
 import javax.inject.Inject
 
-class SavedMoviesSourceLocal @Inject constructor(
-    db: SavedMoviesDatabase
-) : SavedMoviesSource.Local {
+class FavoriteMoviesSourceLocal @Inject constructor(
+    db: FavoriteMoviesDatabase
+) : FavoriteMoviesSource.Local {
 
-    private val dao = db.getMoviesSavedDao()
+    private val dao = db.getMoviesFavoriteDao()
 
-    override suspend fun getSavedMovies(): List<MovieGlobal> {
+    override suspend fun getFavoriteMovies(): List<MovieGlobal> {
         return dao.getQuantity(5).toMovieGlobal()
     }
 
-    override suspend fun addSavedMovie(movie: MovieGlobal) {
+    override suspend fun addFavoriteMovie(movie: MovieGlobal) {
         dao.insert(movie.toMovieEntity())
     }
 
-    override suspend fun removeSavedMovie(movieId: Long) {
+    override suspend fun removeFavoriteMovie(movieId: Long) {
         dao.deleteById(movieId)
     }
 
@@ -57,7 +57,7 @@ private fun MovieEntity.toMovieGlobal(): MovieGlobal {
         title = this.title,
         description = this.description,
         posterPath = this.posterUrl,
-        saved = true,
+        favorite = true,
         scheduled = this.scheduled
     )
 }

@@ -68,7 +68,7 @@ fun HomeRoot(
 
     val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
 
-    RepeatOnLifecycleEffect { viewModel.getSavedMovies() }
+    RepeatOnLifecycleEffect { viewModel.getFavoriteMovies() }
 
     Scaffold(
         modifier = Modifier
@@ -96,7 +96,7 @@ fun HomeRoot(
         HomeScreen(
             uiState = uiState,
             discoverMoviesList = uiState.discoverList,
-            savedMoviesList = uiState.savedList,
+            favoriteMoviesList = uiState.favoriteList,
             inputQuery = inputQuery,
             onInputQueryChange = { viewModel.updateInput(it) },
             onSearchButtonClick = { viewModel.runSearch(it) },
@@ -114,7 +114,7 @@ fun HomeRoot(
 fun HomeScreen(
     uiState: HomeUiState,
     discoverMoviesList: List<HomeMovie>,
-    savedMoviesList: List<HomeMovie>,
+    favoriteMoviesList: List<HomeMovie>,
     inputQuery: String,
     onInputQueryChange: (String) -> Unit,
     onSearchButtonClick: (String) -> Unit,
@@ -157,13 +157,13 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
             }
-            if (uiState.isLoadingSaved) {
+            if (uiState.isLoadingFavorite) {
                 MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
-                SavedMovies(
+                FavoriteMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    savedMoviesList
+                    favoriteMoviesList
                 )
             }
 
@@ -208,10 +208,10 @@ private fun DiscoverNewMovies(
 }
 
 @Composable
-private fun SavedMovies(
+private fun FavoriteMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    homeMovies: List<HomeMovie>,
+    favoriteMovies: List<HomeMovie>,
 ) {
     Column(
         modifier = Modifier
@@ -220,24 +220,24 @@ private fun SavedMovies(
             .semantics { isTraversalGroup = true }
     ) {
         RowTextAndGoButton(
-            text = stringResource(R.string.saved_movies_title),
+            text = stringResource(R.string.favorite_movies_title),
             onButtonClick = {
-                navigateToMovieList(ListTypes.SAVED)
+                navigateToMovieList(ListTypes.FAVORITE)
             },
-            buttonVisible = homeMovies.size > 3
+            buttonVisible = favoriteMovies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (homeMovies.isEmpty()) {
-            NoMoviesSaved()
+        if (favoriteMovies.isEmpty()) {
+            NoMoviesFavorite()
         } else {
-            SavedCarousel(homeMovies, goToMovieDetails)
+            FavoriteCarousel(favoriteMovies, goToMovieDetails)
         }
     }
 }
 
 @Composable
-fun SavedCarousel(
+fun FavoriteCarousel(
     homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit
 ) {
@@ -294,9 +294,9 @@ private fun MoviesCarousel(homeMovies: List<HomeMovie>, goToMovieDetails: (Long)
 }
 
 @Composable
-fun NoMoviesSaved(modifier: Modifier = Modifier) {
+fun NoMoviesFavorite(modifier: Modifier = Modifier) {
     Text(
-        text = stringResource(R.string.no_movies_saved),
+        text = stringResource(R.string.no_movies_favorite),
         color = TextColor,
     )
 }
@@ -341,7 +341,7 @@ fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
         discoverMoviesList = emptyList(),
-        savedMoviesList = emptyList(),
+        favoriteMoviesList = emptyList(),
         inputQuery = "",
         onSearchButtonClick = {},
         onInputQueryChange = {},

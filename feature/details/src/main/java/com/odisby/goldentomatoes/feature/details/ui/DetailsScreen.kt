@@ -20,7 +20,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -79,18 +80,42 @@ fun DetailsRoot(
             .background(BackgroundColor)
             .navigationBarsPadding(),
         topBar = {
-            IconButton(
-                onClick = navigateUp,
-                modifier = Modifier.statusBarsPadding(),
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = TextColor,
-                    containerColor = Black_50,
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                    contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                )
+                IconButton(
+                    onClick = {
+                        navigateUp()
+                    },
+                    modifier = Modifier.statusBarsPadding(),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = TextColor,
+                        containerColor = Black_50,
+                    )
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        viewModel.onNotificationButtonClick()
+                    },
+                    modifier = Modifier.statusBarsPadding(),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = TextColor,
+                        containerColor = Black_50,
+                    )
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                    )
+                }
             }
         }
     ) { contentPadding ->
@@ -114,7 +139,7 @@ fun DetailsRoot(
         }
 
         // Set it instead just call DetailsScreen because recomposition isn't being triggered
-        if(uiState.movieDetails != null) {
+        if (uiState.movieDetails != null) {
             DetailsScreen(
                 movieDetails = uiState.movieDetails!!,
                 onNextMovieClick = {
@@ -199,9 +224,9 @@ private fun BottomButtons(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier.fillMaxWidth()
     ) {
-        var notificationButtonIcon: ImageVector = Icons.Outlined.Notifications
+        var favoriteButtonIcon: ImageVector = Icons.Outlined.Favorite
 
-        if (scheduled) notificationButtonIcon = Icons.Filled.Notifications
+        if (scheduled) favoriteButtonIcon = Icons.Filled.Favorite
 
 
         Button(
@@ -215,7 +240,7 @@ private fun BottomButtons(
             )
         ) {
             Icon(
-                painter = rememberVectorPainter(notificationButtonIcon),
+                painter = rememberVectorPainter(favoriteButtonIcon),
                 contentDescription = null,
             )
         }
@@ -247,23 +272,50 @@ private fun DetailsScreenPreview() {
                 .background(BackgroundColor)
                 .navigationBarsPadding(),
             topBar = {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = TextColor,
-                        containerColor = Black_50,
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
                 }
             }
         ) { contentPadding ->
             DetailsScreen(
-                movieDetails = MovieDetails(1, "Title", "Description", "", scheduled = false, saved = false),
+                movieDetails = MovieDetails(
+                    1,
+                    "Title",
+                    "Description",
+                    "",
+                    scheduled = false,
+                    favorite = false
+                ),
                 onNextMovieClick = { },
                 onNotificationButtonClick = { },
                 modifier = Modifier
@@ -283,18 +335,38 @@ private fun DetailsErrorPreview() {
                 .background(BackgroundColor)
                 .navigationBarsPadding(),
             topBar = {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = TextColor,
-                        containerColor = Black_50,
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
                 }
             }
         ) { contentPadding ->
@@ -320,18 +392,38 @@ private fun DetailsLoadingPreview() {
                 .navigationBarsPadding()
                 .fillMaxSize(),
             topBar = {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = TextColor,
-                        containerColor = Black_50,
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
                 }
             }
         ) { contentPadding ->

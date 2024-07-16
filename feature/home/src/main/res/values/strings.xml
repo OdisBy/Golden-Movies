@@ -10,7 +10,7 @@
     <!--    Serach Bar-->
     <string name="clear_query">Limpar busca</string>
     <string name="home_fab_label">Descubra filmes aleatórios</string>
-    <string name="saved_movies_title">Filmes salvos</string>
+    <string name="favorite_movies_title">Filmes favoritos</string>
     <string name="discover_movies_title">Descubra novos filmes</string>
-    <string name="no_movies_saved">Você ainda não salvou nenhum filme :)</string>
+    <string name="no_movies_favorite">Você ainda não favoritou nenhum filme :)</string>
 </resources>
