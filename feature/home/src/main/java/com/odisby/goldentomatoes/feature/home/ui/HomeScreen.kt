@@ -42,10 +42,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.odisby.goldentomatoes.core.ui.AppEventListener
+import com.odisby.goldentomatoes.core.ui.RepeatOnLifecycleEffect
+import com.odisby.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.Primary200
@@ -66,15 +66,9 @@ fun HomeRoot(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    AppEventListener {
-        when (it) {
-            Lifecycle.Event.ON_RESUME -> {
-                viewModel.getScheduledMovies()
-            }
+    val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
 
-            else -> {}
-        }
-    }
+    RepeatOnLifecycleEffect { viewModel.getScheduledMovies() }
 
     Scaffold(
         modifier = Modifier
@@ -85,7 +79,7 @@ fun HomeRoot(
             if (hasInternetConnection) {
                 FloatingActionButton(
                     onClick = {
-                        navigateToDetailsScreen(-1)
+                        navigateToDetailsScreen(RANDOM_MOVIE_ID)
                     },
                     containerColor = Primary200,
                     contentColor = Primary900,
@@ -101,6 +95,10 @@ fun HomeRoot(
     ) { contentPadding ->
         HomeScreen(
             uiState = uiState,
+            discoverMoviesList = uiState.discoverList,
+            scheduledMoviesList = uiState.scheduledList,
+            inputQuery = inputQuery,
+            onInputQueryChange = { viewModel.updateInput(it) },
             onSearchButtonClick = { viewModel.runSearch(it) },
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
@@ -115,6 +113,10 @@ fun HomeRoot(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    discoverMoviesList: List<Movie>,
+    scheduledMoviesList: List<Movie>,
+    inputQuery: String,
+    onInputQueryChange: (String) -> Unit,
     onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
@@ -123,16 +125,15 @@ fun HomeScreen(
 ) {
 
     var searchBarActive by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
 
     Column {
         // Search bar should have max size, so I'll have to break this in two Columns zzzz
         SearchBarApp(
-            searchQuery = searchQuery,
+            searchQuery = inputQuery,
             onSearchButtonClick = onSearchButtonClick,
             searchBarActive = searchBarActive,
             uiState = uiState,
-            onChangeQuery = { searchQuery = it },
+            onChangeQuery = onInputQueryChange,
             onChangeSearchBarActive = { searchBarActive = it },
         )
         // carrosel loading surface
@@ -149,7 +150,7 @@ fun HomeScreen(
                     DiscoverNewMovies(
                         goToMovieDetails,
                         navigateToMovieList,
-                        movies = uiState.discoverList
+                        discoverMoviesList
                     )
                 }
 
@@ -162,13 +163,12 @@ fun HomeScreen(
                 ScheduledMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    movies = uiState.scheduledList
+                    scheduledMoviesList
                 )
             }
 
         }
     }
-
 }
 
 @Composable
@@ -340,7 +340,11 @@ private fun RowTextAndGoButton(
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
+        discoverMoviesList = emptyList(),
+        scheduledMoviesList = emptyList(),
+        inputQuery = "",
         onSearchButtonClick = {},
+        onInputQueryChange = {},
         navigateToMovieList = { },
         hasInternetConnection = true,
         goToMovieDetails = {}

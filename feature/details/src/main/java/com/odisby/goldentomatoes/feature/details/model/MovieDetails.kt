@@ -1,6 +1,6 @@
 package com.odisby.goldentomatoes.feature.details.model
 
-data class Movie(
+data class MovieDetails(
     val id: Long,
     val title: String,
     val description: String,

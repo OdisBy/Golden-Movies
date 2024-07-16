@@ -54,22 +54,20 @@ import com.odisby.goldentomatoes.core.ui.theme.Black_50
 import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.details.R
-import com.odisby.goldentomatoes.feature.details.model.Movie
+import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 
 @Composable
 fun DetailsRoot(
-    navigateUp: () -> Unit,
     movieId: Long,
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    /*
-    Movie Id -1 Is being treated as random movie
-    */
+
     LaunchedEffect(key1 = Unit) {
-        viewModel.getMovieDetails(movieId)
+        viewModel.loadMovieDetails(movieId)
     }
 
     fun onNotificationButtonClick() {
@@ -105,7 +103,7 @@ fun DetailsRoot(
             )
             return@Scaffold
         }
-        if (uiState.movie == null) {
+        if (uiState.errorMessage != null) {
             ErrorScreen(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,16 +113,19 @@ fun DetailsRoot(
             return@Scaffold
         }
 
-        DetailsScreen(
-            movie = uiState.movie!!,
-            onNextMovieClick = {
-                viewModel.getMovieDetails(-1)
-            },
-            onNotificationButtonClick = { onNotificationButtonClick() },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        )
+        // Set it instead just call DetailsScreen because recomposition isn't being triggered
+        if(uiState.movieDetails != null) {
+            DetailsScreen(
+                movieDetails = uiState.movieDetails!!,
+                onNextMovieClick = {
+                    viewModel.onNextRandomMovieClick()
+                },
+                onNotificationButtonClick = { onNotificationButtonClick() },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+            )
+        }
     }
 }
 
@@ -140,7 +141,7 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 fun DetailsScreen(
-    movie: Movie,
+    movieDetails: MovieDetails,
     onNextMovieClick: () -> Unit,
     onNotificationButtonClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -150,8 +151,8 @@ fun DetailsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
-            contentDescription = movie.title,
+            model = "https://image.tmdb.org/t/p/w500/${movieDetails.posterPath}",
+            contentDescription = movieDetails.title,
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .height(500.dp)
@@ -164,13 +165,13 @@ fun DetailsScreen(
                 .padding(horizontal = 12.dp)
         ) {
             Text(
-                movie.title,
+                movieDetails.title,
                 color = TextColor,
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                movie.description,
+                movieDetails.description,
                 color = TextColor,
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis
@@ -180,7 +181,7 @@ fun DetailsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         BottomButtons(
-            scheduled = movie.scheduled,
+            scheduled = movieDetails.scheduled,
             onNotificationButtonClick = onNotificationButtonClick,
             onNextMovieClick = onNextMovieClick,
         )
@@ -262,7 +263,7 @@ private fun DetailsScreenPreview() {
             }
         ) { contentPadding ->
             DetailsScreen(
-                movie = Movie(1, "Title", "Description", ""),
+                movieDetails = MovieDetails(1, "Title", "Description", ""),
                 onNextMovieClick = { },
                 onNotificationButtonClick = { },
                 modifier = Modifier

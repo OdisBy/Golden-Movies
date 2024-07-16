@@ -4,14 +4,16 @@ import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
 import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
 import com.odisby.goldentomatoes.data.data.source.DiscoverSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
 
 class DiscoverRepositoryImpl @Inject constructor(
     private val remoteSource: DiscoverSource.Remote
 ) : DiscoverRepository {
-    override suspend fun getDiscoverMovies(): Resource<List<MovieGlobal>> {
-        return remoteSource.getDiscoverMovies().toMovieGlobal()
+    override suspend fun getDiscoverMovies(): Flow<Resource<List<MovieGlobal>>> = flow {
+        emit(remoteSource.getDiscoverMovies().toMovieGlobal())
     }
 
     override suspend fun randomMovieId(): Long? {
@@ -31,4 +33,3 @@ class DiscoverRepositoryImpl @Inject constructor(
         }
     }
 }
-
