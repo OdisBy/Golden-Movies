@@ -5,20 +5,27 @@ import com.odisby.goldentomatoes.data.data.model.MovieGlobal
 import com.odisby.goldentomatoes.data.data.model.MovieRemote
 import com.odisby.goldentomatoes.data.data.repositories.DetailsRepository
 import com.odisby.goldentomatoes.data.data.source.DetailsDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class DetailsRepositoryImpl @Inject constructor(
     private val remoteDataSource: DetailsDataSource.Remote,
     private val localDataSource: DetailsDataSource.Local
 ) : DetailsRepository {
-    override suspend fun getMovieDetails(movieId: Long): Resource<MovieGlobal> {
-        val localMovie = localDataSource.getMovieDetails(movieId)
-        if (localMovie != null) {
-            return Resource.Success(localMovie.toMovieGlobal())
+
+    override suspend fun getMovieDetails(movieId: Long): Flow<Resource<MovieGlobal>> = flow {
+        localDataSource.getMovieDetails(movieId)?.let { localMovie ->
+            emit(Resource.Success(localMovie.toMovieGlobal()))
         }
 
-        val remoteMovie = remoteDataSource.getMovieDetails(movieId)
-        return remoteMovie.toMovieGlobal()
+        try {
+            val remoteMovie = remoteDataSource.getMovieDetails(movieId)
+            emit(remoteMovie.toMovieGlobal())
+        } catch (e: Exception) {
+            // Handle the exception and emit an error state
+            emit(Resource.Error(e.message ?: "Failed to fetch movie details"))
+        }
     }
 }
 

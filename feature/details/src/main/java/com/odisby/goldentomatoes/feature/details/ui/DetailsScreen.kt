@@ -54,7 +54,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Black_50
 import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.details.R
-import com.odisby.goldentomatoes.feature.details.model.Movie
+import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 
 @Composable
 fun DetailsRoot(
@@ -105,7 +105,7 @@ fun DetailsRoot(
             )
             return@Scaffold
         }
-        if (uiState.movie == null) {
+        if (uiState.movieDetails == null) {
             ErrorScreen(
                 modifier = Modifier
                     .fillMaxSize()
@@ -116,7 +116,7 @@ fun DetailsRoot(
         }
 
         DetailsScreen(
-            movie = uiState.movie!!,
+            movieDetails = uiState.movieDetails!!,
             onNextMovieClick = {
                 viewModel.getMovieDetails(-1)
             },
@@ -140,7 +140,7 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 fun DetailsScreen(
-    movie: Movie,
+    movieDetails: MovieDetails,
     onNextMovieClick: () -> Unit,
     onNotificationButtonClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -150,8 +150,8 @@ fun DetailsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
-            contentDescription = movie.title,
+            model = "https://image.tmdb.org/t/p/w500/${movieDetails.posterPath}",
+            contentDescription = movieDetails.title,
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .height(500.dp)
@@ -164,13 +164,13 @@ fun DetailsScreen(
                 .padding(horizontal = 12.dp)
         ) {
             Text(
-                movie.title,
+                movieDetails.title,
                 color = TextColor,
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                movie.description,
+                movieDetails.description,
                 color = TextColor,
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis
@@ -180,7 +180,7 @@ fun DetailsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         BottomButtons(
-            scheduled = movie.scheduled,
+            scheduled = movieDetails.scheduled,
             onNotificationButtonClick = onNotificationButtonClick,
             onNextMovieClick = onNextMovieClick,
         )
@@ -262,7 +262,7 @@ private fun DetailsScreenPreview() {
             }
         ) { contentPadding ->
             DetailsScreen(
-                movie = Movie(1, "Title", "Description", ""),
+                movieDetails = MovieDetails(1, "Title", "Description", ""),
                 onNextMovieClick = { },
                 onNotificationButtonClick = { },
                 modifier = Modifier

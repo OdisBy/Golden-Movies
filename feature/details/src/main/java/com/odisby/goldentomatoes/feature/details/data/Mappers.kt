@@ -2,10 +2,10 @@ package com.odisby.goldentomatoes.feature.details.data
 
 import com.odisby.goldentomatoes.data.data.model.MovieEntity
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
-import com.odisby.goldentomatoes.feature.details.model.Movie
+import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 
-fun MovieGlobal.toMovie(): Movie {
-    return Movie(
+fun MovieGlobal.toMovieDetails(): MovieDetails {
+    return MovieDetails(
         id = this.id,
         title = this.title,
         description = this.description,
@@ -14,7 +14,7 @@ fun MovieGlobal.toMovie(): Movie {
     )
 }
 
-fun Movie.toMovieEntity(): MovieEntity {
+fun MovieDetails.toMovieEntity(): MovieEntity {
     return MovieEntity(
         id = this.id,
         title = this.title,
@@ -23,8 +23,8 @@ fun Movie.toMovieEntity(): MovieEntity {
     )
 }
 
-fun MovieEntity.toMovie(): Movie {
-    return Movie(
+fun MovieEntity.toMovie(): MovieDetails {
+    return MovieDetails(
         id = this.id,
         title = this.title,
         description = this.description,
@@ -33,7 +33,7 @@ fun MovieEntity.toMovie(): Movie {
     )
 }
 
-fun Movie.toGlobalMovie(): MovieGlobal {
+fun MovieDetails.toGlobalMovie(): MovieGlobal {
     return MovieGlobal(
         id = this.id,
         title = this.title,
