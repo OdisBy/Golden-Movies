@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +30,9 @@ class MovieListViewModel @Inject constructor(
         get() = _state
 
     init {
-        _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+        _state.update {
+            it.copy(isLoading = true, errorMessage = null)
+        }
     }
 
     fun getDiscoverMovies(type: ListTypes) = viewModelScope.launch {
@@ -46,28 +49,34 @@ class MovieListViewModel @Inject constructor(
                 }
 
         } catch (e: Exception) {
-            _state.value = _state.value.copy(
-                errorMessage = e.localizedMessage ?: "Error",
-                isLoading = false
-            )
-        }
-    }
-
-    private fun handleDiscoverMovies(it: Resource<List<MovieListItem>>) {
-        when (it) {
-            is Resource.Success -> {
-                _state.value = _state.value.copy(
-                    moviesList = it.data.toPersistentList(),
-                    errorMessage = null,
+            _state.update {
+                it.copy(
+                    errorMessage = e.localizedMessage ?: "Error",
                     isLoading = false
                 )
             }
+        }
+    }
+
+    private fun handleDiscoverMovies(resource: Resource<List<MovieListItem>>) {
+        when (resource) {
+            is Resource.Success -> {
+                _state.update {
+                    it.copy(
+                        moviesList = resource.data.toPersistentList(),
+                        errorMessage = null,
+                        isLoading = false
+                    )
+                }
+            }
 
             is Resource.Error -> {
-                _state.value = _state.value.copy(
-                    errorMessage = it.message,
-                    isLoading = false
-                )
+                _state.update {
+                    it.copy(
+                        errorMessage = resource.message,
+                        isLoading = false
+                    )
+                }
             }
         }
     }

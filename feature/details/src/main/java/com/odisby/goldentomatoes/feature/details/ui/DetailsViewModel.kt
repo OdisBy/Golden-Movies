@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +30,9 @@ class DetailsViewModel @Inject constructor(
         get() = _state
 
     init {
-        _state.value = _state.value.copy(isLoading = true)
+        _state.update {
+            it.copy(isLoading = true, errorMessage = null)
+        }
     }
 
     /**
@@ -44,7 +47,11 @@ class DetailsViewModel @Inject constructor(
     Movie Id -1 Is being treated as random movie
     */
     private fun getMovieDetails(movieId: Long) = viewModelScope.launch {
-        _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+        _state.update {
+            it.copy(
+                isLoading = true, errorMessage = null
+            )
+        }
 
         if (movieId == RANDOM_MOVIE_ID) {
             getRandomMovieDetails()

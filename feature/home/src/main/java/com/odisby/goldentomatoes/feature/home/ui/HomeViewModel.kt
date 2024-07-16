@@ -63,7 +63,9 @@ class HomeViewModel @Inject constructor(
 
     private fun getDiscoverMovies() = viewModelScope.launch {
         try {
-            _state.value = _state.value.copy(searchErrorMessage = null)
+            _state.update {
+                it.copy(searchErrorMessage = "")
+            }
 
             getDiscoverMoviesUseCase()
                 .flowOn(Dispatchers.Default)
@@ -150,18 +152,27 @@ class HomeViewModel @Inject constructor(
             try {
                 _state.value = _state.value.copy(isSearching = true, searchQuery = searchQuery)
 
-                val getMovies = searchMoviesUseCase.invoke(searchQuery)
-
-                val persistent = getMovies.toPersistentList()
-
-                _state.update {
-                    it.copy(
-                        searchMovieList = persistent,
-                        queryHasNoResults = persistent.isEmpty(),
-                        isSearching = false,
-                        searchErrorMessage = null
-                    )
-                }
+                searchMoviesUseCase.invoke(searchQuery)
+                    .flowOn(Dispatchers.Default)
+                    .catch { e ->
+                        Timber.e("Unexpected catch error ${e.message}")
+                        _state.value =
+                            _state.value.copy(
+                                searchMovieList = persistentListOf(),
+                                queryHasNoResults = false,
+                                isSearching = false,
+                                searchErrorMessage = e.localizedMessage ?: "Error"
+                            )
+                    }
+                    .collect {
+                        _state.value =
+                            _state.value.copy(
+                                searchMovieList = it.toPersistentList(),
+                                queryHasNoResults = it.isEmpty(),
+                                isSearching = false,
+                                searchErrorMessage = null
+                            )
+                    }
             } catch (e: Exception) {
                 _state.update {
                     it.copy(
