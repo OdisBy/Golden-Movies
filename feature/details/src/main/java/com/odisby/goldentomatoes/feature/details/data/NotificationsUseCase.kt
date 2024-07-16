@@ -1,7 +1,7 @@
 package com.odisby.goldentomatoes.feature.details.data
 
 import android.content.Context
-import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
+import com.odisby.goldentomatoes.data.data.repositories.SavedRepository
 import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 import com.odisby.notification_scheduler.NotificationWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -11,15 +11,15 @@ import javax.inject.Inject
 
 class NotificationsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val scheduledRepository: ScheduledRepository,
+    private val savedRepository: SavedRepository,
 ) {
 
     suspend operator fun invoke(movieDetails: MovieDetails) {
         if (movieDetails.scheduled) {
-            scheduledRepository.removeScheduledMovie(movieDetails.id)
+            savedRepository.removeSavedMovie(movieDetails.id)
             cancelNotification(movieDetails.id)
         } else {
-            scheduledRepository.addScheduledMovie(movieDetails.toGlobalMovie())
+            savedRepository.addSavedMovie(movieDetails.toGlobalMovie())
             createNotification(movieDetails.id, movieDetails.title, LocalDateTime.now().plusMinutes(1))
         }
     }

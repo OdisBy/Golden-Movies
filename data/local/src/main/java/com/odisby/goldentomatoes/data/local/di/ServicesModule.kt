@@ -2,7 +2,7 @@ package com.odisby.goldentomatoes.data.local.di
 
 import android.content.Context
 import androidx.room.Room
-import com.odisby.goldentomatoes.data.local.db.ScheduledMoviesDatabase
+import com.odisby.goldentomatoes.data.local.db.SavedMoviesDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,10 +21,10 @@ object ServicesModule {
     fun provideDatabase(
         @Named(value = DB_NAME) dbname: String,
         @ApplicationContext context: Context,
-    ): ScheduledMoviesDatabase {
+    ): SavedMoviesDatabase {
         return Room.databaseBuilder(
             context,
-            ScheduledMoviesDatabase::class.java,
+            SavedMoviesDatabase::class.java,
             dbname
         )
             .fallbackToDestructiveMigration()

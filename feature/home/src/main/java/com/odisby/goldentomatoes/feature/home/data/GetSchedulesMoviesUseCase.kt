@@ -1,16 +1,16 @@
 package com.odisby.goldentomatoes.feature.home.data
 
-import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
+import com.odisby.goldentomatoes.data.data.repositories.SavedRepository
 import com.odisby.goldentomatoes.feature.home.model.Movie
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetSchedulesMoviesUseCase @Inject constructor(
-    private val scheduledMoviesRepository: ScheduledRepository
+    private val scheduledMoviesRepository: SavedRepository
 ) {
     suspend operator fun invoke(): Flow<List<Movie>> =
-        scheduledMoviesRepository.getScheduledMovies().map { listMovies ->
+        scheduledMoviesRepository.getSavedMovies().map { listMovies ->
             listMovies.map { movieGlobal ->
                 movieGlobal.toMovie()
             }

@@ -7,9 +7,9 @@ import com.odisby.goldentomatoes.data.data.model.MovieEntity
 
 @Database(
     entities = [MovieEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
-abstract class ScheduledMoviesDatabase : RoomDatabase() {
-    abstract fun getMoviesSchedulesDao(): MoviesSchedulesDao
+abstract class SavedMoviesDatabase : RoomDatabase() {
+    abstract fun getMoviesSavedDao(): MoviesSchedulesDao
 }
