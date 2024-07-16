@@ -15,19 +15,21 @@ class DetailsRepositoryImpl @Inject constructor(
 ) : DetailsRepository {
 
     override suspend fun getMovieDetails(movieId: Long): Flow<Resource<MovieGlobal>> = flow {
-        localDataSource.getMovieDetails(movieId)?.let { localMovie ->
-            emit(Resource.Success(localMovie.toMovieGlobal()))
-        }
-
         try {
-            val remoteMovie = remoteDataSource.getMovieDetails(movieId)
-            emit(remoteMovie.toMovieGlobal())
+            val localMovie = localDataSource.getMovieDetails(movieId)
+
+            if (localMovie != null) {
+                emit(Resource.Success(localMovie.toMovieGlobal()))
+            } else {
+                val remoteMovie = remoteDataSource.getMovieDetails(movieId)
+                emit(remoteMovie.toMovieGlobal())
+            }
         } catch (e: Exception) {
-            // Handle the exception and emit an error state
             emit(Resource.Error(e.message ?: "Failed to fetch movie details"))
         }
     }
 }
+
 
 fun Resource<MovieRemote>.toMovieGlobal(): Resource<MovieGlobal> {
     return when (this) {

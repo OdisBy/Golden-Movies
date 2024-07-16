@@ -96,6 +96,7 @@ fun HomeRoot(
         HomeScreen(
             uiState = uiState,
             discoverMoviesList = uiState.discoverList,
+            scheduledMoviesList = uiState.scheduledList,
             inputQuery = inputQuery,
             onInputQueryChange = { viewModel.updateInput(it) },
             onSearchButtonClick = { viewModel.runSearch(it) },
@@ -113,6 +114,7 @@ fun HomeRoot(
 fun HomeScreen(
     uiState: HomeUiState,
     discoverMoviesList: List<Movie>,
+    scheduledMoviesList: List<Movie>,
     inputQuery: String,
     onInputQueryChange: (String) -> Unit,
     onSearchButtonClick: (String) -> Unit,
@@ -161,7 +163,7 @@ fun HomeScreen(
                 ScheduledMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    movies = uiState.scheduledList
+                    scheduledMoviesList
                 )
             }
 
@@ -339,6 +341,7 @@ fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
         discoverMoviesList = emptyList(),
+        scheduledMoviesList = emptyList(),
         inputQuery = "",
         onSearchButtonClick = {},
         onInputQueryChange = {},

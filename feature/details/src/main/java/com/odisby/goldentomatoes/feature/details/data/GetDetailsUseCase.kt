@@ -14,10 +14,10 @@ class GetDetailsUseCase @Inject constructor(
     private val discoverRepository: DiscoverRepository,
 ) {
     suspend operator fun invoke(movieId: Long): Flow<Resource<MovieDetails>> =
-        detailsRepository.getMovieDetails(movieId).map {
-            when (it) {
-                is Resource.Success -> Resource.Success(it.data.toMovieDetails())
-                is Resource.Error -> Resource.Error(it.message)
+        detailsRepository.getMovieDetails(movieId).map { resource ->
+            when (resource) {
+                is Resource.Success -> Resource.Success(resource.data.toMovieDetails())
+                is Resource.Error -> Resource.Error(resource.message)
             }
         }
 

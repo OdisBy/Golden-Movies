@@ -53,7 +53,7 @@ class DetailsViewModel @Inject constructor(
 
         try {
             getDetailsUseCase(movieId)
-                .flowOn(Dispatchers.IO)
+                .flowOn(Dispatchers.Default)
                 .catch { e ->
                     Timber.e("Unexpected catch error ${e.message}")
                     _state.value =
@@ -75,10 +75,10 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getRandomMovieDetails() {
+    private suspend fun getRandomMovieDetails() = viewModelScope.launch {
         try {
             getDetailsUseCase.getRandomMovieDetails()
-                .flowOn(Dispatchers.IO)
+                .flowOn(Dispatchers.Default)
                 .catch { e ->
                     Timber.e("Unexpected catch error ${e.message}")
                     _state.value =

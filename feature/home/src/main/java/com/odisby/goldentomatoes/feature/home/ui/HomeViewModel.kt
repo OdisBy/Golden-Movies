@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(
             _state.value = _state.value.copy(searchErrorMessage = null)
 
             getDiscoverMoviesUseCase()
-                .flowOn(Dispatchers.IO)
+                .flowOn(Dispatchers.Default)
                 .catch { e ->
                     Timber.e("Unexpected catch error ${e.message}")
                     _state.update {
@@ -116,23 +116,32 @@ class HomeViewModel @Inject constructor(
 
     fun getScheduledMovies() = viewModelScope.launch {
         try {
-            val result = getScheduledMoviesUseCase()
+            getScheduledMoviesUseCase()
+                .flowOn(Dispatchers.Default)
+                .catch { e ->
+                    Timber.e("Unexpected catch error ${e.message}")
+                    _state.value =
+                        _state.value.copy(
+                            isLoadingScheduled = false,
+                            scheduledList = persistentListOf(),
+                            searchErrorMessage = e.localizedMessage ?: "Error"
+                        )
+                }
+                .collect { result ->
+                    _state.value =
+                        _state.value.copy(
+                            scheduledList = result.toPersistentList(),
+                            isLoadingScheduled = false
+                        )
+                }
 
-            _state.update {
-                it.copy(
-                    isLoadingScheduled = false,
-                    scheduledList = result.toPersistentList()
-                )
-
-            }
         } catch (e: Exception) {
-            _state.update {
-                it.copy(
+            _state.value =
+                _state.value.copy(
                     isLoadingScheduled = false,
                     scheduledList = persistentListOf(),
                     searchErrorMessage = e.localizedMessage ?: "Error"
                 )
-            }
         }
     }
 

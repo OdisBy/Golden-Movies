@@ -31,8 +31,8 @@ class GetDiscoverMoviesUseCase @Inject constructor(
     }
 
     private suspend fun getScheduledMovies(): Flow<Resource<List<MovieListItem>>> = flow {
-        val result = scheduledRepository.getScheduledMovies()
-
-        emit(Resource.Success(result.map { it.toMovieListItem() }))
+        scheduledRepository.getScheduledMovies().map {
+            emit(Resource.Success(it.map { it.toMovieListItem() }))
+        }
     }
 }

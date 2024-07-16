@@ -1,8 +1,11 @@
 package com.odisby.goldentomatoes.data.data.impl
 
+import android.util.Log
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
 import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
 import com.odisby.goldentomatoes.data.data.source.ScheduledMoviesSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ScheduledRepositoryImpl @Inject constructor(
@@ -11,13 +14,13 @@ class ScheduledRepositoryImpl @Inject constructor(
 
     private val scheduledMovies = mutableListOf<MovieGlobal>()
 
-    override suspend fun getScheduledMovies(): List<MovieGlobal> {
+    override suspend fun getScheduledMovies(): Flow<List<MovieGlobal>> = flow {
         if (scheduledMovies.isEmpty()) {
             val movies = localDataSource.getScheduledMovies()
             scheduledMovies.addAll(movies)
         }
 
-        return scheduledMovies
+        emit(scheduledMovies)
     }
 
     override suspend fun addScheduledMovie(movie: MovieGlobal) {
@@ -30,10 +33,10 @@ class ScheduledRepositoryImpl @Inject constructor(
         scheduledMovies.removeIf { it.id == movieId }
     }
 
-    override suspend fun getMoviesById(movieId: Long): MovieGlobal? {
+    override suspend fun getMoviesById(movieId: Long): Flow<MovieGlobal?> = flow {
         val cacheMovie = scheduledMovies.find { it.id == movieId }
-        if (cacheMovie != null) return cacheMovie
+        if (cacheMovie != null) emit(cacheMovie)
 
-        return localDataSource.getMoviesById(movieId)
+        emit(localDataSource.getMoviesById(movieId))
     }
 }

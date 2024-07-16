@@ -32,26 +32,24 @@ class MovieListViewModel @Inject constructor(
         _state.value = _state.value.copy(isLoading = true, errorMessage = null)
     }
 
-    fun getDiscoverMovies(type: ListTypes) {
-        viewModelScope.launch {
-            try {
-                getDiscoverMoviesUseCase.invoke(type)
-                    .flowOn(Dispatchers.IO)
-                    .catch { e ->
-                        Timber.e("Unexpected catch error ${e.message}")
-                        _state.value =
-                            _state.value.copy(errorMessage = e.localizedMessage, isLoading = false)
-                    }
-                    .collect {
-                        handleDiscoverMovies(it)
-                    }
+    fun getDiscoverMovies(type: ListTypes) = viewModelScope.launch {
+        try {
+            getDiscoverMoviesUseCase.invoke(type)
+                .flowOn(Dispatchers.Default)
+                .catch { e ->
+                    Timber.e("Unexpected catch error ${e.message}")
+                    _state.value =
+                        _state.value.copy(errorMessage = e.localizedMessage, isLoading = false)
+                }
+                .collect {
+                    handleDiscoverMovies(it)
+                }
 
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    errorMessage = e.localizedMessage ?: "Error",
-                    isLoading = false
-                )
-            }
+        } catch (e: Exception) {
+            _state.value = _state.value.copy(
+                errorMessage = e.localizedMessage ?: "Error",
+                isLoading = false
+            )
         }
     }
 
