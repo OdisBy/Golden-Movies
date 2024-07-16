@@ -58,18 +58,16 @@ import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 
 @Composable
 fun DetailsRoot(
-    navigateUp: () -> Unit,
     movieId: Long,
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    /*
-    Movie Id -1 Is being treated as random movie
-    */
+
     LaunchedEffect(key1 = Unit) {
-        viewModel.getMovieDetails(movieId)
+        viewModel.loadMovieDetails(movieId)
     }
 
     fun onNotificationButtonClick() {
@@ -105,7 +103,7 @@ fun DetailsRoot(
             )
             return@Scaffold
         }
-        if (uiState.movieDetails == null) {
+        if (uiState.errorMessage != null) {
             ErrorScreen(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,16 +113,19 @@ fun DetailsRoot(
             return@Scaffold
         }
 
-        DetailsScreen(
-            movieDetails = uiState.movieDetails!!,
-            onNextMovieClick = {
-                viewModel.getMovieDetails(-1)
-            },
-            onNotificationButtonClick = { onNotificationButtonClick() },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        )
+        // Set it instead just call DetailsScreen because recomposition isn't being triggered
+        if(uiState.movieDetails != null) {
+            DetailsScreen(
+                movieDetails = uiState.movieDetails!!,
+                onNextMovieClick = {
+                    viewModel.onNextRandomMovieClick()
+                },
+                onNotificationButtonClick = { onNotificationButtonClick() },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+            )
+        }
     }
 }
 

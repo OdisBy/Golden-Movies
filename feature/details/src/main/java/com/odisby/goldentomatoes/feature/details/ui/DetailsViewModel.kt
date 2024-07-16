@@ -23,8 +23,9 @@ class DetailsViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        const val RANDOM_MOVIE_ID = -1L
+        private const val RANDOM_MOVIE_ID = -1L
     }
+
 
     private val _state = MutableStateFlow(DetailsUiState())
 
@@ -35,10 +36,18 @@ class DetailsViewModel @Inject constructor(
         _state.value = _state.value.copy(isLoading = true)
     }
 
+    /**
+     * Usually We would use the savedStateHandler, get the movieId
+     * but It is not supported with Compose Type Safety Navigation
+     */
+    fun loadMovieDetails(movieId: Long) {
+        getMovieDetails(movieId)
+    }
+
     /*
     Movie Id -1 Is being treated as random movie
     */
-    fun getMovieDetails(movieId: Long) = viewModelScope.launch {
+    private fun getMovieDetails(movieId: Long) = viewModelScope.launch {
         _state.value = _state.value.copy(isLoading = true)
 
         if (movieId == RANDOM_MOVIE_ID) {
@@ -109,6 +118,10 @@ class DetailsViewModel @Inject constructor(
                     )
             }
         }
+    }
+
+    fun onNextRandomMovieClick() {
+        getMovieDetails(RANDOM_MOVIE_ID)
     }
 
     fun onNotificationButtonClick() {
