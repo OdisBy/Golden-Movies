@@ -2,12 +2,12 @@ package com.odisby.goldentomatoes.core.ui.constants
 
 sealed class ListTypes {
     data object DISCOVER : ListTypes()
-    data object SCHEDULED : ListTypes()
+    data object SAVED : ListTypes()
 
     fun toRoute(): String {
         return when (this) {
             DISCOVER -> "discover"
-            SCHEDULED -> "scheduled"
+            SAVED -> "saved"
         }
     }
 
@@ -15,7 +15,7 @@ sealed class ListTypes {
         fun fromRoute(route: String): ListTypes {
             return when (route) {
                 "discover" -> DISCOVER
-                "scheduled" -> SCHEDULED
+                "saved" -> SAVED
                 else -> throw IllegalArgumentException("Route $route is not recognized.")
             }
         }

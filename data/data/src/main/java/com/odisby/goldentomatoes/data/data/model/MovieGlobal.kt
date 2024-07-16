@@ -5,5 +5,6 @@ data class MovieGlobal(
     val title: String,
     val description: String,
     val posterPath: String,
-    val scheduled: Boolean = false,
+    val saved: Boolean,
+    val scheduled: Boolean,
 )

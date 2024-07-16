@@ -19,13 +19,14 @@ class SearchMoviesRepositoryImpl @Inject constructor(
             // It wont filter by local, just check if the remotes ones are in the local ones
             val resultLocal = localDataSource.searchMovies(resultRemote.map { it.id })
 
-            emit(resultRemote.map { movieRemote ->
-                SearchMovieRemote(
-                    id = movieRemote.id,
-                    title = movieRemote.title,
-                    scheduled = resultLocal.any { it?.id == movieRemote.id }
-                )
-            }
+            emit(
+                resultRemote.map { movieRemote ->
+                    SearchMovieRemote(
+                        id = movieRemote.id,
+                        title = movieRemote.title,
+                        saved = resultLocal.any { it?.id == movieRemote.id }
+                    )
+                }
             )
         } catch (e: Exception) {
             Timber.e(e)

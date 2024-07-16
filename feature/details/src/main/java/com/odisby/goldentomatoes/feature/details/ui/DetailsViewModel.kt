@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
-    private val scheduleMovieUseCase: NotificationsUseCase,
+    private val notificationsUseCase: NotificationsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailsUiState())
@@ -127,11 +127,25 @@ class DetailsViewModel @Inject constructor(
         getMovieDetails(RANDOM_MOVIE_ID)
     }
 
+    fun onSaveMovieButtonClick() {
+        viewModelScope.launch {
+            try {
+                val movie = state.value.movieDetails ?: return@launch
+                notificationsUseCase.invoke(movie)
+                _state.update {
+                    it.copy(movieDetails = movie.copy(saved = !movie.saved))
+                }
+            } catch (e: Exception) {
+                Timber.e("Não foi possível salvar o filme ${e.localizedMessage}")
+            }
+        }
+    }
+
     fun onNotificationButtonClick() {
         viewModelScope.launch {
             try {
                 val movie = state.value.movieDetails ?: return@launch
-                scheduleMovieUseCase.invoke(movie)
+                notificationsUseCase.invoke(movie)
                 _state.value =
                     _state.value.copy(movieDetails = movie.copy(scheduled = !movie.scheduled))
             } catch (e: Exception) {

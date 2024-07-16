@@ -263,7 +263,7 @@ private fun DetailsScreenPreview() {
             }
         ) { contentPadding ->
             DetailsScreen(
-                movieDetails = MovieDetails(1, "Title", "Description", ""),
+                movieDetails = MovieDetails(1, "Title", "Description", "", scheduled = false, saved = false),
                 onNextMovieClick = { },
                 onNotificationButtonClick = { },
                 modifier = Modifier

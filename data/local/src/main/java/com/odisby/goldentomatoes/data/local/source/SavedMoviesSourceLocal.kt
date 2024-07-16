@@ -28,6 +28,11 @@ class SavedMoviesSourceLocal @Inject constructor(
         return dao.getById(movieId)?.toMovieGlobal()
     }
 
+    override suspend fun setScheduledStatus(movieId: Long, newState: Boolean) {
+        val movie = dao.getById(movieId) ?: return
+        dao.update(movie.copy(scheduled = newState))
+    }
+
 }
 
 private fun List<MovieEntity>.toMovieGlobal(): List<MovieGlobal> {
@@ -42,6 +47,7 @@ private fun MovieGlobal.toMovieEntity(): MovieEntity {
         title = this.title,
         description = this.description,
         posterUrl = this.posterPath,
+        scheduled = this.scheduled
     )
 }
 
@@ -51,6 +57,7 @@ private fun MovieEntity.toMovieGlobal(): MovieGlobal {
         title = this.title,
         description = this.description,
         posterPath = this.posterUrl,
-        scheduled = true
+        saved = true,
+        scheduled = this.scheduled
     )
 }

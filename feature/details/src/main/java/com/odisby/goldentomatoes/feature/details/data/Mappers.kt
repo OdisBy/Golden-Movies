@@ -10,6 +10,7 @@ fun MovieGlobal.toMovieDetails(): MovieDetails {
         title = this.title,
         description = this.description,
         posterPath = this.posterPath,
+        saved = this.saved,
         scheduled = this.scheduled
     )
 }
@@ -19,17 +20,19 @@ fun MovieDetails.toMovieEntity(): MovieEntity {
         id = this.id,
         title = this.title,
         description = this.description,
-        posterUrl = this.posterPath
+        posterUrl = this.posterPath,
+        scheduled = this.scheduled
     )
 }
 
-fun MovieEntity.toMovie(): MovieDetails {
+fun MovieEntity.toMovieDetails(): MovieDetails {
     return MovieDetails(
         id = this.id,
         title = this.title,
         description = this.description,
         posterPath = this.posterUrl,
-        scheduled = true
+        saved = true,
+        scheduled = this.scheduled
     )
 }
 
@@ -39,6 +42,7 @@ fun MovieDetails.toGlobalMovie(): MovieGlobal {
         title = this.title,
         description = this.description,
         posterPath = this.posterPath,
-        scheduled = true
+        saved = this.saved,
+        scheduled = this.scheduled
     )
 }

@@ -38,4 +38,8 @@ class SavedRepositoryImpl @Inject constructor(
 
         emit(localDataSource.getMoviesById(movieId))
     }
+
+    override suspend fun setScheduledStatus(movieId: Long, newState: Boolean) {
+        localDataSource.setScheduledStatus(movieId, newState)
+    }
 }

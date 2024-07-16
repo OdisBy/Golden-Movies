@@ -52,7 +52,7 @@ import com.odisby.goldentomatoes.core.ui.theme.Primary200
 import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
-import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.HomeMovie
 import com.odisby.goldentomatoes.feature.home.ui.components.NoMoviesFounded
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 
@@ -68,7 +68,7 @@ fun HomeRoot(
 
     val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
 
-    RepeatOnLifecycleEffect { viewModel.getScheduledMovies() }
+    RepeatOnLifecycleEffect { viewModel.getSavedMovies() }
 
     Scaffold(
         modifier = Modifier
@@ -96,7 +96,7 @@ fun HomeRoot(
         HomeScreen(
             uiState = uiState,
             discoverMoviesList = uiState.discoverList,
-            scheduledMoviesList = uiState.scheduledList,
+            savedMoviesList = uiState.savedList,
             inputQuery = inputQuery,
             onInputQueryChange = { viewModel.updateInput(it) },
             onSearchButtonClick = { viewModel.runSearch(it) },
@@ -113,8 +113,8 @@ fun HomeRoot(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    discoverMoviesList: List<Movie>,
-    scheduledMoviesList: List<Movie>,
+    discoverMoviesList: List<HomeMovie>,
+    savedMoviesList: List<HomeMovie>,
     inputQuery: String,
     onInputQueryChange: (String) -> Unit,
     onSearchButtonClick: (String) -> Unit,
@@ -157,13 +157,13 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
             }
-            if (uiState.isLoadingScheduled) {
+            if (uiState.isLoadingSaved) {
                 MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
-                ScheduledMovies(
+                SavedMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    scheduledMoviesList
+                    savedMoviesList
                 )
             }
 
@@ -180,7 +180,7 @@ fun MoviesListLoading(modifier: Modifier) {
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    movies: List<Movie>,
+    homeMovies: List<HomeMovie>,
 ) {
     Column(
         modifier = Modifier
@@ -194,24 +194,24 @@ private fun DiscoverNewMovies(
             onButtonClick = {
                 navigateToMovieList(ListTypes.DISCOVER)
             },
-            buttonVisible = movies.size > 3
+            buttonVisible = homeMovies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (movies.isEmpty()) {
+        if (homeMovies.isEmpty()) {
             NoMoviesFounded(modifier = Modifier.height(200.dp))
         } else {
-            DiscoverCarousel(movies, goToMovieDetails)
+            DiscoverCarousel(homeMovies, goToMovieDetails)
 
         }
     }
 }
 
 @Composable
-private fun ScheduledMovies(
+private fun SavedMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    movies: List<Movie>,
+    homeMovies: List<HomeMovie>,
 ) {
     Column(
         modifier = Modifier
@@ -220,40 +220,40 @@ private fun ScheduledMovies(
             .semantics { isTraversalGroup = true }
     ) {
         RowTextAndGoButton(
-            text = stringResource(R.string.schedules_movies_title),
+            text = stringResource(R.string.saved_movies_title),
             onButtonClick = {
-                navigateToMovieList(ListTypes.SCHEDULED)
+                navigateToMovieList(ListTypes.SAVED)
             },
-            buttonVisible = movies.size > 3
+            buttonVisible = homeMovies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (movies.isEmpty()) {
-            NoMoviesScheduled()
+        if (homeMovies.isEmpty()) {
+            NoMoviesSaved()
         } else {
-            ScheduledCarousel(movies, goToMovieDetails)
+            SavedCarousel(homeMovies, goToMovieDetails)
         }
     }
 }
 
 @Composable
-fun ScheduledCarousel(
-    movies: List<Movie>,
+fun SavedCarousel(
+    homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
-        movies = movies,
+        homeMovies = homeMovies,
         goToMovieDetails = goToMovieDetails
     )
 }
 
 @Composable
 fun DiscoverCarousel(
-    movies: List<Movie>,
+    homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
-        movies = movies,
+        homeMovies = homeMovies,
         goToMovieDetails = goToMovieDetails
     )
 }
@@ -269,16 +269,16 @@ fun DiscoverCarousel(
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit) {
+private fun MoviesCarousel(homeMovies: List<HomeMovie>, goToMovieDetails: (Long) -> Unit) {
     HorizontalMultiBrowseCarousel(
-        state = CarouselState(itemCount = { movies.count() }),
+        state = CarouselState(itemCount = { homeMovies.count() }),
         modifier = Modifier
             .width(412.dp)
             .height(221.dp),
         preferredItemWidth = 186.dp,
         itemSpacing = 8.dp,
     ) { index ->
-        val movie = movies[index]
+        val movie = homeMovies[index]
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
             contentDescription = movie.title,
@@ -294,9 +294,9 @@ private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit
 }
 
 @Composable
-fun NoMoviesScheduled(modifier: Modifier = Modifier) {
+fun NoMoviesSaved(modifier: Modifier = Modifier) {
     Text(
-        text = stringResource(R.string.no_movies_scheduled),
+        text = stringResource(R.string.no_movies_saved),
         color = TextColor,
     )
 }
@@ -341,7 +341,7 @@ fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
         discoverMoviesList = emptyList(),
-        scheduledMoviesList = emptyList(),
+        savedMoviesList = emptyList(),
         inputQuery = "",
         onSearchButtonClick = {},
         onInputQueryChange = {},

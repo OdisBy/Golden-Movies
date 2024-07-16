@@ -7,5 +7,5 @@ package com.odisby.goldentomatoes.data.data.model
 data class SearchMovieRemote(
     val id: Long,
     val title: String,
-    val scheduled: Boolean,
+    val saved: Boolean,
 )

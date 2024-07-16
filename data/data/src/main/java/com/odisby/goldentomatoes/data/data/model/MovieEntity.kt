@@ -11,6 +11,7 @@ data class MovieEntity(
     @ColumnInfo(name = COLUMN_NAME) val title: String,
     @ColumnInfo(name = COLUMN_POSTER_URL) val posterUrl: String,
     @ColumnInfo(name = COLUMN_DESCRIPTION) val description: String,
+    @ColumnInfo(name = COLUMN_SCHEDULED) val scheduled: Boolean
 ) {
     companion object {
         const val TABLE_NAME = "movie_entity"
@@ -18,5 +19,6 @@ data class MovieEntity(
         const val COLUMN_NAME = "title"
         const val COLUMN_POSTER_URL = "poster_url"
         const val COLUMN_DESCRIPTION = "description"
+        const val COLUMN_SCHEDULED = "scheduled"
     }
 }

@@ -8,5 +8,6 @@ interface SavedMoviesSource {
         suspend fun addSavedMovie(movie: MovieGlobal)
         suspend fun removeSavedMovie(movieId: Long)
         suspend fun getMoviesById(movieId: Long): MovieGlobal?
+        suspend fun setScheduledStatus(movieId: Long, newState: Boolean)
     }
 }

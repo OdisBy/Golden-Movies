@@ -23,7 +23,7 @@ interface DataModule {
 
     @Singleton
     @Binds
-    fun providesScheduledRepositoryNew(impl: SavedRepositoryImpl): SavedRepository
+    fun providesSavedRepositoryNew(impl: SavedRepositoryImpl): SavedRepository
 
     @Singleton
     @Binds

@@ -11,4 +11,6 @@ interface SavedRepository {
     suspend fun removeSavedMovie(movieId: Long)
 
     suspend fun getMoviesById(movieId: Long): Flow<MovieGlobal?>
+
+    suspend fun setScheduledStatus(movieId: Long, newState: Boolean)
 }

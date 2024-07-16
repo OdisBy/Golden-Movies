@@ -22,7 +22,7 @@ interface LocalModule {
 
     @Binds
     @Singleton
-    fun bindLocalScheduledDataSource(impl: SavedMoviesSourceLocal): SavedMoviesSource.Local
+    fun bindLocalSavedDataSource(impl: SavedMoviesSourceLocal): SavedMoviesSource.Local
 
     @Binds
     @Singleton

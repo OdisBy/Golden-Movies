@@ -16,10 +16,10 @@ class NotificationsUseCase @Inject constructor(
 
     suspend operator fun invoke(movieDetails: MovieDetails) {
         if (movieDetails.scheduled) {
-            savedRepository.removeSavedMovie(movieDetails.id)
+            savedRepository.setScheduledStatus(movieDetails.id, false)
             cancelNotification(movieDetails.id)
         } else {
-            savedRepository.addSavedMovie(movieDetails.toGlobalMovie())
+            savedRepository.setScheduledStatus(movieDetails.id, true)
             createNotification(movieDetails.id, movieDetails.title, LocalDateTime.now().plusMinutes(1))
         }
     }

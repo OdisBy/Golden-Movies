@@ -17,7 +17,7 @@ class GetDiscoverMoviesUseCase @Inject constructor(
     suspend operator fun invoke(type: ListTypes): Flow<Resource<List<MovieListItem>>> {
         return when (type) {
             ListTypes.DISCOVER -> getDiscoverMovies()
-            ListTypes.SCHEDULED -> getScheduledMovies()
+            ListTypes.SAVED -> getSavedMovies()
         }
     }
 
@@ -30,7 +30,7 @@ class GetDiscoverMoviesUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getScheduledMovies(): Flow<Resource<List<MovieListItem>>> = flow {
+    private suspend fun getSavedMovies(): Flow<Resource<List<MovieListItem>>> = flow {
         savedRepository.getSavedMovies().map {
             emit(Resource.Success(it.map { it.toMovieListItem() }))
         }
