@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +43,7 @@ import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,12 +55,12 @@ fun SearchBarApp(
     onChangeQuery: (String) -> Unit,
     onChangeSearchBarActive: (Boolean) -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     SearchBar(
         query = searchQuery,
         onQueryChange = { onChangeQuery(it) },
-        onSearch = {
-            onSearchButtonClick(it)
-        },
+        onSearch = { keyboardController?.hide() },
         placeholder = {
             Text(
                 text = stringResource(R.string.search_movie_placeholder),
@@ -157,28 +159,31 @@ fun MovieSearchListItem(
     modifier: Modifier = Modifier
 ) {
     TextButton(
-        // Todo intent to Details with movie id
-        onClick = { },
-        contentPadding = PaddingValues(24.dp)
+        onClick = { /* TODO: Intent para Detalhes com movie id */ },
+        contentPadding = PaddingValues(24.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = movie.title, color = TextColor, style = MaterialTheme.typography.bodyMedium)
-            if (movie.scheduled) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Filled.Notifications),
-                    contentDescription = null,
-                    tint = Primary400
-                )
-            } else {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Outlined.Notifications),
-                    contentDescription = null,
-                    tint = TextColor
-                )
-            }
+            Text(
+                text = movie.title,
+                color = TextColor,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 16.dp)
+            )
+
+            Icon(
+                painter = rememberVectorPainter(
+                    image = if (movie.scheduled) Icons.Filled.Notifications else Icons.Outlined.Notifications
+                ),
+                contentDescription = null,
+                tint = if (movie.scheduled) Primary400 else TextColor
+            )
         }
     }
 }
@@ -192,6 +197,29 @@ private fun SearchBarAppPreview() {
             onSearchButtonClick = {},
             searchBarActive = false,
             uiState = HomeUiState(),
+            onChangeQuery = {},
+            onChangeSearchBarActive = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SearchBarAppActivePreview() {
+    GoldenTomatoesTheme {
+        SearchBarApp(
+            searchQuery = "Meu malvado favorito numero 4 ou 5",
+            onSearchButtonClick = {},
+            searchBarActive = true,
+            uiState = HomeUiState(
+                movieList = listOf(
+                    SearchMovie(
+                        id = 1,
+                        title = "Meu malvado favorito numero 4 ou 5 ou 6 ou 7 ou 8",
+                        scheduled = true
+                    )
+                ).toPersistentList()
+            ),
             onChangeQuery = {},
             onChangeSearchBarActive = {}
         )

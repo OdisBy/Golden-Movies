@@ -12,12 +12,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
@@ -29,30 +33,48 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeUiState>
         get() = _state
 
+    /**
+     * Input Text flow to Search Bar
+     * It is decoupled from UiState because It has to handle debounce
+     */
+    private val _inputText: MutableStateFlow<String> =
+        MutableStateFlow("")
+
+    val inputText: StateFlow<String> = _inputText
+
     init {
         viewModelScope.launch {
             _state.update {
                 it.copy(isLoadingDiscover = true, isLoadingScheduled = true)
             }
 
-            when (val result = getDiscoverMoviesUseCase()) {
-                is Resource.Success -> {
-                    _state.update {
-                        it.copy(
-                            isLoadingDiscover = false,
-                            discoverList = result.data
-                        )
-                    }
-                }
+            getDiscoverMovies()
 
-                is Resource.Error -> {
-                    _state.update {
-                        it.copy(
-                            isLoadingDiscover = false,
-                            discoverList = emptyList(),
-                            searchErrorMessage = result.message ?: "Error"
-                        )
-                    }
+            // Collect Latest cancel last action when a new action is emitted
+            inputText.debounce(500).collectLatest { input ->
+                runSearch(input)
+            }
+        }
+    }
+
+    private suspend fun getDiscoverMovies() {
+        when (val result = getDiscoverMoviesUseCase()) {
+            is Resource.Success -> {
+                _state.update {
+                    it.copy(
+                        isLoadingDiscover = false,
+                        discoverList = result.data
+                    )
+                }
+            }
+
+            is Resource.Error -> {
+                _state.update {
+                    it.copy(
+                        isLoadingDiscover = false,
+                        discoverList = emptyList(),
+                        searchErrorMessage = result.message ?: "Error"
+                    )
                 }
             }
         }
@@ -83,7 +105,7 @@ class HomeViewModel @Inject constructor(
     private fun getSearchMovies(searchQuery: String) {
         viewModelScope.launch {
             try {
-                _state.value = _state.value.copy(isSearching = true)
+                _state.value = _state.value.copy(isSearching = true, searchQuery = searchQuery)
 
                 val getMovies = searchMoviesUseCase.invoke(searchQuery)
 
@@ -110,6 +132,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
     fun runSearch(query: String) {
         viewModelScope.launch {
             if (query.length > 3) {
@@ -125,7 +148,10 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
 
+    fun updateInput(inputText: String) {
+        _inputText.update { inputText }
     }
 }
 
@@ -135,6 +161,7 @@ data class HomeUiState(
     val discoverList: List<Movie> = emptyList(),
     val scheduledList: ImmutableList<Movie> = persistentListOf(),
     val movieList: ImmutableList<SearchMovie> = persistentListOf(),
+    val searchQuery: String = "",
     val queryHasNoResults: Boolean = false,
     val isSearching: Boolean = false,
     val searchErrorMessage: String? = null,

@@ -21,3 +21,7 @@ sealed class ListTypes {
         }
     }
 }
+
+object Constants {
+    const val RANDOM_MOVIE_ID = -1L
+}

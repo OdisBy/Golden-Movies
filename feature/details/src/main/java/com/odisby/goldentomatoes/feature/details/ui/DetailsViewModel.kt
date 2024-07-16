@@ -3,6 +3,7 @@ package com.odisby.goldentomatoes.feature.details.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
+import com.odisby.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.odisby.goldentomatoes.feature.details.data.GetDetailsUseCase
 import com.odisby.goldentomatoes.feature.details.data.NotificationsUseCase
 import com.odisby.goldentomatoes.feature.details.model.MovieDetails
@@ -21,11 +22,6 @@ class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
     private val scheduleMovieUseCase: NotificationsUseCase,
 ) : ViewModel() {
-
-    companion object {
-        private const val RANDOM_MOVIE_ID = -1L
-    }
-
 
     private val _state = MutableStateFlow(DetailsUiState())
 
