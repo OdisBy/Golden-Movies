@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -96,6 +95,7 @@ fun HomeRoot(
     ) { contentPadding ->
         HomeScreen(
             uiState = uiState,
+            discoverMoviesList = uiState.discoverList,
             inputQuery = inputQuery,
             onInputQueryChange = { viewModel.updateInput(it) },
             onSearchButtonClick = { viewModel.runSearch(it) },
@@ -112,6 +112,7 @@ fun HomeRoot(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
+    discoverMoviesList: List<Movie>,
     inputQuery: String,
     onInputQueryChange: (String) -> Unit,
     onSearchButtonClick: (String) -> Unit,
@@ -147,7 +148,7 @@ fun HomeScreen(
                     DiscoverNewMovies(
                         goToMovieDetails,
                         navigateToMovieList,
-                        movies = uiState.discoverList
+                        discoverMoviesList
                     )
                 }
 
@@ -166,7 +167,6 @@ fun HomeScreen(
 
         }
     }
-
 }
 
 @Composable
@@ -338,6 +338,7 @@ private fun RowTextAndGoButton(
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
+        discoverMoviesList = emptyList(),
         inputQuery = "",
         onSearchButtonClick = {},
         onInputQueryChange = {},

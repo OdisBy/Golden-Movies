@@ -12,13 +12,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
@@ -57,25 +61,55 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getDiscoverMovies() {
-        when (val result = getDiscoverMoviesUseCase()) {
-            is Resource.Success -> {
-                _state.update {
-                    it.copy(
-                        isLoadingDiscover = false,
-                        discoverList = result.data
-                    )
+    private fun getDiscoverMovies() = viewModelScope.launch {
+        try {
+            _state.value = _state.value.copy(searchErrorMessage = null)
+
+            getDiscoverMoviesUseCase()
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    Timber.e("Unexpected catch error ${e.message}")
+                    _state.update {
+                        it.copy(
+                            isLoadingDiscover = false,
+                            discoverList = persistentListOf(),
+                            searchErrorMessage = e.localizedMessage ?: "Error"
+                        )
+                    }
                 }
+                .collect {
+                    discoverMoviesHandler(it)
+                }
+
+        } catch (e: Exception) {
+            Timber.e(e)
+            _state.update {
+                it.copy(
+                    isLoadingDiscover = false,
+                    discoverList = persistentListOf(),
+                    searchErrorMessage = e.localizedMessage ?: "Error"
+                )
+            }
+        }
+    }
+
+    private fun discoverMoviesHandler(resource: Resource<List<Movie>>) {
+        when (resource) {
+            is Resource.Success -> {
+                _state.value =
+                    _state.value.copy(
+                        discoverList = resource.data.toPersistentList(),
+                        isLoadingDiscover = false
+                    )
             }
 
             is Resource.Error -> {
-                _state.update {
-                    it.copy(
-                        isLoadingDiscover = false,
-                        discoverList = emptyList(),
-                        searchErrorMessage = result.message ?: "Error"
+                _state.value =
+                    _state.value.copy(
+                        discoverList = persistentListOf(),
+                        searchErrorMessage = resource.message ?: "Error",
+                        isLoadingDiscover = false
                     )
-                }
             }
         }
     }
@@ -113,7 +147,7 @@ class HomeViewModel @Inject constructor(
 
                 _state.update {
                     it.copy(
-                        movieList = persistent,
+                        searchMovieList = persistent,
                         queryHasNoResults = persistent.isEmpty(),
                         isSearching = false,
                         searchErrorMessage = null
@@ -122,7 +156,7 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.update {
                     it.copy(
-                        movieList = persistentListOf(),
+                        searchMovieList = persistentListOf(),
                         queryHasNoResults = false,
                         isSearching = false,
                         searchErrorMessage = e.localizedMessage ?: "Error"
@@ -140,7 +174,7 @@ class HomeViewModel @Inject constructor(
             } else {
                 _state.update {
                     it.copy(
-                        movieList = persistentListOf(),
+                        searchMovieList = persistentListOf(),
                         queryHasNoResults = false,
                         isSearching = false,
                         searchErrorMessage = null
@@ -158,9 +192,9 @@ class HomeViewModel @Inject constructor(
 data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
     val isLoadingScheduled: Boolean = false,
-    val discoverList: List<Movie> = emptyList(),
+    val discoverList: ImmutableList<Movie> = persistentListOf(),
     val scheduledList: ImmutableList<Movie> = persistentListOf(),
-    val movieList: ImmutableList<SearchMovie> = persistentListOf(),
+    val searchMovieList: ImmutableList<SearchMovie> = persistentListOf(),
     val searchQuery: String = "",
     val queryHasNoResults: Boolean = false,
     val isSearching: Boolean = false,

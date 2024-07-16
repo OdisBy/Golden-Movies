@@ -111,8 +111,8 @@ fun SearchBarApp(
             NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
             return@SearchBar
         }
-        if (uiState.movieList.isNotEmpty()) {
-            ListWithMovies(uiState.movieList)
+        if (uiState.searchMovieList.isNotEmpty()) {
+            ListWithMovies(uiState.searchMovieList)
         }
     }
 }
@@ -212,7 +212,7 @@ private fun SearchBarAppActivePreview() {
             onSearchButtonClick = {},
             searchBarActive = true,
             uiState = HomeUiState(
-                movieList = listOf(
+                searchMovieList = listOf(
                     SearchMovie(
                         id = 1,
                         title = "Meu malvado favorito numero 4 ou 5 ou 6 ou 7 ou 8",

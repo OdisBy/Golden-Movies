@@ -44,7 +44,7 @@ class DetailsViewModel @Inject constructor(
     Movie Id -1 Is being treated as random movie
     */
     private fun getMovieDetails(movieId: Long) = viewModelScope.launch {
-        _state.value = _state.value.copy(isLoading = true)
+        _state.value = _state.value.copy(isLoading = true, errorMessage = null)
 
         if (movieId == RANDOM_MOVIE_ID) {
             getRandomMovieDetails()
@@ -98,18 +98,18 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    private fun resourceMovieDetailsHandler(it: Resource<MovieDetails>) {
-        when (it) {
+    private fun resourceMovieDetailsHandler(resource: Resource<MovieDetails>) {
+        when (resource) {
             is Resource.Success -> {
                 _state.value =
-                    _state.value.copy(movieDetails = it.data, isLoading = false)
+                    _state.value.copy(movieDetails = resource.data, isLoading = false)
             }
 
             is Resource.Error -> {
-                Timber.e("Resource Error ${it.message}")
+                Timber.e("Resource Error ${resource.message}")
                 _state.value =
                     _state.value.copy(
-                        errorMessage = it.message ?: "Error",
+                        errorMessage = resource.message ?: "Error",
                         isLoading = false
                     )
             }

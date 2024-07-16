@@ -10,9 +10,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,25 +35,39 @@ class MovieListViewModel @Inject constructor(
     fun getDiscoverMovies(type: ListTypes) {
         viewModelScope.launch {
             try {
-                val result: Resource<List<MovieListItem>> = getDiscoverMoviesUseCase.invoke(type)
-
-                when (result) {
-                    is Resource.Error -> {
+                getDiscoverMoviesUseCase.invoke(type)
+                    .flowOn(Dispatchers.IO)
+                    .catch { e ->
+                        Timber.e("Unexpected catch error ${e.message}")
                         _state.value =
-                            _state.value.copy(errorMessage = result.message, isLoading = false)
+                            _state.value.copy(errorMessage = e.localizedMessage, isLoading = false)
+                    }
+                    .collect {
+                        handleDiscoverMovies(it)
                     }
 
-                    is Resource.Success -> {
-                        _state.value = _state.value.copy(
-                            moviesList = result.data.toPersistentList(),
-                            errorMessage = null,
-                            isLoading = false
-                        )
-                    }
-                }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     errorMessage = e.localizedMessage ?: "Error",
+                    isLoading = false
+                )
+            }
+        }
+    }
+
+    private fun handleDiscoverMovies(it: Resource<List<MovieListItem>>) {
+        when (it) {
+            is Resource.Success -> {
+                _state.value = _state.value.copy(
+                    moviesList = it.data.toPersistentList(),
+                    errorMessage = null,
+                    isLoading = false
+                )
+            }
+
+            is Resource.Error -> {
+                _state.value = _state.value.copy(
+                    errorMessage = it.message,
                     isLoading = false
                 )
             }
