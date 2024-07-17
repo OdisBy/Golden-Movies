@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.notification_schedule"
+    namespace = "com.odisby.goldentomatoes.work_managers"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
@@ -24,8 +24,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":data:data"))
+
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.hilt.worker)
     kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)

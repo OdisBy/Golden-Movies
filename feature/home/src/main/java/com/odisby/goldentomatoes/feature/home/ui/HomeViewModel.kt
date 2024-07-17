@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
-import com.odisby.goldentomatoes.feature.home.data.GetSchedulesMoviesUseCase
+import com.odisby.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
 import com.odisby.goldentomatoes.feature.home.data.SearchMoviesUseCase
-import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.HomeMovie
 import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
-    private val getScheduledMoviesUseCase: GetSchedulesMoviesUseCase,
+    private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
     private val searchMoviesUseCase: SearchMoviesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _state.update {
-                it.copy(isLoadingDiscover = true, isLoadingScheduled = true)
+                it.copy(isLoadingDiscover = true, isLoadingFavorite = true)
             }
 
             getDiscoverMovies()
@@ -95,7 +95,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun discoverMoviesHandler(resource: Resource<List<Movie>>) {
+    private fun discoverMoviesHandler(resource: Resource<List<HomeMovie>>) {
         when (resource) {
             is Resource.Success -> {
                 _state.value =
@@ -116,32 +116,32 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getScheduledMovies() = viewModelScope.launch {
+    fun getFavoriteMovies() = viewModelScope.launch {
         try {
-            getScheduledMoviesUseCase()
+            getFavoriteMoviesUseCase()
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
                     Timber.e("Unexpected catch error ${e.message}")
                     _state.value =
                         _state.value.copy(
-                            isLoadingScheduled = false,
-                            scheduledList = persistentListOf(),
+                            isLoadingFavorite = false,
+                            favoriteList = persistentListOf(),
                             searchErrorMessage = e.localizedMessage ?: "Error"
                         )
                 }
                 .collect { result ->
                     _state.value =
                         _state.value.copy(
-                            scheduledList = result.toPersistentList(),
-                            isLoadingScheduled = false
+                            favoriteList = result.toPersistentList(),
+                            isLoadingFavorite = false
                         )
                 }
 
         } catch (e: Exception) {
             _state.value =
                 _state.value.copy(
-                    isLoadingScheduled = false,
-                    scheduledList = persistentListOf(),
+                    isLoadingFavorite = false,
+                    favoriteList = persistentListOf(),
                     searchErrorMessage = e.localizedMessage ?: "Error"
                 )
         }
@@ -211,9 +211,9 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val isLoadingDiscover: Boolean = false,
-    val isLoadingScheduled: Boolean = false,
-    val discoverList: ImmutableList<Movie> = persistentListOf(),
-    val scheduledList: ImmutableList<Movie> = persistentListOf(),
+    val isLoadingFavorite: Boolean = false,
+    val discoverList: ImmutableList<HomeMovie> = persistentListOf(),
+    val favoriteList: ImmutableList<HomeMovie> = persistentListOf(),
     val searchMovieList: ImmutableList<SearchMovie> = persistentListOf(),
     val searchQuery: String = "",
     val queryHasNoResults: Boolean = false,

@@ -2,30 +2,35 @@ package com.odisby.goldentomatoes.data.local.source
 
 import com.odisby.goldentomatoes.data.data.model.MovieEntity
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
-import com.odisby.goldentomatoes.data.data.source.ScheduledMoviesSource
-import com.odisby.goldentomatoes.data.local.db.ScheduledMoviesDatabase
+import com.odisby.goldentomatoes.data.data.source.FavoriteMoviesSource
+import com.odisby.goldentomatoes.data.local.db.FavoriteMoviesDatabase
 import javax.inject.Inject
 
-class ScheduledMoviesSourceLocal @Inject constructor(
-    db: ScheduledMoviesDatabase
-) : ScheduledMoviesSource.Local {
+class FavoriteMoviesSourceLocal @Inject constructor(
+    db: FavoriteMoviesDatabase
+) : FavoriteMoviesSource.Local {
 
-    private val dao = db.getMoviesSchedulesDao()
+    private val dao = db.getMoviesFavoriteDao()
 
-    override suspend fun getScheduledMovies(): List<MovieGlobal> {
+    override suspend fun getFavoriteMovies(): List<MovieGlobal> {
         return dao.getQuantity(5).toMovieGlobal()
     }
 
-    override suspend fun addScheduledMovie(movie: MovieGlobal) {
+    override suspend fun addFavoriteMovie(movie: MovieGlobal) {
         dao.insert(movie.toMovieEntity())
     }
 
-    override suspend fun removeScheduledMovie(movieId: Long) {
+    override suspend fun removeFavoriteMovie(movieId: Long) {
         dao.deleteById(movieId)
     }
 
     override suspend fun getMoviesById(movieId: Long): MovieGlobal? {
         return dao.getById(movieId)?.toMovieGlobal()
+    }
+
+    override suspend fun setScheduledStatus(movieId: Long, newState: Boolean) {
+        val movie = dao.getById(movieId) ?: return
+        dao.update(movie.copy(scheduled = newState))
     }
 
 }
@@ -42,6 +47,7 @@ private fun MovieGlobal.toMovieEntity(): MovieEntity {
         title = this.title,
         description = this.description,
         posterUrl = this.posterPath,
+        scheduled = this.scheduled
     )
 }
 
@@ -51,6 +57,7 @@ private fun MovieEntity.toMovieGlobal(): MovieGlobal {
         title = this.title,
         description = this.description,
         posterPath = this.posterUrl,
-        scheduled = true
+        favorite = true,
+        scheduled = this.scheduled
     )
 }

@@ -5,5 +5,6 @@ data class MovieDetails(
     val title: String,
     val description: String,
     val posterPath: String,
-    val scheduled: Boolean = false,
+    val favorite: Boolean,
+    val scheduled: Boolean
 )

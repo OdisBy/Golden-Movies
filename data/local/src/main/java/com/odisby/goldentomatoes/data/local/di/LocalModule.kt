@@ -1,10 +1,10 @@
 package com.odisby.goldentomatoes.data.local.di
 
 import com.odisby.goldentomatoes.data.data.source.DetailsDataSource
-import com.odisby.goldentomatoes.data.data.source.ScheduledMoviesSource
+import com.odisby.goldentomatoes.data.data.source.FavoriteMoviesSource
 import com.odisby.goldentomatoes.data.data.source.SearchMoviesSource
 import com.odisby.goldentomatoes.data.local.source.DetailsDataSourceLocal
-import com.odisby.goldentomatoes.data.local.source.ScheduledMoviesSourceLocal
+import com.odisby.goldentomatoes.data.local.source.FavoriteMoviesSourceLocal
 import com.odisby.goldentomatoes.data.local.source.SearchMoviesSourceLocal
 import dagger.Binds
 import dagger.Module
@@ -22,7 +22,7 @@ interface LocalModule {
 
     @Binds
     @Singleton
-    fun bindLocalScheduledDataSource(impl: ScheduledMoviesSourceLocal): ScheduledMoviesSource.Local
+    fun bindLocalFavoriteDataSource(impl: FavoriteMoviesSourceLocal): FavoriteMoviesSource.Local
 
     @Binds
     @Singleton
