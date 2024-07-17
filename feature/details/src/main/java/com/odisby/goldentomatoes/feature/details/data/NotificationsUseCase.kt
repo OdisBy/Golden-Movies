@@ -36,7 +36,6 @@ class NotificationsUseCase @Inject constructor(
                 movieId,
                 movieName,
                 reminderDate,
-//                action = { favoriteRepository.setScheduledStatus(movieId, false) }
             )
         } catch (e: Exception) {
             Timber.e("Failed to create notification to movie. Error ${e.localizedMessage}")

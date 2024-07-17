@@ -1,14 +1,22 @@
 package com.odisby.goldentomatoes
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
+import javax.inject.Inject
+
 
 @HiltAndroidApp
-class GoldenTomatoesApplication : Application(), ImageLoaderFactory {
+class GoldenTomatoesApplication : Application(), ImageLoaderFactory, Configuration.Provider {
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+
     override fun onCreate() {
         super.onCreate()
 
@@ -27,4 +35,9 @@ class GoldenTomatoesApplication : Application(), ImageLoaderFactory {
             }
             .build()
     }
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 }

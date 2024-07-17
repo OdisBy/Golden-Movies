@@ -88,6 +88,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.hilt.worker)
     kapt(libs.hilt.android.compiler)
     kapt(libs.androidx.hilt.compiler)
 
@@ -97,6 +98,8 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Worker
+    implementation(libs.work.runtime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

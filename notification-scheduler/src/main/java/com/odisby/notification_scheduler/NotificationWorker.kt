@@ -1,6 +1,8 @@
 package com.odisby.notification_scheduler
 
 import android.content.Context
+import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -9,9 +11,13 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.odisby.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.odisby.goldentomatoes.notification_schedule.R
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import java.time.Duration
 import java.time.LocalDateTime
+import javax.inject.Inject
 
 private const val NOTIFICATION_TITLE_KEY = "NOTIFICATION_TITLE_KEY"
 private const val NOTIFICATION_CONTENT_KEY = "NOTIFICATION_CONTENT_KEY"
@@ -40,7 +46,7 @@ class NotificationWorker(
     }
 
     companion object {
-        fun start(context: Context, movieId: Long, movieName: String, reminderDate: LocalDateTime,) {
+        fun start(context: Context, movieId: Long, movieName: String, reminderDate: LocalDateTime) {
 
             val initialDelayEarly =
                 Duration.between(LocalDateTime.now(), reminderDate).minusMinutes(20)
@@ -63,11 +69,12 @@ class NotificationWorker(
             )
             val uniqueIdEarly = "early_$movieId"
             val uniqueIdOnTime = "ontime_$movieId"
+            val tagOnTime = NOTIFICATION_TAG.plus("_${movieId}")
 
             WorkManager.getInstance(context)
                 .enqueueUniqueWork(
                     uniqueIdEarly,
-                    ExistingWorkPolicy.KEEP,
+                    ExistingWorkPolicy.REPLACE,
                     createRequest(
                         initialDelayEarly,
                         inputDataEarly,
@@ -75,12 +82,22 @@ class NotificationWorker(
                     )
                 )
 
+            val onTimeWorkRequest = createRequest(initialDelay, inputData, tagOnTime)
+
+            val actionWorkRequest = OneTimeWorkRequestBuilder<ActionWorker>()
+                .setInputData(workDataOf("deleteAction" to movieId))
+                .addTag(tagOnTime)
+                .build()
+
             WorkManager.getInstance(context)
-                .enqueueUniqueWork(
+                .beginUniqueWork(
                     uniqueIdOnTime,
-                    ExistingWorkPolicy.KEEP,
-                    createRequest(initialDelay, inputData, NOTIFICATION_TAG.plus("_${movieId}"))
+                    ExistingWorkPolicy.REPLACE,
+                    onTimeWorkRequest
                 )
+                .then(actionWorkRequest)
+                .enqueue()
+
         }
 
         fun cancel(context: Context, movieId: Long) {
@@ -101,5 +118,36 @@ class NotificationWorker(
                 .setInputData(inputData)
                 .addTag(tag)
                 .build()
+    }
+}
+
+@HiltWorker
+class ActionWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val favoriteRepository: FavoriteRepository
+) : CoroutineWorker(context, workerParams) {
+
+    override suspend fun doWork(): Result {
+        val movieId = inputData.getLong("deleteAction", -1)
+
+        // Encontra a função correspondente (você precisará gerenciar essa lista em algum lugar)
+        val deleteAction = findDeleteActionByHashCode(movieId)
+
+        Log.d("ActionWorker", "3. deleteAction: ${deleteAction.hashCode()}")
+
+        // Executa a deleteAction se encontrada
+        deleteAction?.invoke()
+
+        return Result.success()
+    }
+
+    private fun findDeleteActionByHashCode(movieId: Long): (suspend () -> Unit)? {
+        Log.d("ActionWorker", "Entering in findDeleteActionByHashCode with movieId ${movieId}")
+        if (movieId == -1L) {
+            return null
+        }
+        Log.d("ActionWorker", "Finding delete action for movieId: $movieId")
+        return { favoriteRepository.setScheduledStatus(movieId, false) }
     }
 }
