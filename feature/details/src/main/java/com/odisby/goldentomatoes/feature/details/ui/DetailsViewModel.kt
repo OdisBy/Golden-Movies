@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.odisby.goldentomatoes.feature.details.data.GetDetailsUseCase
-import com.odisby.goldentomatoes.feature.details.data.NotificationsUseCase
+import com.odisby.goldentomatoes.feature.details.data.ScheduleUseCase
 import com.odisby.goldentomatoes.feature.details.data.SaveMoviesUseCase
 import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
-    private val notificationsUseCase: NotificationsUseCase,
+    private val scheduleUseCase: ScheduleUseCase,
     private val saveMoviesUseCase: SaveMoviesUseCase
 ) : ViewModel() {
 
@@ -152,7 +152,7 @@ class DetailsViewModel @Inject constructor(
                     saveMoviesUseCase.invoke(movie)
                 }
 
-                notificationsUseCase.invoke(movie)
+                scheduleUseCase.invoke(movie)
                 _state.value =
                     _state.value.copy(movieDetails = movie.copy(scheduled = !movie.scheduled, favorite = !movie.favorite))
             } catch (e: Exception) {

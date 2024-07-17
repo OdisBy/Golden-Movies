@@ -1,4 +1,4 @@
-package com.odisby.notification_scheduler
+package com.odisby.work_managers
 
 import android.Manifest
 import android.app.Notification
@@ -10,7 +10,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.odisby.goldentomatoes.notification_schedule.R
+import com.odisby.goldentomatoes.work_managers.R
 import java.util.concurrent.TimeUnit
 
 private const val CHANNEL_ID = "lembrete-assistir"
@@ -28,6 +28,7 @@ fun Context.showNotification(title: String, content: String, timeOut: Long?) {
     ) {
         return
     }
+
     NotificationManagerCompat
         .from(this)
         .notify(content.hashCode(), notification)

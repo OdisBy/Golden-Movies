@@ -3,13 +3,13 @@ package com.odisby.goldentomatoes.feature.details.data
 import android.content.Context
 import com.odisby.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.odisby.goldentomatoes.feature.details.model.MovieDetails
-import com.odisby.notification_scheduler.NotificationWorker
+import com.odisby.work_managers.ScheduledWorkerHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class NotificationsUseCase @Inject constructor(
+class ScheduleUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     private val favoriteRepository: FavoriteRepository,
 ) {
@@ -31,7 +31,7 @@ class NotificationsUseCase @Inject constructor(
     private fun createNotification(movieId: Long, movieName: String, reminderDate: LocalDateTime) {
         try {
             Timber.d("Creating notification to movie: $movieId")
-            NotificationWorker.start(
+            ScheduledWorkerHelper.scheduleNotification(
                 context,
                 movieId,
                 movieName,
@@ -46,7 +46,7 @@ class NotificationsUseCase @Inject constructor(
     private fun cancelNotification(movieId: Long) {
         try {
             Timber.d("Cancelling notification to movie: $movieId")
-            NotificationWorker.cancel(context, movieId)
+            ScheduledWorkerHelper.cancel(context, movieId)
         } catch (e: Exception) {
             Timber.e("Failed to cancel notification to movie. Error ${e.localizedMessage}")
         }
