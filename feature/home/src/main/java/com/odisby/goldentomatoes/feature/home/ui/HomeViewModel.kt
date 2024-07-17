@@ -61,7 +61,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getDiscoverMovies() = viewModelScope.launch {
+    fun getDiscoverMovies() = viewModelScope.launch {
         try {
             _state.update {
                 it.copy(searchErrorMessage = "")
@@ -109,7 +109,6 @@ class HomeViewModel @Inject constructor(
                 _state.value =
                     _state.value.copy(
                         discoverList = persistentListOf(),
-                        searchErrorMessage = resource.message ?: "Error",
                         isLoadingDiscover = false
                     )
             }
@@ -126,7 +125,6 @@ class HomeViewModel @Inject constructor(
                         _state.value.copy(
                             isLoadingFavorite = false,
                             favoriteList = persistentListOf(),
-                            searchErrorMessage = e.localizedMessage ?: "Error"
                         )
                 }
                 .collect { result ->
@@ -142,7 +140,6 @@ class HomeViewModel @Inject constructor(
                 _state.value.copy(
                     isLoadingFavorite = false,
                     favoriteList = persistentListOf(),
-                    searchErrorMessage = e.localizedMessage ?: "Error"
                 )
         }
     }
