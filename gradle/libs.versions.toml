@@ -28,6 +28,12 @@ hiltNavigationCompose = "1.2.0"
 chucker = "4.0.0"
 workRuntimeVersion = "2.9.0"
 accompanistPermissions = "0.33.1-alpha"
+mockk = "1.13.2"
+kotest = "5.9.1"
+kotlinxTest = "1.9.0-RC"
+turbine = "1.1.0"
+junitKtx = "1.2.1"
+junitJupiter = "5.8.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +79,11 @@ chucker-library = { module = "com.github.chuckerteam.chucker:library", version.r
 chucker-library-noop = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker"}
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeVersion" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions"}
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxTest" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 
 [plugins]
