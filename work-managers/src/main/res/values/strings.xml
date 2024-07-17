@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pre_notification_title">Vamos assistir %s?</string>
-    <string name="pre_notification_content">Prepare a pipoca em até 20 minutos!</string>
+    <string name="pre_notification_content">Prepare a pipoca em até %d minutos!</string>
     <string name="ontime_notification_title">Chegou sua hora de assistir!</string>
     <string name="ontime_notification_content">Comece a assistir o filme %s agora mesmo!</string>
 </resources>

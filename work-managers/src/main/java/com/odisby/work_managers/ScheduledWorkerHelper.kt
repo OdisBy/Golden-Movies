@@ -26,14 +26,19 @@ class ScheduledWorkerHelper {
         ) {
 
             // Setup variables
+            val earlyDelayMinutes = 20L
+
             val earlyDelayNotification =
-                Duration.between(LocalDateTime.now(), reminderDate).minusMinutes(20)
+                Duration.between(LocalDateTime.now(), reminderDate).minusMinutes(earlyDelayMinutes)
             val earlyNotificationData = workDataOf(
                 NOTIFICATION_TITLE_KEY to context.resources.getString(
                     R.string.pre_notification_title,
                     movieName
                 ),
-                NOTIFICATION_CONTENT_KEY to context.resources.getString(R.string.pre_notification_content),
+                NOTIFICATION_CONTENT_KEY to context.resources.getString(
+                    R.string.pre_notification_content,
+                    earlyDelayMinutes.toInt()
+                ),
                 NOTIFICATION_TIMEOUT to 20L
             )
 
