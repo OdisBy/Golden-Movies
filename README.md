@@ -36,6 +36,8 @@ O app foi separado em módulos conforme recomendação do Android, utilizando o 
 - :core: Módulo com recursos uteis para todos os módulos
   - :core:ui: Módulo com principais recursos de UI que são utilizados em vários módulos
   - :core:network: Módulo com principais recursos para acesso a network
+- :work-managers: Módulo responsável por lidar com os WorkManagers do projeto, no nosso caso um WorkManager para notificações e um para rodar uma action em um repository
+- testutils: Módulo com classes úteis para testes em todo o projeto
 
 ###### Libs Principais
 
