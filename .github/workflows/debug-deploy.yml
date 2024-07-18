@@ -34,14 +34,19 @@ jobs:
       - name: Increment version
         id: increment-version
         uses: RichardInnocent/semantic-versioning-git@v0.0.1
+        with:
+          version-prefix: v
 
       - name: Create local.properties
         run: |
-          echo "API_KEY=${DEBUG_API_KEY}" >> local.properties
           echo "CI_VERSION_NAME=${{ env.new_version }}" >> local.properties
           echo "CI_VERSION_CODE=${{ github.run_number }}" >> local.properties
         env:
           new_version: ${{ steps.increment-version.outputs.new-version }}
+
+      - name: Create apikey.properties
+        run: |
+          echo "API_KEY=${{ secrets.DEBUG_API_KEY }}" >> apikey.properties
 
       - name: Debug Build
         run: ./gradlew assembleDebug
