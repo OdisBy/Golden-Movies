@@ -1,6 +1,5 @@
 package com.odisby.goldentomatoes.feature.movielist.data
 
-import app.cash.turbine.test
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.data.data.model.MovieGlobal
@@ -11,19 +10,17 @@ import com.odisby.goldentomatoes.testutils.robot.GIVEN
 import com.odisby.goldentomatoes.testutils.robot.RUN_UNIT_TEST
 import com.odisby.goldentomatoes.testutils.robot.THEN
 import com.odisby.goldentomatoes.testutils.robot.WHEN
-import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-internal class GetDiscoverMoviesUseCaseTest {
+internal class GetListMoviesUseCaseTest {
 
     private val robot = Robot()
 
@@ -38,10 +35,20 @@ internal class GetDiscoverMoviesUseCaseTest {
     }
 
     @Test
-    fun `When ListType is Discover should return DiscoverMovies`() = runTest {
+    fun `When ListType is Discover should call DiscoverMovies Repository`() = runTest {
         RUN_UNIT_TEST(robot) {
+            GIVEN { repositorySuccessDefault() }
             WHEN { invokeWithType(ListTypes.DISCOVER) }
             THEN { assertOnlyDiscoverRepositoryIsCalled(times = 1) }
+        }
+    }
+
+    @Test
+    fun `When ListType is Discover should call FavoriteMovies Repository`() = runTest {
+        RUN_UNIT_TEST(robot) {
+            GIVEN { repositorySuccessDefault() }
+            WHEN { invokeWithType(ListTypes.FAVORITE) }
+            THEN { assertOnlyFavoriteRepositoryIsCalled(times = 1) }
         }
     }
 
@@ -52,13 +59,13 @@ internal class GetDiscoverMoviesUseCaseTest {
         @MockK
         lateinit var favoriteRepository: FavoriteRepository
 
-        private lateinit var getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase
+        private lateinit var getListMoviesUseCase: GetListMoviesUseCase
 
         override fun setup() {
             MockKAnnotations.init(this, relaxUnitFun = true)
 
-            getDiscoverMoviesUseCase =
-                GetDiscoverMoviesUseCase(discoverRepository, favoriteRepository)
+            getListMoviesUseCase =
+                GetListMoviesUseCase(discoverRepository, favoriteRepository)
         }
 
         override fun tearsDown() {
@@ -76,19 +83,15 @@ internal class GetDiscoverMoviesUseCaseTest {
         }
 
         suspend fun invokeWithType(type: ListTypes) {
-            getDiscoverMoviesUseCase.invoke(type)
-        }
-
-        suspend fun invokeDiscoverReturnsDiscoverMovies() {
-            getDiscoverMoviesUseCase.invoke(ListTypes.DISCOVER).test {
-                val result = awaitItem()
-
-                result shouldBe Resource.Success(dumbMovieDiscover)
-            }
+            getListMoviesUseCase.invoke(type)
         }
 
         fun assertOnlyDiscoverRepositoryIsCalled(times: Int) {
             coVerify(exactly = times) { discoverRepository.getDiscoverMovies() }
+        }
+
+        fun assertOnlyFavoriteRepositoryIsCalled(times: Int) {
+            coVerify(exactly = times) { favoriteRepository.getFavoriteMovies() }
         }
 
 
