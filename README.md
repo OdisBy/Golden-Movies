@@ -36,6 +36,8 @@ O app foi separado em módulos conforme recomendação do Android, utilizando o 
 - :core: Módulo com recursos uteis para todos os módulos
   - :core:ui: Módulo com principais recursos de UI que são utilizados em vários módulos
   - :core:network: Módulo com principais recursos para acesso a network
+- :work-managers: Módulo responsável por lidar com os WorkManagers do projeto, no nosso caso um WorkManager para notificações e um para rodar uma action em um repository
+- testutils: Módulo com classes úteis para testes em todo o projeto
 
 ###### Libs Principais
 
@@ -52,6 +54,9 @@ Esses arquivos foram feitos em um estágio inicial, antes de iniciar realmente, 
 Pode encontrar tudo nesse link do excalidraw https://excalidraw.com/#json=CDJ4n7U7t9gt8OqCA9xvk,Qwcx9a921ordHBETYh2C1Q
 
 Pode encontrar algumas escritas também nesse projeto do Notion https://www.notion.so/Golden-Tomatoes-2bd879e700c341b2b034f6f4d66ba732?pvs=4
+
+Postman consumindo a API: https://www.postman.com/grey-comet-197365/workspace/golden-tomatoes
+
 
 
 

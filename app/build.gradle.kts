@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
 }
 
@@ -16,8 +16,12 @@ android {
         applicationId = "com.odisby.goldentomatoes"
         minSdk = rootProject.extra.get("minSdk") as Int
         targetSdk = rootProject.extra.get("targetSdk") as Int
-        versionCode = 1
-        versionName = "1.0"
+
+        val (versionNameValue, versionCodeValue) = getVersionNameAndCode()
+
+        versionName = versionNameValue
+        versionCode = versionCodeValue
+
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -25,13 +29,38 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = System.getenv("RELEASE_KEY_ALIAS")
+            keyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+            storeFile = file("../keystore.jks")
+            storePassword = System.getenv("RELEASE_STORE_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+
+            resValue("string", "app_name", "Golden Tomatoes")
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
+
+            applicationIdSuffix = ".debug"
+
+            resValue("string", "app_name", "Golden Tomatoes - Debug")
         }
     }
 
@@ -88,8 +117,9 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    implementation(libs.hilt.worker)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
 
     // Timber
     implementation(libs.timber)
@@ -97,6 +127,8 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Worker
+    implementation(libs.work.runtime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -105,4 +137,17 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+fun getVersionNameAndCode(): Pair<String, Int> {
+
+    val properties = Properties().apply {
+        load(project.rootProject.file("local.properties").inputStream())
+    }
+
+    val versionName = properties.getProperty("CI_VERSION_NAME") ?: "1.0"
+
+    val versionCode = properties.getProperty("CI_VERSION_CODE")?.toInt() ?: 1
+
+    return Pair(versionName, versionCode)
 }

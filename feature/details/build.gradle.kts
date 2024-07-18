@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -37,7 +37,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
     implementation(project(":data:data"))
-    implementation(project(":notification-scheduler"))
+    implementation(project(":work-managers"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -60,8 +60,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.timber)

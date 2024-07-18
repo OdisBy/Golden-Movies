@@ -10,9 +10,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,33 +30,53 @@ class MovieListViewModel @Inject constructor(
         get() = _state
 
     init {
-        _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+        _state.update {
+            it.copy(isLoading = true, errorMessage = null)
+        }
     }
 
-    fun getDiscoverMovies(type: ListTypes) {
-        viewModelScope.launch {
-            try {
-                val result: Resource<List<MovieListItem>> = getDiscoverMoviesUseCase.invoke(type)
-
-                when (result) {
-                    is Resource.Error -> {
-                        _state.value =
-                            _state.value.copy(errorMessage = result.message, isLoading = false)
-                    }
-
-                    is Resource.Success -> {
-                        _state.value = _state.value.copy(
-                            moviesList = result.data.toPersistentList(),
-                            errorMessage = null,
-                            isLoading = false
-                        )
-                    }
+    fun getDiscoverMovies(type: ListTypes) = viewModelScope.launch {
+        try {
+            getDiscoverMoviesUseCase.invoke(type)
+                .flowOn(Dispatchers.Default)
+                .catch { e ->
+                    Timber.e("Unexpected catch error ${e.message}")
+                    _state.value =
+                        _state.value.copy(errorMessage = e.localizedMessage, isLoading = false)
                 }
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
+                .collect {
+                    handleDiscoverMovies(it)
+                }
+
+        } catch (e: Exception) {
+            _state.update {
+                it.copy(
                     errorMessage = e.localizedMessage ?: "Error",
                     isLoading = false
                 )
+            }
+        }
+    }
+
+    private fun handleDiscoverMovies(resource: Resource<List<MovieListItem>>) {
+        when (resource) {
+            is Resource.Success -> {
+                _state.update {
+                    it.copy(
+                        moviesList = resource.data.toPersistentList(),
+                        errorMessage = null,
+                        isLoading = false
+                    )
+                }
+            }
+
+            is Resource.Error -> {
+                _state.update {
+                    it.copy(
+                        errorMessage = resource.message,
+                        isLoading = false
+                    )
+                }
             }
         }
     }

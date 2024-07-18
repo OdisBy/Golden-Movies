@@ -20,7 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -54,26 +56,20 @@ import com.odisby.goldentomatoes.core.ui.theme.Black_50
 import com.odisby.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.details.R
-import com.odisby.goldentomatoes.feature.details.model.Movie
+import com.odisby.goldentomatoes.feature.details.model.MovieDetails
 
 @Composable
 fun DetailsRoot(
-    navigateUp: () -> Unit,
     movieId: Long,
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    /*
-    Movie Id -1 Is being treated as random movie
-    */
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getMovieDetails(movieId)
-    }
 
-    fun onNotificationButtonClick() {
-        viewModel.onNotificationButtonClick()
+    LaunchedEffect(key1 = Unit) {
+        viewModel.loadMovieDetails(movieId)
     }
 
     Scaffold(
@@ -81,18 +77,45 @@ fun DetailsRoot(
             .background(BackgroundColor)
             .navigationBarsPadding(),
         topBar = {
-            IconButton(
-                onClick = navigateUp,
-                modifier = Modifier.statusBarsPadding(),
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = TextColor,
-                    containerColor = Black_50,
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                    contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                )
+                IconButton(
+                    onClick = {
+                        navigateUp()
+                    },
+                    modifier = Modifier.statusBarsPadding(),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = TextColor,
+                        containerColor = Black_50,
+                    )
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                    )
+                }
+
+                val notificationButtonIcon: ImageVector =
+                    if (uiState.movieDetails?.scheduled == true) Icons.Filled.Notifications else Icons.Outlined.Notifications
+
+                IconButton(
+                    onClick = {
+                        viewModel.onNotificationButtonClick()
+                    },
+                    modifier = Modifier.statusBarsPadding(),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = TextColor,
+                        containerColor = Black_50,
+                    )
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(notificationButtonIcon),
+                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.notification_button_description)
+                    )
+                }
             }
         }
     ) { contentPadding ->
@@ -105,7 +128,7 @@ fun DetailsRoot(
             )
             return@Scaffold
         }
-        if (uiState.movie == null) {
+        if (uiState.errorMessage != null) {
             ErrorScreen(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,16 +138,19 @@ fun DetailsRoot(
             return@Scaffold
         }
 
-        DetailsScreen(
-            movie = uiState.movie!!,
-            onNextMovieClick = {
-                viewModel.getMovieDetails(-1)
-            },
-            onNotificationButtonClick = { onNotificationButtonClick() },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        )
+        // Set it instead just call DetailsScreen because recomposition isn't being triggered
+        if (uiState.movieDetails != null) {
+            DetailsScreen(
+                movieDetails = uiState.movieDetails!!,
+                onNextMovieClick = {
+                    viewModel.onNextRandomMovieClick()
+                },
+                onFavoriteButtonClick = { viewModel.onFavoriteButtonClick() },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+            )
+        }
     }
 }
 
@@ -140,9 +166,9 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 fun DetailsScreen(
-    movie: Movie,
+    movieDetails: MovieDetails,
     onNextMovieClick: () -> Unit,
-    onNotificationButtonClick: () -> Unit,
+    onFavoriteButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -150,8 +176,8 @@ fun DetailsScreen(
             .verticalScroll(rememberScrollState())
     ) {
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
-            contentDescription = movie.title,
+            model = "https://image.tmdb.org/t/p/w500/${movieDetails.posterPath}",
+            contentDescription = movieDetails.title,
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .height(500.dp)
@@ -164,13 +190,13 @@ fun DetailsScreen(
                 .padding(horizontal = 12.dp)
         ) {
             Text(
-                movie.title,
+                movieDetails.title,
                 color = TextColor,
                 style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                movie.description,
+                movieDetails.description,
                 color = TextColor,
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis
@@ -180,8 +206,8 @@ fun DetailsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         BottomButtons(
-            scheduled = movie.scheduled,
-            onNotificationButtonClick = onNotificationButtonClick,
+            favorite = movieDetails.favorite,
+            onNotificationButtonClick = onFavoriteButtonClick,
             onNextMovieClick = onNextMovieClick,
         )
     }
@@ -189,7 +215,7 @@ fun DetailsScreen(
 
 @Composable
 private fun BottomButtons(
-    scheduled: Boolean,
+    favorite: Boolean,
     onNotificationButtonClick: () -> Unit,
     onNextMovieClick: () -> Unit,
 ) {
@@ -198,9 +224,9 @@ private fun BottomButtons(
         horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier.fillMaxWidth()
     ) {
-        var notificationButtonIcon: ImageVector = Icons.Outlined.Notifications
+        var favoriteButtonIcon: ImageVector = Icons.Outlined.FavoriteBorder
 
-        if (scheduled) notificationButtonIcon = Icons.Filled.Notifications
+        if (favorite) favoriteButtonIcon = Icons.Filled.Favorite
 
 
         Button(
@@ -214,7 +240,7 @@ private fun BottomButtons(
             )
         ) {
             Icon(
-                painter = rememberVectorPainter(notificationButtonIcon),
+                painter = rememberVectorPainter(favoriteButtonIcon),
                 contentDescription = null,
             )
         }
@@ -246,25 +272,55 @@ private fun DetailsScreenPreview() {
                 .background(BackgroundColor)
                 .navigationBarsPadding(),
             topBar = {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = TextColor,
-                        containerColor = Black_50,
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
+
+                    val notificationButtonIcon: ImageVector =
+                        if (true) Icons.Filled.Notifications else Icons.Outlined.Notifications
+
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(notificationButtonIcon),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
                 }
             }
         ) { contentPadding ->
             DetailsScreen(
-                movie = Movie(1, "Title", "Description", ""),
+                movieDetails = MovieDetails(
+                    1,
+                    "Title",
+                    "Description",
+                    "",
+                    scheduled = true,
+                    favorite = false
+                ),
                 onNextMovieClick = { },
-                onNotificationButtonClick = { },
+                onFavoriteButtonClick = { },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),
@@ -282,18 +338,38 @@ private fun DetailsErrorPreview() {
                 .background(BackgroundColor)
                 .navigationBarsPadding(),
             topBar = {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = TextColor,
-                        containerColor = Black_50,
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
                 }
             }
         ) { contentPadding ->
@@ -319,18 +395,38 @@ private fun DetailsLoadingPreview() {
                 .navigationBarsPadding()
                 .fillMaxSize(),
             topBar = {
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = TextColor,
-                        containerColor = Black_50,
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                        contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.statusBarsPadding(),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = TextColor,
+                            containerColor = Black_50,
+                        )
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Outlined.Notifications),
+                            contentDescription = stringResource(com.odisby.goldentomatoes.core.ui.R.string.back_button_description)
+                        )
+                    }
                 }
             }
         ) { contentPadding ->

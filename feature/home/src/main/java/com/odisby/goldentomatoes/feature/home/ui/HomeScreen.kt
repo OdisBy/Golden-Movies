@@ -42,17 +42,17 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.odisby.goldentomatoes.core.ui.AppEventListener
+import com.odisby.goldentomatoes.core.ui.RepeatOnLifecycleEffect
+import com.odisby.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
 import com.odisby.goldentomatoes.core.ui.theme.BackgroundColor
 import com.odisby.goldentomatoes.core.ui.theme.Primary200
 import com.odisby.goldentomatoes.core.ui.theme.Primary900
 import com.odisby.goldentomatoes.core.ui.theme.TextColor
 import com.odisby.goldentomatoes.feature.home.R
-import com.odisby.goldentomatoes.feature.home.model.Movie
+import com.odisby.goldentomatoes.feature.home.model.HomeMovie
 import com.odisby.goldentomatoes.feature.home.ui.components.NoMoviesFounded
 import com.odisby.goldentomatoes.feature.home.ui.components.SearchBarApp
 
@@ -66,15 +66,9 @@ fun HomeRoot(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    AppEventListener {
-        when (it) {
-            Lifecycle.Event.ON_RESUME -> {
-                viewModel.getScheduledMovies()
-            }
+    val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
 
-            else -> {}
-        }
-    }
+    RepeatOnLifecycleEffect { viewModel.getFavoriteMovies() }
 
     Scaffold(
         modifier = Modifier
@@ -85,7 +79,7 @@ fun HomeRoot(
             if (hasInternetConnection) {
                 FloatingActionButton(
                     onClick = {
-                        navigateToDetailsScreen(-1)
+                        navigateToDetailsScreen(RANDOM_MOVIE_ID)
                     },
                     containerColor = Primary200,
                     contentColor = Primary900,
@@ -101,7 +95,10 @@ fun HomeRoot(
     ) { contentPadding ->
         HomeScreen(
             uiState = uiState,
-            onSearchButtonClick = { viewModel.runSearch(it) },
+            discoverMoviesList = uiState.discoverList,
+            favoriteMoviesList = uiState.favoriteList,
+            inputQuery = inputQuery,
+            onInputQueryChange = { viewModel.updateInput(it) },
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
             hasInternetConnection = hasInternetConnection,
@@ -115,7 +112,10 @@ fun HomeRoot(
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    onSearchButtonClick: (String) -> Unit,
+    discoverMoviesList: List<HomeMovie>,
+    favoriteMoviesList: List<HomeMovie>,
+    inputQuery: String,
+    onInputQueryChange: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
     hasInternetConnection: Boolean,
@@ -123,17 +123,16 @@ fun HomeScreen(
 ) {
 
     var searchBarActive by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
 
     Column {
         // Search bar should have max size, so I'll have to break this in two Columns zzzz
         SearchBarApp(
-            searchQuery = searchQuery,
-            onSearchButtonClick = onSearchButtonClick,
+            searchQuery = inputQuery,
             searchBarActive = searchBarActive,
             uiState = uiState,
-            onChangeQuery = { searchQuery = it },
+            onChangeQuery = onInputQueryChange,
             onChangeSearchBarActive = { searchBarActive = it },
+            onMovieClicked = goToMovieDetails
         )
         // carrosel loading surface
 
@@ -149,26 +148,25 @@ fun HomeScreen(
                     DiscoverNewMovies(
                         goToMovieDetails,
                         navigateToMovieList,
-                        movies = uiState.discoverList
+                        discoverMoviesList
                     )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
             }
-            if (uiState.isLoadingScheduled) {
+            if (uiState.isLoadingFavorite) {
                 MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
-                ScheduledMovies(
+                FavoriteMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    movies = uiState.scheduledList
+                    favoriteMoviesList
                 )
             }
 
         }
     }
-
 }
 
 @Composable
@@ -180,7 +178,7 @@ fun MoviesListLoading(modifier: Modifier) {
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    movies: List<Movie>,
+    homeMovies: List<HomeMovie>,
 ) {
     Column(
         modifier = Modifier
@@ -194,24 +192,24 @@ private fun DiscoverNewMovies(
             onButtonClick = {
                 navigateToMovieList(ListTypes.DISCOVER)
             },
-            buttonVisible = movies.size > 3
+            buttonVisible = homeMovies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (movies.isEmpty()) {
+        if (homeMovies.isEmpty()) {
             NoMoviesFounded(modifier = Modifier.height(200.dp))
         } else {
-            DiscoverCarousel(movies, goToMovieDetails)
+            DiscoverCarousel(homeMovies, goToMovieDetails)
 
         }
     }
 }
 
 @Composable
-private fun ScheduledMovies(
+private fun FavoriteMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    movies: List<Movie>,
+    favoriteMovies: List<HomeMovie>,
 ) {
     Column(
         modifier = Modifier
@@ -220,40 +218,40 @@ private fun ScheduledMovies(
             .semantics { isTraversalGroup = true }
     ) {
         RowTextAndGoButton(
-            text = stringResource(R.string.schedules_movies_title),
+            text = stringResource(R.string.favorite_movies_title),
             onButtonClick = {
-                navigateToMovieList(ListTypes.SCHEDULED)
+                navigateToMovieList(ListTypes.FAVORITE)
             },
-            buttonVisible = movies.size > 3
+            buttonVisible = favoriteMovies.size > 3
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (movies.isEmpty()) {
-            NoMoviesScheduled()
+        if (favoriteMovies.isEmpty()) {
+            NoMoviesFavorite()
         } else {
-            ScheduledCarousel(movies, goToMovieDetails)
+            FavoriteCarousel(favoriteMovies, goToMovieDetails)
         }
     }
 }
 
 @Composable
-fun ScheduledCarousel(
-    movies: List<Movie>,
+fun FavoriteCarousel(
+    homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
-        movies = movies,
+        homeMovies = homeMovies,
         goToMovieDetails = goToMovieDetails
     )
 }
 
 @Composable
 fun DiscoverCarousel(
-    movies: List<Movie>,
+    homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit
 ) {
     MoviesCarousel(
-        movies = movies,
+        homeMovies = homeMovies,
         goToMovieDetails = goToMovieDetails
     )
 }
@@ -269,16 +267,16 @@ fun DiscoverCarousel(
  */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit) {
+private fun MoviesCarousel(homeMovies: List<HomeMovie>, goToMovieDetails: (Long) -> Unit) {
     HorizontalMultiBrowseCarousel(
-        state = CarouselState(itemCount = { movies.count() }),
+        state = CarouselState(itemCount = { homeMovies.count() }),
         modifier = Modifier
             .width(412.dp)
             .height(221.dp),
         preferredItemWidth = 186.dp,
         itemSpacing = 8.dp,
     ) { index ->
-        val movie = movies[index]
+        val movie = homeMovies[index]
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
             contentDescription = movie.title,
@@ -294,9 +292,9 @@ private fun MoviesCarousel(movies: List<Movie>, goToMovieDetails: (Long) -> Unit
 }
 
 @Composable
-fun NoMoviesScheduled(modifier: Modifier = Modifier) {
+fun NoMoviesFavorite(modifier: Modifier = Modifier) {
     Text(
-        text = stringResource(R.string.no_movies_scheduled),
+        text = stringResource(R.string.no_movies_favorite),
         color = TextColor,
     )
 }
@@ -340,7 +338,10 @@ private fun RowTextAndGoButton(
 fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
-        onSearchButtonClick = {},
+        discoverMoviesList = emptyList(),
+        favoriteMoviesList = emptyList(),
+        inputQuery = "",
+        onInputQueryChange = {},
         navigateToMovieList = { },
         hasInternetConnection = true,
         goToMovieDetails = {}

@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,23 +43,24 @@ import com.odisby.goldentomatoes.feature.home.R
 import com.odisby.goldentomatoes.feature.home.model.SearchMovie
 import com.odisby.goldentomatoes.feature.home.ui.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun SearchBarApp(
     searchQuery: String,
-    onSearchButtonClick: (String) -> Unit,
     searchBarActive: Boolean,
     uiState: HomeUiState,
     onChangeQuery: (String) -> Unit,
     onChangeSearchBarActive: (Boolean) -> Unit,
+    onMovieClicked: (Long) -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     SearchBar(
         query = searchQuery,
         onQueryChange = { onChangeQuery(it) },
-        onSearch = {
-            onSearchButtonClick(it)
-        },
+        onSearch = { keyboardController?.hide() },
         placeholder = {
             Text(
                 text = stringResource(R.string.search_movie_placeholder),
@@ -109,8 +111,8 @@ fun SearchBarApp(
             NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
             return@SearchBar
         }
-        if (uiState.movieList.isNotEmpty()) {
-            ListWithMovies(uiState.movieList)
+        if (uiState.searchMovieList.isNotEmpty()) {
+            ListWithMovies(uiState.searchMovieList, onMovieClicked)
         }
     }
 }
@@ -135,7 +137,7 @@ fun NoMoviesFounded(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
+private fun ListWithMovies(movies: ImmutableList<SearchMovie>, onMovieClicked: (Long) -> Unit) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(16.dp),
@@ -145,7 +147,7 @@ private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
             count = movies.size,
             key = { index -> movies[index].id },
             itemContent = { index ->
-                MovieSearchListItem(movie = movies[index])
+                MovieSearchListItem(movie = movies[index], onMovieClicked = onMovieClicked)
             }
         )
     }
@@ -154,31 +156,37 @@ private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
 @Composable
 fun MovieSearchListItem(
     movie: SearchMovie,
+    onMovieClicked: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextButton(
-        // Todo intent to Details with movie id
-        onClick = { },
-        contentPadding = PaddingValues(24.dp)
+        onClick = {
+            onMovieClicked(movie.id)
+        },
+        contentPadding = PaddingValues(24.dp),
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = movie.title, color = TextColor, style = MaterialTheme.typography.bodyMedium)
-            if (movie.scheduled) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Filled.Notifications),
-                    contentDescription = null,
-                    tint = Primary400
-                )
-            } else {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Outlined.Notifications),
-                    contentDescription = null,
-                    tint = TextColor
-                )
-            }
+            Text(
+                text = movie.title,
+                color = TextColor,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 16.dp)
+            )
+
+            Icon(
+                painter = rememberVectorPainter(
+                    image = if (movie.favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                ),
+                contentDescription = null,
+                tint = if (movie.favorite) Primary400 else TextColor
+            )
         }
     }
 }
@@ -189,9 +197,32 @@ private fun SearchBarAppPreview() {
     GoldenTomatoesTheme {
         SearchBarApp(
             searchQuery = "",
-            onSearchButtonClick = {},
+            onMovieClicked = {},
             searchBarActive = false,
             uiState = HomeUiState(),
+            onChangeQuery = {},
+            onChangeSearchBarActive = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SearchBarAppActivePreview() {
+    GoldenTomatoesTheme {
+        SearchBarApp(
+            searchQuery = "Meu malvado favorito numero 4 ou 5",
+            onMovieClicked = {},
+            searchBarActive = true,
+            uiState = HomeUiState(
+                searchMovieList = listOf(
+                    SearchMovie(
+                        id = 1,
+                        title = "Meu malvado favorito numero 4 ou 5 ou 6 ou 7 ou 8",
+                        favorite = true
+                    )
+                ).toPersistentList()
+            ),
             onChangeQuery = {},
             onChangeSearchBarActive = {}
         )

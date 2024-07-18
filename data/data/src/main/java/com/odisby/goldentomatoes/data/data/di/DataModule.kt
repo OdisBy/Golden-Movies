@@ -2,11 +2,11 @@ package com.odisby.goldentomatoes.data.data.di
 
 import com.odisby.goldentomatoes.data.data.impl.DetailsRepositoryImpl
 import com.odisby.goldentomatoes.data.data.impl.DiscoverRepositoryImpl
-import com.odisby.goldentomatoes.data.data.impl.ScheduledRepositoryImpl
+import com.odisby.goldentomatoes.data.data.impl.FavoriteRepositoryImpl
 import com.odisby.goldentomatoes.data.data.impl.SearchMoviesRepositoryImpl
 import com.odisby.goldentomatoes.data.data.repositories.DetailsRepository
 import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
-import com.odisby.goldentomatoes.data.data.repositories.ScheduledRepository
+import com.odisby.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.odisby.goldentomatoes.data.data.repositories.SearchMoviesRepository
 import dagger.Binds
 import dagger.Module
@@ -23,7 +23,7 @@ interface DataModule {
 
     @Singleton
     @Binds
-    fun providesScheduledRepositoryNew(impl: ScheduledRepositoryImpl): ScheduledRepository
+    fun providesFavoriteRepositoryNew(impl: FavoriteRepositoryImpl): FavoriteRepository
 
     @Singleton
     @Binds

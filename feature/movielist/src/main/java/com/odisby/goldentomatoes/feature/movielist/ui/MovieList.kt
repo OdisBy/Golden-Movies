@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -66,15 +67,19 @@ fun MovieListRoot(
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    viewModel.getDiscoverMovies(listType)
+    LaunchedEffect(Unit) {
+        viewModel.getDiscoverMovies(listType)
+    }
 
     val screenTitle = when (listType) {
         ListTypes.DISCOVER -> {
             "Descobrir Filmes"
         }
-        ListTypes.SCHEDULED -> {
+
+        ListTypes.FAVORITE -> {
             "Filmes Agendados"
         }
+
         else -> "Descobrir Filmes"
     }
 

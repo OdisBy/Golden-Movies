@@ -1,0 +1,84 @@
+name: Release Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency: ci-${{ github.ref }}
+    permissions:
+      contents: write
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Increment version
+        id: increment-version
+        uses: RichardInnocent/semantic-versioning-git@v0.0.1
+
+      - name: Create local.properties
+        run: |
+          echo "API_KEY=${RELEASE_API_KEY}" >> local.properties
+          echo "CI_VERSION_NAME=${{ env.new_version }}" >> local.properties
+          echo "CI_VERSION_CODE=${{ github.run_number }}" >> local.properties
+        env:
+          new_version: ${{ steps.increment-version.outputs.new-version }}
+
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > keystore.jks
+
+      - name: Release Build
+        run: ./gradlew assembleRelease
+        env:
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-tomatoes.apk
+          path: app/build/outputs/apk/debug/app-release.apk
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          new_version: ${{ steps.increment-version.outputs.new-version }}
+        with:
+          tag_name: ${{ env.new_version }}
+          release_name: Release ${{ github.ref }}
+          body: Versão de Release ${{ env.new_version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload APK to new Release
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./app/build/outputs/apk/debug/app-release.apk
+          asset_name: golden-tomatoes-debug.apk
+          asset_content_type: application/zip

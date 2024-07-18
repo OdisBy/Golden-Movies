@@ -11,6 +11,7 @@ fun MovieRemote.toMovieGlobal(): MovieGlobal {
         title = this.title,
         description = this.overview,
         posterPath = this.posterPath,
+        favorite = false,
         scheduled = false
     )
 }
@@ -21,7 +22,8 @@ fun MovieEntity.toMovieGlobal(): MovieGlobal {
         title = this.title,
         description = this.description,
         posterPath = this.posterUrl,
-        scheduled = true
+        favorite = true,
+        scheduled = this.scheduled
     )
 }
 
