@@ -48,7 +48,7 @@ jobs:
 
       - name: Decode Keystore
         env:
-          ENCODED_STRING: ${{ secrets.KEYSTORE }}
+          ENCODED_STRING: ${{ secrets.RELEASE_KEYSTORE }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
