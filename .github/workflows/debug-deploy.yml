@@ -44,7 +44,7 @@ jobs:
 
       - name: Create apikey.properties
         run: |
-          echo "API_KEY=${DEBUG_API_KEY}" >> local.properties
+          echo "API_KEY=${{ secrets.DEBUG_API_KEY }}" >> apikey.properties
 
       - name: Debug Build
         run: ./gradlew assembleDebug
@@ -62,7 +62,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           new_version: ${{ steps.increment-version.outputs.new-version }}
         with:
-          tag_name: ${{ env.new_version }}
+          tag_name: ${{ env.new_version }}-debug
           release_name: Debug ${{ env.new_version }}
           body: Versão de Debug ${{ env.new_version }}
           draft: false
