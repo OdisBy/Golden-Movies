@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
-    fun getDiscoverMovies(type: ListTypes) = viewModelScope.launch {
+    fun getDiscoverMovies(type: ListTypes) = runBlocking {
         try {
             getDiscoverMoviesUseCase.invoke(type)
                 .flowOn(Dispatchers.Default)

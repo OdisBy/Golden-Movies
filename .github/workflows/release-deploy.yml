@@ -67,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: golden-tomatoes.apk
-          path: app/build/outputs/apk/debug/app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
 
       - name: Create Release
         id: create_release
