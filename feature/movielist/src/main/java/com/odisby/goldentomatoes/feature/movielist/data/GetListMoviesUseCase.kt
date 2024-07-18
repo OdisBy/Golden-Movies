@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetDiscoverMoviesUseCase @Inject constructor(
+class GetListMoviesUseCase @Inject constructor(
     private val discoverRepository: DiscoverRepository,
     private val favoriteRepository: FavoriteRepository,
 ) {

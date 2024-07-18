@@ -1,10 +1,9 @@
 package com.odisby.goldentomatoes.feature.movielist.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.odisby.goldentomatoes.core.network.model.Resource
 import com.odisby.goldentomatoes.core.ui.constants.ListTypes
-import com.odisby.goldentomatoes.feature.movielist.data.GetDiscoverMoviesUseCase
+import com.odisby.goldentomatoes.feature.movielist.data.GetListMoviesUseCase
 import com.odisby.goldentomatoes.feature.movielist.model.MovieListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -16,14 +15,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MovieListViewModel @Inject constructor(
-    private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase
+    private val getListMoviesUseCase: GetListMoviesUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(MovieListUiState())
 
@@ -38,7 +36,7 @@ class MovieListViewModel @Inject constructor(
 
     fun getDiscoverMovies(type: ListTypes) = runBlocking {
         try {
-            getDiscoverMoviesUseCase.invoke(type)
+            getListMoviesUseCase.invoke(type)
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
                     Timber.e("Unexpected catch error ${e.message}")

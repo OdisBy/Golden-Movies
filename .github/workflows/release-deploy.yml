@@ -79,7 +79,7 @@ jobs:
           new_version: ${{ steps.increment-version.outputs.new-version }}
         with:
           tag_name: ${{ env.new_version }}
-          release_name: Release ${{ github.ref }}
+          release_name: Release ${{ env.new_version }}
           body: Versão de Release ${{ env.new_version }}
           draft: false
           prerelease: false
