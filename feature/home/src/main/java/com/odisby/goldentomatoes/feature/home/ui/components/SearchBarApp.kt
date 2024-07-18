@@ -14,10 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,11 +49,11 @@ import kotlinx.collections.immutable.toPersistentList
 @OptIn(ExperimentalMaterial3Api::class)
 fun SearchBarApp(
     searchQuery: String,
-    onSearchButtonClick: (String) -> Unit,
     searchBarActive: Boolean,
     uiState: HomeUiState,
     onChangeQuery: (String) -> Unit,
     onChangeSearchBarActive: (Boolean) -> Unit,
+    onMovieClicked: (Long) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -114,7 +112,7 @@ fun SearchBarApp(
             return@SearchBar
         }
         if (uiState.searchMovieList.isNotEmpty()) {
-            ListWithMovies(uiState.searchMovieList)
+            ListWithMovies(uiState.searchMovieList, onMovieClicked)
         }
     }
 }
@@ -139,7 +137,7 @@ fun NoMoviesFounded(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
+private fun ListWithMovies(movies: ImmutableList<SearchMovie>, onMovieClicked: (Long) -> Unit) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(16.dp),
@@ -149,7 +147,7 @@ private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
             count = movies.size,
             key = { index -> movies[index].id },
             itemContent = { index ->
-                MovieSearchListItem(movie = movies[index])
+                MovieSearchListItem(movie = movies[index], onMovieClicked = onMovieClicked)
             }
         )
     }
@@ -158,10 +156,13 @@ private fun ListWithMovies(movies: ImmutableList<SearchMovie>) {
 @Composable
 fun MovieSearchListItem(
     movie: SearchMovie,
+    onMovieClicked: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextButton(
-        onClick = { /* TODO: Intent para Detalhes com movie id */ },
+        onClick = {
+            onMovieClicked(movie.id)
+        },
         contentPadding = PaddingValues(24.dp),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -196,7 +197,7 @@ private fun SearchBarAppPreview() {
     GoldenTomatoesTheme {
         SearchBarApp(
             searchQuery = "",
-            onSearchButtonClick = {},
+            onMovieClicked = {},
             searchBarActive = false,
             uiState = HomeUiState(),
             onChangeQuery = {},
@@ -211,7 +212,7 @@ private fun SearchBarAppActivePreview() {
     GoldenTomatoesTheme {
         SearchBarApp(
             searchQuery = "Meu malvado favorito numero 4 ou 5",
-            onSearchButtonClick = {},
+            onMovieClicked = {},
             searchBarActive = true,
             uiState = HomeUiState(
                 searchMovieList = listOf(

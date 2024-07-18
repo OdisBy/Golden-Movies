@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat.startActivity
 @Composable
 fun PermissionDialog(context: Context, title: String = "", content: String = "") {
     val openDialog = remember { mutableStateOf(true) }
+    val appPackageName = context.packageName
 
     if (openDialog.value) {
         AlertDialog(
@@ -40,7 +41,7 @@ fun PermissionDialog(context: Context, title: String = "", content: String = "")
             },
             confirmButton = {
                 TextButton(onClick = {
-                    val uri: Uri = Uri.fromParts("package", "com.odisby.goldentomatoes", null)
+                    val uri: Uri = Uri.fromParts("package", appPackageName, null)
                     val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         data = uri

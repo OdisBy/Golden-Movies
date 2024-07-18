@@ -99,7 +99,6 @@ fun HomeRoot(
             favoriteMoviesList = uiState.favoriteList,
             inputQuery = inputQuery,
             onInputQueryChange = { viewModel.updateInput(it) },
-            onSearchButtonClick = { viewModel.runSearch(it) },
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
             hasInternetConnection = hasInternetConnection,
@@ -117,7 +116,6 @@ fun HomeScreen(
     favoriteMoviesList: List<HomeMovie>,
     inputQuery: String,
     onInputQueryChange: (String) -> Unit,
-    onSearchButtonClick: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
     hasInternetConnection: Boolean,
@@ -130,11 +128,11 @@ fun HomeScreen(
         // Search bar should have max size, so I'll have to break this in two Columns zzzz
         SearchBarApp(
             searchQuery = inputQuery,
-            onSearchButtonClick = onSearchButtonClick,
             searchBarActive = searchBarActive,
             uiState = uiState,
             onChangeQuery = onInputQueryChange,
             onChangeSearchBarActive = { searchBarActive = it },
+            onMovieClicked = goToMovieDetails
         )
         // carrosel loading surface
 
@@ -343,7 +341,6 @@ fun HomeScreenPreview() {
         discoverMoviesList = emptyList(),
         favoriteMoviesList = emptyList(),
         inputQuery = "",
-        onSearchButtonClick = {},
         onInputQueryChange = {},
         navigateToMovieList = { },
         hasInternetConnection = true,
