@@ -34,6 +34,8 @@ jobs:
       - name: Increment version
         id: increment-version
         uses: RichardInnocent/semantic-versioning-git@v0.0.1
+        with:
+          version-prefix: v
 
       - name: Create local.properties
         run: |
