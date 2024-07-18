@@ -13,6 +13,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +33,7 @@ class MovieListViewModelTest {
     }
 
     @Test
-    fun `getDiscoverMovies in a success case should update moviesList`() {
+    fun `getDiscoverMovies in a success case should update moviesList`() = runTest {
         RUN_UNIT_TEST(robot) {
             GIVEN { getDiscoverMoviesUseCaseSuccess() }
             WHEN { invokeUseCase(ListTypes.DISCOVER) }
@@ -41,7 +42,7 @@ class MovieListViewModelTest {
     }
 
     @Test
-    fun `getDiscoverMovies in a error case should update errorMessage`() {
+    fun `getDiscoverMovies in a error case should update errorMessage`() = runTest {
         RUN_UNIT_TEST(robot) {
             GIVEN { getDiscoverMoviesUseCaseError() }
             WHEN { invokeUseCase(ListTypes.DISCOVER) }
