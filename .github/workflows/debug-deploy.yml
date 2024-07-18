@@ -44,7 +44,7 @@ jobs:
 
       - name: Create apikey.properties
         run: |
-          echo "API_KEY=${DEBUG_API_KEY}" >> apikey.properties
+          echo "API_KEY=${{ secrets.DEBUG_API_KEY }}" >> apikey.properties
 
       - name: Debug Build
         run: ./gradlew assembleDebug
