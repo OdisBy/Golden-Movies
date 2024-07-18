@@ -6,7 +6,6 @@ import com.odisby.goldentomatoes.data.data.repositories.DiscoverRepository
 import com.odisby.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.odisby.goldentomatoes.feature.movielist.model.MovieListItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -21,18 +20,18 @@ class GetDiscoverMoviesUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getDiscoverMovies(): Flow<Resource<List<MovieListItem>>> = flow {
-        discoverRepository.getDiscoverMovies().map {
+    private suspend fun getDiscoverMovies(): Flow<Resource<List<MovieListItem>>> {
+        return discoverRepository.getDiscoverMovies().map {
             when (it) {
-                is Resource.Success -> emit(Resource.Success(it.data.map { it.toMovieListItem() }))
-                is Resource.Error -> emit(Resource.Error(it.message))
+                is Resource.Success -> Resource.Success(it.data.map { it.toMovieListItem() })
+                is Resource.Error -> Resource.Error(it.message)
             }
         }
     }
 
-    private suspend fun getFavoriteMovies(): Flow<Resource<List<MovieListItem>>> = flow {
-        favoriteRepository.getFavoriteMovies().map {
-            emit(Resource.Success(it.map { it.toMovieListItem() }))
+    private suspend fun getFavoriteMovies(): Flow<Resource<List<MovieListItem>>> {
+        return favoriteRepository.getFavoriteMovies().map {
+            Resource.Success(it.map { it.toMovieListItem() })
         }
     }
 }
