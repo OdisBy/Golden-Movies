@@ -14,7 +14,9 @@ import com.odisby.goldentomatoes.testutils.robot.WHEN
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -38,8 +40,8 @@ internal class GetDiscoverMoviesUseCaseTest {
     @Test
     fun `When ListType is Discover should return DiscoverMovies`() = runTest {
         RUN_UNIT_TEST(robot) {
-            GIVEN { repositorySuccessDefault() }
-            THEN { invokeDiscoverReturnsDiscoverMovies() }
+            WHEN { invokeWithType(ListTypes.DISCOVER) }
+            THEN { assertOnlyDiscoverRepositoryIsCalled(times = 1) }
         }
     }
 
@@ -73,12 +75,20 @@ internal class GetDiscoverMoviesUseCaseTest {
             } returns flowOf(dumbMovieFavorite)
         }
 
+        suspend fun invokeWithType(type: ListTypes) {
+            getDiscoverMoviesUseCase.invoke(type)
+        }
+
         suspend fun invokeDiscoverReturnsDiscoverMovies() {
             getDiscoverMoviesUseCase.invoke(ListTypes.DISCOVER).test {
                 val result = awaitItem()
 
                 result shouldBe Resource.Success(dumbMovieDiscover)
             }
+        }
+
+        fun assertOnlyDiscoverRepositoryIsCalled(times: Int) {
+            coVerify(exactly = times) { discoverRepository.getDiscoverMovies() }
         }
 
 
