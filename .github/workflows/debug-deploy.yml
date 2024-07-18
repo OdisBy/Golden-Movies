@@ -37,11 +37,14 @@ jobs:
 
       - name: Create local.properties
         run: |
-          echo "API_KEY=${DEBUG_API_KEY}" >> local.properties
           echo "CI_VERSION_NAME=${{ env.new_version }}" >> local.properties
           echo "CI_VERSION_CODE=${{ github.run_number }}" >> local.properties
         env:
           new_version: ${{ steps.increment-version.outputs.new-version }}
+
+      - name: Create apikey.properties
+        run: |
+          echo "API_KEY=${DEBUG_API_KEY}" >> local.properties
 
       - name: Debug Build
         run: ./gradlew assembleDebug
