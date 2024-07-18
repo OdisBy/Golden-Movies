@@ -30,6 +30,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Create local.properties
+        run: echo "" >> local.properties
+
       - name: Test
         run: |
           ./gradlew testDebugUnit --stacktrace
