@@ -89,6 +89,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./app/build/outputs/apk/debug/app-release.apk
+          asset_path: ./app/build/outputs/apk/release/app-release.apk
           asset_name: golden-tomatoes.apk
           asset_content_type: application/zip
