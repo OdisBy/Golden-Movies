@@ -44,7 +44,7 @@ jobs:
           new_version: ${{ steps.increment-version.outputs.new-version }}
 
       - name: Debug Build
-        run: ./gradlew buildDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
