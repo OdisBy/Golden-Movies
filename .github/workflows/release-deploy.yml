@@ -64,6 +64,7 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          new_version: ${{ steps.increment-version.outputs.new-version }}
         with:
           tag_name: ${{ env.new_version }}
           release_name: Release ${{ github.ref }}
