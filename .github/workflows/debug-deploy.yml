@@ -34,6 +34,8 @@ jobs:
       - name: Increment version
         id: increment-version
         uses: RichardInnocent/semantic-versioning-git@v0.0.1
+        with:
+          version-prefix: v
 
       - name: Create local.properties
         run: |
@@ -62,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           new_version: ${{ steps.increment-version.outputs.new-version }}
         with:
-          tag_name: ${{ env.new_version }}-debug
+          tag_name: ${{ env.new_version }}
           release_name: Debug ${{ env.new_version }}
           body: Versão de Debug ${{ env.new_version }}
           draft: false
