@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.aetherinsight.goldentomatoes.core.ui.RepeatOnLifecycleEffect
+import com.aetherinsight.goldentomatoes.core.ui.common.TMDBAttribution
 import com.aetherinsight.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
@@ -231,6 +232,7 @@ private fun FavoriteMovies(
         } else {
             FavoriteCarousel(favoriteMovies, goToMovieDetails)
         }
+        TMDBAttribution()
     }
 }
 
