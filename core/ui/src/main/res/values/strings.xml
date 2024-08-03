@@ -7,4 +7,6 @@
     <string name="ask_notification_debug_content">Para utilizar o Chucker no modo de Debug, e para receber notificações, é necessário ativar as notificações do aplicativo no Android 13+</string>
     <string name="ask_notification_content">É necessário ativar as notificações do aplicativo para que possamos te lembrar de assistir o filme!</string>
     <string name="cancel">Cancelar</string>
+    <string name="tmdb_logo_description">TMDB Logo</string>
+    <string name="tmdb_attribution_text">Este aplicativo usa o TMDB e a API do TMDB, mas não é endossado, certificado ou aprovado pelo TMDB.</string>
 </resources>
