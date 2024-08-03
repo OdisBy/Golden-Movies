@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.feature.details"
+    namespace = "com.aetherinsight.goldentomatoes.feature.details"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
@@ -59,6 +59,8 @@ dependencies {
 
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.accompanist.permissions)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.feature.home"
+    namespace = "com.aetherinsight.goldentomatoes.feature.home"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
