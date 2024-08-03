@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.testutils"
+    namespace = "com.aetherinsight.goldentomatoes.testutils"
     compileSdk = 34
 
     defaultConfig {
