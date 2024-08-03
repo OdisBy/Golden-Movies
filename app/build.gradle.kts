@@ -130,6 +130,8 @@ dependencies {
     // Worker
     implementation(libs.work.runtime)
 
+    implementation(libs.androidx.splashscreen)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

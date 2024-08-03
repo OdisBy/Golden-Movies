@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.res.stringResource
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.aetherinsight.goldentomatoes.core.ui.common.checkNotificationPolicyAccess
 import com.aetherinsight.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
@@ -18,6 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen()
 
         val notificationManager: NotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -31,8 +34,6 @@ class MainActivity : ComponentActivity() {
         val hasInternet =
             activeNetworkInfo?.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 ?: false
-
-
 
 
         enableEdgeToEdge()
