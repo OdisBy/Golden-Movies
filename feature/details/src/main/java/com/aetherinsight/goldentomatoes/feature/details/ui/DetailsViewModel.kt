@@ -1,5 +1,6 @@
 package com.aetherinsight.goldentomatoes.feature.details.ui
 
+import androidx.compose.material3.TimePickerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
@@ -143,7 +144,7 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    fun onNotificationButtonClick() {
+    fun onNotificationButtonClick(minutesToSchedule: Long) {
         viewModelScope.launch {
             try {
                 val movie = state.value.movieDetails ?: return@launch
@@ -152,7 +153,7 @@ class DetailsViewModel @Inject constructor(
                     saveMoviesUseCase.invoke(movie)
                 }
 
-                scheduleUseCase.invoke(movie)
+                scheduleUseCase.invoke(movieDetails =  movie, minutesToSchedule = minutesToSchedule)
                 _state.value =
                     _state.value.copy(movieDetails = movie.copy(scheduled = !movie.scheduled, favorite = !movie.favorite))
             } catch (e: Exception) {

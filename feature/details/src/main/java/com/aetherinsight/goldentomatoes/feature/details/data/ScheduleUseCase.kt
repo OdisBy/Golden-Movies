@@ -14,7 +14,7 @@ class ScheduleUseCase @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
 ) {
 
-    suspend operator fun invoke(movieDetails: MovieDetails) {
+    suspend operator fun invoke(movieDetails: MovieDetails, minutesToSchedule: Long = 60L) {
         if (movieDetails.scheduled) {
             favoriteRepository.setScheduledStatus(movieDetails.id, false)
             cancelNotification(movieDetails.id)
@@ -23,7 +23,7 @@ class ScheduleUseCase @Inject constructor(
             createNotification(
                 movieDetails.id,
                 movieDetails.title,
-                LocalDateTime.now().plusMinutes(1)
+                LocalDateTime.now().plusMinutes(minutesToSchedule)
             )
         }
     }
