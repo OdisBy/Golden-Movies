@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.data.remote"
+    namespace = "com.aetherinsight.goldentomatoes.data.remote"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {

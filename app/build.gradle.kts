@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes"
+    namespace = "com.aetherinsight.goldentomatoes"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
-        applicationId = "com.odisby.goldentomatoes"
+        applicationId = "com.aetherinsight.goldentomatoes"
         minSdk = rootProject.extra.get("minSdk") as Int
         targetSdk = rootProject.extra.get("targetSdk") as Int
 
@@ -129,6 +129,8 @@ dependencies {
 
     // Worker
     implementation(libs.work.runtime)
+
+    implementation(libs.androidx.splashscreen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

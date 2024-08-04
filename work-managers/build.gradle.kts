@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.odisby.goldentomatoes.work_managers"
+    namespace = "com.aetherinsight.goldentomatoes.work_managers"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
