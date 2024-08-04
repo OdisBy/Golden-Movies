@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -38,6 +40,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.aetherinsight.goldentomatoes.core.ui.common.DialDialog
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColorAccent
@@ -59,11 +67,12 @@ import com.aetherinsight.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.details.R
 import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
+import com.aetherinsight.goldentomatoes.feature.details.utils.calculateMinutesDifference
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsRoot(
     movieId: Long,
@@ -72,7 +81,9 @@ fun DetailsRoot(
     viewModel: DetailsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    var askForSchedule by remember { mutableStateOf(false) }
 
+    var scheduleMinutes = rememberSaveable { mutableLongStateOf(0L) }
 
     val notificationPermission = rememberPermissionState(
         permission = Manifest.permission.POST_NOTIFICATIONS
@@ -114,7 +125,7 @@ fun DetailsRoot(
                 IconButton(
                     onClick = {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || notificationPermission.status.isGranted) {
-                            viewModel.onNotificationButtonClick()
+                            askForSchedule = true
                         } else {
                             notificationPermission.launchPermissionRequest()
                         }
@@ -152,18 +163,31 @@ fun DetailsRoot(
             return@Scaffold
         }
 
-        // Set it instead just call DetailsScreen because recomposition isn't being triggered
         if (uiState.movieDetails != null) {
-            DetailsScreen(
-                movieDetails = uiState.movieDetails!!,
-                onNextMovieClick = {
-                    viewModel.onNextRandomMovieClick()
-                },
-                onFavoriteButtonClick = { viewModel.onFavoriteButtonClick() },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-            )
+            Box {
+                if (askForSchedule) {
+                    DialDialog(
+                        onConfirm = { timePickerState ->
+                            val minutes = calculateMinutesDifference(timePickerState)
+                            viewModel.onNotificationButtonClick(minutes)
+                            askForSchedule = false
+                        },
+                        onDismiss = {
+                            askForSchedule = false
+                        }
+                    )
+                }
+                DetailsScreen(
+                    movieDetails = uiState.movieDetails!!,
+                    onNextMovieClick = {
+                        viewModel.onNextRandomMovieClick()
+                    },
+                    onFavoriteButtonClick = { viewModel.onFavoriteButtonClick() },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding),
+                )
+            }
         }
     }
 }

@@ -9,4 +9,5 @@
     <string name="cancel">Cancelar</string>
     <string name="tmdb_logo_description">TMDB Logo</string>
     <string name="tmdb_attribution_text">Este aplicativo usa o TMDB e a API do TMDB, mas não é endossado, certificado ou aprovado pelo TMDB.</string>
+    <string name="ok">OK</string>
 </resources>

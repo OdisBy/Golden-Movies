@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="Theme.GoldenTomatoes.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#1C1B1A</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.GoldenTomatoes</item>
+    </style>
+
     <style name="Theme.GoldenTomatoes" parent="android:Theme.Material.Light.NoActionBar" />
+
 </resources>
