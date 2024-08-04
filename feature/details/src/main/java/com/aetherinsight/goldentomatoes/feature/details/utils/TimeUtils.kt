@@ -3,7 +3,6 @@ package com.aetherinsight.goldentomatoes.feature.details.utils
 import android.icu.util.Calendar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
-import androidx.core.graphics.set
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun calculateMinutesDifference(timePickerState: TimePickerState): Long {

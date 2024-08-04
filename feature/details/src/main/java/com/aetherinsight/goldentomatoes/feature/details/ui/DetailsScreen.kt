@@ -2,7 +2,6 @@ package com.aetherinsight.goldentomatoes.feature.details.ui
 
 import android.Manifest
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,9 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.aetherinsight.goldentomatoes.core.ui.common.DialWithDialogExample
+import com.aetherinsight.goldentomatoes.core.ui.common.DialDialog
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
-import com.aetherinsight.goldentomatoes.core.ui.common.TimePickerDialog
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColorAccent
 import com.aetherinsight.goldentomatoes.core.ui.theme.Black_50
@@ -165,24 +163,10 @@ fun DetailsRoot(
             return@Scaffold
         }
 
-        // Set it instead just call DetailsScreen because recomposition isn't being triggered
         if (uiState.movieDetails != null) {
-            Box() {
+            Box {
                 if (askForSchedule) {
-                    Log.d("Ruliam", "Ask for schedule")
-//                    TimePickerDialog(
-//                        onConfirm = {
-//                            viewModel.onNotificationButtonClick()
-//                            askForSchedule = false
-//                        },
-//                        onCancel = {
-//                            askForSchedule = false
-//                        },
-//                        title = "asas",
-//                        toggle = {},
-//                        content = { }
-//                    )
-                    DialWithDialogExample(
+                    DialDialog(
                         onConfirm = { timePickerState ->
                             val minutes = calculateMinutesDifference(timePickerState)
                             viewModel.onNotificationButtonClick(minutes)
