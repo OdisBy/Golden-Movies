@@ -93,7 +93,7 @@ class DetailsViewModelTest {
         }
 
         fun onNotificationButtonClick() {
-            detailsViewModel.onNotificationButtonClick()
+            detailsViewModel.onNotificationButtonClick(10L)
         }
 
         suspend fun getMovieDetailsUseCaseSuccess(movieId: Long) {
