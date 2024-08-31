@@ -1,10 +1,10 @@
-# Golden Tomatoes
+# Golden Movies (Antigamente Golden Tomatoes)
 
 Você já quis buscar por filmes aleatórios mas sempre cai na mesma lista padrão de filmes?
 
- O Golden Tomatoes resolve isso. Oferecemos uma lista aleatória que você pode buscar por filmes completamente aleatórios!
+ O Golden Movies resolve isso. Oferecemos uma lista aleatória que você pode buscar por filmes completamente aleatórios!
 
-Mas e se você eu quiser salvar para assistir o filme só mais tarde? Não se preocupe, o Golden Tomatoes tem um sistema que permita que você salve seus filmes aleatórios favoritos localmente, e você ainda receberá uma notificação lembrando você de assistir!
+Mas e se você eu quiser salvar para assistir o filme só mais tarde? Não se preocupe, o Golden Movies tem um sistema que permita que você salve seus filmes aleatórios favoritos localmente, e você ainda receberá uma notificação lembrando você de assistir!
 
 
 
