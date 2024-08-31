@@ -58,6 +58,13 @@ jobs:
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > keystore.jks
 
+      - name: Release Bundle
+        run: ./gradlew bundleRelease
+        env:
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+
       - name: Release Build
         run: ./gradlew assembleRelease
         env:
@@ -65,13 +72,13 @@ jobs:
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
 
-      - name: Upload Release APK
+      - name: Upload Release APK at Github
         uses: actions/upload-artifact@v4
         with:
           name: golden-tomatoes.apk
           path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Create Release
+      - name: Create Release at Github
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -84,7 +91,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload APK to new Release
+      - name: Upload APK to new Release at Github
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -94,3 +101,14 @@ jobs:
           asset_path: ./app/build/outputs/apk/release/app-release.apk
           asset_name: golden-tomatoes.apk
           asset_content_type: application/zip
+
+      - name: Upload Bundle to Play Console
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          packageName: com.aetherinsight.goldentomatoes
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: production
+          status: draft
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          debugSymbols: app/intermediates/merged_native_libs/release/out/lib
