@@ -111,4 +111,3 @@ jobs:
           track: production
           status: draft
           mappingFile: app/build/outputs/mapping/release/mapping.txt
-          debugSymbols: app/intermediates/merged_native_libs/release/out/lib
