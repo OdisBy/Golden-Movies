@@ -105,7 +105,7 @@ jobs:
       - name: Upload Bundle to Play Console
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.aetherinsight.goldentomatoes
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: production
