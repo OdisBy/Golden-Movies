@@ -45,7 +45,7 @@ android {
             isDebuggable = false
             signingConfig = signingConfigs.getByName("release")
 
-            resValue("string", "app_name", "Golden Tomatoes")
+            resValue("string", "app_name", "Golden Movies")
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -60,7 +60,7 @@ android {
 
             applicationIdSuffix = ".debug"
 
-            resValue("string", "app_name", "Golden Tomatoes - Debug")
+            resValue("string", "app_name", "Golden Movies - Debug")
         }
     }
 
