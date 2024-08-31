@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Golden Tomatoes"
+rootProject.name = "Golden Movies"
 include(":app")
 include(":core:ui")
 include(":core:network")
