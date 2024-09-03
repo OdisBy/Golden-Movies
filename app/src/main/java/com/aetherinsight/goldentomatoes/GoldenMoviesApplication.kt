@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 
 @HiltAndroidApp
-class GoldenTomatoesApplication : Application(), ImageLoaderFactory, Configuration.Provider {
+class GoldenMoviesApplication : Application(), ImageLoaderFactory, Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
