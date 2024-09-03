@@ -1,6 +1,7 @@
 package com.aetherinsight.goldentomatoes.feature.home.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -57,62 +58,66 @@ fun SearchBarApp(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    SearchBar(
-        query = searchQuery,
-        onQueryChange = { onChangeQuery(it) },
-        onSearch = { keyboardController?.hide() },
-        placeholder = {
-            Text(
-                text = stringResource(R.string.search_movie_placeholder),
-                style = MaterialTheme.typography.labelLarge
-            )
-        },
-        active = searchBarActive,
-        onActiveChange = { onChangeSearchBarActive(it) },
-        modifier = Modifier.fillMaxWidth(),
-        trailingIcon = {
-            if (searchQuery.isNotBlank() && searchBarActive) {
-                IconButton(onClick = { onChangeQuery("") }) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.Default.Close),
-                        tint = TextColor,
-                        contentDescription = stringResource(R.string.clear_query)
-                    )
-                }
-            }
-        },
-        leadingIcon = {
-            Icon(
-                painter = rememberVectorPainter(Icons.Default.Search),
-                tint = TextColor,
-                contentDescription = null
-            )
-        },
-        colors = SearchBarDefaults.colors(
-            containerColor = BackgroundColorAccent,
-            dividerColor = Primary500,
-        )
+    Box(
+        if (searchBarActive) Modifier.fillMaxSize() else Modifier.padding(horizontal = 12.dp)
     ) {
-        if (searchQuery.isBlank()) {
-            return@SearchBar
-        }
-        if (uiState.isSearching) {
-            SearchingItem(modifier = Modifier.align(Alignment.CenterHorizontally))
-            return@SearchBar
-        }
-        if (uiState.searchErrorMessage != null) {
-            ErrorItem(
-                message = uiState.searchErrorMessage,
-                modifier = Modifier.windowInsetsPadding(WindowInsets.ime)
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { onChangeQuery(it) },
+            onSearch = { keyboardController?.hide() },
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.search_movie_placeholder),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            },
+            active = searchBarActive,
+            onActiveChange = { onChangeSearchBarActive(it) },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                if (searchQuery.isNotBlank() && searchBarActive) {
+                    IconButton(onClick = { onChangeQuery("") }) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Default.Close),
+                            tint = TextColor,
+                            contentDescription = stringResource(R.string.clear_query)
+                        )
+                    }
+                }
+            },
+            leadingIcon = {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Default.Search),
+                    tint = TextColor,
+                    contentDescription = null
+                )
+            },
+            colors = SearchBarDefaults.colors(
+                containerColor = BackgroundColorAccent,
+                dividerColor = Primary500,
             )
-            return@SearchBar
-        }
-        if (uiState.queryHasNoResults) {
-            NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
-            return@SearchBar
-        }
-        if (uiState.searchMovieList.isNotEmpty()) {
-            ListWithMovies(uiState.searchMovieList, onMovieClicked)
+        ) {
+            if (searchQuery.isBlank()) {
+                return@SearchBar
+            }
+            if (uiState.isSearching) {
+                SearchingItem(modifier = Modifier.align(Alignment.CenterHorizontally))
+                return@SearchBar
+            }
+            if (uiState.searchErrorMessage != null) {
+                ErrorItem(
+                    message = uiState.searchErrorMessage,
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.ime)
+                )
+                return@SearchBar
+            }
+            if (uiState.queryHasNoResults) {
+                NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
+                return@SearchBar
+            }
+            if (uiState.searchMovieList.isNotEmpty()) {
+                ListWithMovies(uiState.searchMovieList, onMovieClicked)
+            }
         }
     }
 }

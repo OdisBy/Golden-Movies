@@ -65,8 +65,8 @@ fun HomeRoot(
     hasInternetConnection: Boolean,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    
     val uiState by viewModel.state.collectAsStateWithLifecycle()
-
     val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
 
     RepeatOnLifecycleEffect { viewModel.getFavoriteMovies() }
@@ -126,7 +126,6 @@ fun HomeScreen(
     var searchBarActive by remember { mutableStateOf(false) }
 
     Column {
-        // Search bar should have max size, so I'll have to break this in two Columns zzzz
         SearchBarApp(
             searchQuery = inputQuery,
             searchBarActive = searchBarActive,
