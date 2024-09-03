@@ -2,7 +2,7 @@ package com.aetherinsight.goldentomatoes.data.data.impl
 
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.data.data.model.MovieEntity
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.model.MovieRemote
 
 fun MovieRemote.toMovieGlobal(): MovieGlobal {

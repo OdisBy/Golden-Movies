@@ -34,6 +34,7 @@ android {
 
 dependencies {
     implementation(project(":core:network"))
+    implementation(project(":core:data"))
 
     // Hilt
     implementation(libs.hilt.android)

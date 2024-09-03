@@ -1,6 +1,6 @@
 package com.aetherinsight.goldentomatoes.feature.home.data
 
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
 
 fun MovieGlobal.toMovie(): HomeMovie {

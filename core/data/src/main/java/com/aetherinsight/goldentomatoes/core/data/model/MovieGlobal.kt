@@ -1,4 +1,4 @@
-package com.aetherinsight.goldentomatoes.data.data.model
+package com.aetherinsight.goldentomatoes.core.data.model
 
 data class MovieGlobal(
     val id: Long,

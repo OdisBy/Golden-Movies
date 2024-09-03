@@ -1,6 +1,6 @@
 package com.aetherinsight.goldentomatoes.data.data.source
 
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 
 interface FavoriteMoviesSource {
     interface Local : FavoriteMoviesSource {

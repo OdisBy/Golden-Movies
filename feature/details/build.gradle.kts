@@ -36,6 +36,7 @@ dependencies {
 
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
+    implementation(project(":core:data"))
     implementation(project(":data:data"))
     implementation(project(":work-managers"))
     implementation(project(":testutils"))

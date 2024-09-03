@@ -1,6 +1,6 @@
 package com.aetherinsight.goldentomatoes.data.data.impl
 
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.aetherinsight.goldentomatoes.data.data.source.FavoriteMoviesSource
 import kotlinx.coroutines.flow.Flow

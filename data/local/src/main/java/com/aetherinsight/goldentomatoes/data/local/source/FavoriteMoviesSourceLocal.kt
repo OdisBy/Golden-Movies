@@ -1,7 +1,7 @@
 package com.aetherinsight.goldentomatoes.data.local.source
 
 import com.aetherinsight.goldentomatoes.data.data.model.MovieEntity
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.source.FavoriteMoviesSource
 import com.aetherinsight.goldentomatoes.data.local.db.FavoriteMoviesDatabase
 import javax.inject.Inject
