@@ -65,7 +65,8 @@ fun SearchBarRoot(
         state = state,
         onChangeQuery = { viewModel.onInputQueryChange(it) },
         onChangeSearchBarActive = onChangeSearchBarActive,
-        onMovieClicked = goToMovieDetails,
+        onMovieClicked = { goToMovieDetails(it.id) },
+        onFavoriteClicked = { viewModel.favoriteMovie(it) }
     )
 }
 
@@ -74,10 +75,11 @@ fun SearchBarRoot(
 fun SearchBarComponent(
     searchQuery: String,
     searchBarActive: Boolean,
-    state: SearchBarViewModel.SearchBarState,
+    state: SearchBarState,
     onChangeQuery: (String) -> Unit,
     onChangeSearchBarActive: (Boolean) -> Unit,
-    onMovieClicked: (Long) -> Unit,
+    onMovieClicked: (SearchMovie) -> Unit,
+    onFavoriteClicked: (SearchMovie) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -151,7 +153,7 @@ fun SearchBarComponent(
                         return@SearchBar
                     }
 
-                    ListWithMovies(uiState.searchMovieList, onMovieClicked)
+                    ListWithMovies(uiState.searchMovieList, onMovieClicked, onFavoriteClicked)
                 }
             }
         }
@@ -184,7 +186,8 @@ fun NoMoviesFounded(modifier: Modifier = Modifier.Companion) {
 @Composable
 private fun ListWithMovies(
     movies: ImmutableList<SearchMovie>,
-    onMovieClicked: (Long) -> Unit
+    onMovieClicked: (SearchMovie) -> Unit,
+    onFavoriteClicked: (SearchMovie) -> Unit,
 ) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -195,7 +198,7 @@ private fun ListWithMovies(
             count = movies.size,
             key = { index -> movies[index].id },
             itemContent = { index ->
-                MovieSearchListItem(movie = movies[index], onMovieClicked = onMovieClicked)
+                MovieSearchListItem(movie = movies[index], onMovieClicked = onMovieClicked, onFavoriteClicked = onFavoriteClicked)
             }
         )
     }
@@ -204,12 +207,13 @@ private fun ListWithMovies(
 @Composable
 fun MovieSearchListItem(
     movie: SearchMovie,
-    onMovieClicked: (Long) -> Unit,
+    onMovieClicked: (SearchMovie) -> Unit,
+    onFavoriteClicked: (SearchMovie) -> Unit,
     modifier: Modifier = Modifier.Companion
 ) {
     TextButton(
         onClick = {
-            onMovieClicked(movie.id)
+            onMovieClicked(movie)
         },
         contentPadding = PaddingValues(24.dp),
         modifier = modifier.fillMaxWidth()
@@ -228,13 +232,17 @@ fun MovieSearchListItem(
                     .padding(end = 16.dp)
             )
 
-            Icon(
-                painter = rememberVectorPainter(
-                    image = if (movie.favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
-                ),
-                contentDescription = null,
-                tint = if (movie.favorite) Primary400 else TextColor
-            )
+            IconButton(
+                onClick = { onFavoriteClicked(movie) }
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(
+                        image = if (movie.favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                    ),
+                    contentDescription = null,
+                    tint = if (movie.favorite) Primary400 else TextColor,
+                )
+            }
         }
     }
 }

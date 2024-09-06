@@ -2,13 +2,12 @@ package com.aetherinsight.goldentomatoes.feature.details.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
-import com.aetherinsight.goldentomatoes.core.usecases.SaveMoviesUseCase
-import com.aetherinsight.goldentomatoes.feature.details.data.GetDetailsUseCase
+import com.aetherinsight.goldentomatoes.core.usecases.FavoriteMovieUseCase
+import com.aetherinsight.goldentomatoes.core.usecases.GetDetailsUseCase
 import com.aetherinsight.goldentomatoes.feature.details.data.ScheduleUseCase
-import com.aetherinsight.goldentomatoes.feature.details.data.toGlobalMovie
-import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +23,7 @@ import javax.inject.Inject
 class DetailsViewModel @Inject constructor(
     private val getDetailsUseCase: GetDetailsUseCase,
     private val scheduleUseCase: ScheduleUseCase,
-    private val saveMoviesUseCase: SaveMoviesUseCase
+    private val favoriteMovieUseCase: FavoriteMovieUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DetailsUiState())
@@ -108,7 +107,7 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    private fun resourceMovieDetailsHandler(resource: Resource<MovieDetails>) {
+    private fun resourceMovieDetailsHandler(resource: Resource<MovieGlobal>) {
         when (resource) {
             is Resource.Success -> {
                 _state.value =
@@ -134,7 +133,7 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val movie = state.value.movieDetails ?: return@launch
-                saveMoviesUseCase.invoke(movie.toGlobalMovie())
+                favoriteMovieUseCase.invoke(movie)
                 _state.update {
                     it.copy(movieDetails = movie.copy(favorite = !movie.favorite))
                 }
@@ -149,13 +148,18 @@ class DetailsViewModel @Inject constructor(
             try {
                 val movie = state.value.movieDetails ?: return@launch
 
-                if(!movie.favorite) {
-                    saveMoviesUseCase.invoke(movie.toGlobalMovie())
+                if (!movie.favorite) {
+                    favoriteMovieUseCase.invoke(movie)
                 }
 
-                scheduleUseCase.invoke(movieDetails =  movie, minutesToSchedule = minutesToSchedule)
+                scheduleUseCase.invoke(movieDetails = movie, minutesToSchedule = minutesToSchedule)
                 _state.value =
-                    _state.value.copy(movieDetails = movie.copy(scheduled = !movie.scheduled, favorite = !movie.favorite))
+                    _state.value.copy(
+                        movieDetails = movie.copy(
+                            scheduled = !movie.scheduled,
+                            favorite = !movie.favorite
+                        )
+                    )
             } catch (e: Exception) {
                 Timber.e("Não foi possível agendar o filme ${e.localizedMessage}")
             }
@@ -164,7 +168,7 @@ class DetailsViewModel @Inject constructor(
 }
 
 data class DetailsUiState(
-    val movieDetails: MovieDetails? = null,
+    val movieDetails: MovieGlobal? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

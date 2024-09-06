@@ -10,7 +10,7 @@ fun MovieRemote.toMovieGlobal(): MovieGlobal {
         id = this.id,
         title = this.title,
         description = this.overview,
-        posterPath = this.posterPath,
+        posterPath = this.posterPath ?: "",
         favorite = false,
         scheduled = false
     )

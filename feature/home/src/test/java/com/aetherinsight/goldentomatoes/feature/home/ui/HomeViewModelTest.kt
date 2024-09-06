@@ -217,48 +217,5 @@ class HomeViewModelTest {
                 favorite = true,
             )
         )
-
-        private val dummySearchMovies = listOf(
-            SearchMovie(
-                id = 6L,
-                title = "The Matrix 3",
-                favorite = false,
-            ),
-            SearchMovie(
-                id = 2L,
-                title = "The Dark Knight",
-                favorite = false,
-            ),
-            SearchMovie(
-                id = 1L,
-                title = "Inception",
-                favorite = false
-            ),
-            SearchMovie(
-                id = 4L,
-                title = "The Matrix",
-                favorite = false,
-            ),
-            SearchMovie(
-                id = 3L,
-                title = "Interstellar",
-                favorite = false,
-            ),
-            SearchMovie(
-                id = 5L,
-                title = "The Matrix 2",
-                favorite = true,
-            ),
-            SearchMovie(
-                id = 7L,
-                title = "Fight Club",
-                favorite = true,
-            ),
-            SearchMovie(
-                id = 8L,
-                title = "Meu Malvado Favorito 4",
-                favorite = true,
-            )
-        )
     }
 }

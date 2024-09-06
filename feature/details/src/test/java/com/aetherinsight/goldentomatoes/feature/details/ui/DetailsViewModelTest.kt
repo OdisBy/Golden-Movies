@@ -1,10 +1,9 @@
 package com.aetherinsight.goldentomatoes.feature.details.ui
 
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
-import com.aetherinsight.goldentomatoes.feature.details.data.GetDetailsUseCase
+import com.aetherinsight.goldentomatoes.core.usecases.GetDetailsUseCase
 import com.aetherinsight.goldentomatoes.feature.details.data.ScheduleUseCase
-import com.aetherinsight.goldentomatoes.feature.details.data.toGlobalMovie
-import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import com.aetherinsight.goldentomatoes.feature.details.ui.DetailsViewModelTest.Robot.Companion.MOVIE_ID_1
 import com.aetherinsight.goldentomatoes.testutils.MainDispatcherRule
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
@@ -65,7 +64,7 @@ class DetailsViewModelTest {
         private lateinit var scheduleUseCase: ScheduleUseCase
 
         @MockK
-        private lateinit var saveMoviesUseCase: com.aetherinsight.goldentomatoes.core.usecases.SaveMoviesUseCase
+        private lateinit var favoriteMovieUseCase: com.aetherinsight.goldentomatoes.core.usecases.FavoriteMovieUseCase
 
         private lateinit var detailsViewModel: DetailsViewModel
 
@@ -73,7 +72,7 @@ class DetailsViewModelTest {
             MockKAnnotations.init(this, relaxUnitFun = true)
 
             detailsViewModel =
-                DetailsViewModel(getDetailsUseCase, scheduleUseCase, saveMoviesUseCase)
+                DetailsViewModel(getDetailsUseCase, scheduleUseCase, favoriteMovieUseCase)
         }
 
         override fun tearsDown() = runTest {
@@ -120,8 +119,8 @@ class DetailsViewModelTest {
         }
 
         suspend fun getSaveMoviesUseCase(movieId: Long) {
-            saveMoviesUseCase.invoke(
-                dumbMovieDetails2.toGlobalMovie()
+            favoriteMovieUseCase.invoke(
+                dumbMovieDetails2
             )
         }
 
@@ -137,7 +136,7 @@ class DetailsViewModelTest {
         }
 
 
-        private val dumbMovieDetails1 = MovieDetails(
+        private val dumbMovieDetails1 = MovieGlobal(
             id = MOVIE_ID_1,
             title = "Movie 1",
             description = "Description 1",
@@ -146,7 +145,7 @@ class DetailsViewModelTest {
             scheduled = false
         )
 
-        private val dumbMovieDetails2 = MovieDetails(
+        private val dumbMovieDetails2 = MovieGlobal(
             id = MOVIE_ID_2,
             title = "Movie 2",
             description = "Description 2",
@@ -155,7 +154,7 @@ class DetailsViewModelTest {
             scheduled = true
         )
 
-        private val dumbMovieDetails3 = MovieDetails(
+        private val dumbMovieDetails3 = MovieGlobal(
             id = 24L,
             title = "Movie Random",
             description = "Description Random",

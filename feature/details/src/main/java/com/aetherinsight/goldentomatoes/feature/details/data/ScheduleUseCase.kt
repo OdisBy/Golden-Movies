@@ -1,8 +1,8 @@
 package com.aetherinsight.goldentomatoes.feature.details.data
 
 import android.content.Context
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.repositories.FavoriteRepository
-import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import com.aetherinsight.work_managers.ScheduledWorkerHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
@@ -14,7 +14,7 @@ class ScheduleUseCase @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
 ) {
 
-    suspend operator fun invoke(movieDetails: MovieDetails, minutesToSchedule: Long = 60L) {
+    suspend operator fun invoke(movieDetails: MovieGlobal, minutesToSchedule: Long = 60L) {
         if (movieDetails.scheduled) {
             favoriteRepository.setScheduledStatus(movieDetails.id, false)
             cancelNotification(movieDetails.id)

@@ -3,7 +3,9 @@ package com.aetherinsight.goldentomatoes.feature.search_bar.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
+import com.aetherinsight.goldentomatoes.core.usecases.FavoriteMovieUseCase
 import com.aetherinsight.goldentomatoes.feature.search_bar.data.SearchMoviesUseCase
+import com.aetherinsight.goldentomatoes.feature.search_bar.util.toMovieGlobal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -23,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchBarViewModel @Inject constructor(
     private val searchMoviesUseCase: SearchMoviesUseCase,
+    private val favoriteMovieUseCase: FavoriteMovieUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -58,8 +61,29 @@ class SearchBarViewModel @Inject constructor(
 
     }
 
-    fun favoriteMovie(movieId: Long) {
+    fun favoriteMovie(movie: SearchMovie) {
+        viewModelScope.launch {
+            favoriteMovieUseCase.invoke(movie.toMovieGlobal())
 
+            _state.update {
+                when (it) {
+                    is SearchBarState.SuccessfulSearch -> {
+                        val newList = it.searchMovieList.map { item ->
+                            if (item.id == movie.id) {
+                                item.copy(favorite = !item.favorite)
+                            } else {
+                                item
+                            }
+                        }.toPersistentList()
+                        SearchBarState.SuccessfulSearch(newList)
+                    }
+
+                    else -> {
+                        it
+                    }
+                }
+            }
+        }
     }
 
     suspend fun runSearch(query: String) {

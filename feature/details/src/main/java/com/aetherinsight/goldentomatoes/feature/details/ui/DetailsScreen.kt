@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.core.ui.common.DialDialog
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
@@ -66,7 +67,6 @@ import com.aetherinsight.goldentomatoes.core.ui.theme.Black_50
 import com.aetherinsight.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.details.R
-import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import com.aetherinsight.goldentomatoes.feature.details.utils.calculateMinutesDifference
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -204,7 +204,7 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 fun DetailsScreen(
-    movieDetails: MovieDetails,
+    movieDetails: MovieGlobal,
     onNextMovieClick: () -> Unit,
     onFavoriteButtonClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -349,7 +349,7 @@ private fun DetailsScreenPreview() {
             }
         ) { contentPadding ->
             DetailsScreen(
-                movieDetails = MovieDetails(
+                movieDetails = MovieGlobal(
                     1,
                     "Title",
                     "Description",

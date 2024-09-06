@@ -2,7 +2,6 @@ package com.aetherinsight.goldentomatoes.feature.search_bar.data
 
 import app.cash.turbine.test
 import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
-import com.aetherinsight.goldentomatoes.data.data.model.SearchMovieRemote
 import com.aetherinsight.goldentomatoes.data.data.repositories.SearchMoviesRepository
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.GIVEN
@@ -106,39 +105,53 @@ internal class SearchMoviesUseCaseTest {
 
 
         private val dummySearchMoviesRemote = listOf(
-            SearchMovieRemote(
+            SearchMovie(
                 id = 6L,
                 title = "The Matrix 3",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
-            SearchMovieRemote(
+            SearchMovie(
                 id = 2L,
                 title = "The Dark Knight",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
-            SearchMovieRemote(
+            SearchMovie(
                 id = 1L,
                 title = "Inception",
+                posterPath = "",
+                overview = "",
                 favorite = false
             ),
-            SearchMovieRemote(
+            SearchMovie(
                 id = 4L,
                 title = "The Matrix",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
-            SearchMovieRemote(
+            SearchMovie(
                 id = 3L,
                 title = "Interstellar",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
-            SearchMovieRemote(
+            SearchMovie(
                 id = 7L,
                 title = "Fight Club",
+                posterPath = "",
+                overview = "",
                 favorite = true,
             ),
-            SearchMovieRemote(
+            SearchMovie(
                 id = 5L,
                 title = "The Matrix 2",
+                posterPath = "",
+                overview = "",
                 favorite = true,
             ),
         )
@@ -147,36 +160,50 @@ internal class SearchMoviesUseCaseTest {
             SearchMovie(
                 id = 6L,
                 title = "The Matrix 3",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
             SearchMovie(
                 id = 2L,
                 title = "The Dark Knight",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
             SearchMovie(
                 id = 1L,
                 title = "Inception",
+                posterPath = "",
+                overview = "",
                 favorite = false
             ),
             SearchMovie(
                 id = 4L,
                 title = "The Matrix",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
             SearchMovie(
                 id = 3L,
                 title = "Interstellar",
+                posterPath = "",
+                overview = "",
                 favorite = false,
             ),
             SearchMovie(
                 id = 5L,
                 title = "The Matrix 2",
+                posterPath = "",
+                overview = "",
                 favorite = true,
             ),
             SearchMovie(
                 id = 7L,
                 title = "Fight Club",
+                posterPath = "",
+                overview = "",
                 favorite = true,
             ),
         )

@@ -11,13 +11,6 @@ class SearchMoviesUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(query: String): Flow<List<SearchMovie>> =
         searchMoviesRepository.searchMovies(query).map { list ->
-            list.map { movie ->
-                SearchMovie(
-                    id = movie.id,
-                    title = movie.title,
-                    favorite = movie.favorite
-                )
-            }
-                .sortedByDescending { it.favorite }
+            list.sortedByDescending { it.favorite }
         }
 }

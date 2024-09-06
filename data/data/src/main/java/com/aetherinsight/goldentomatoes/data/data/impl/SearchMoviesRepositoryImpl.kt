@@ -1,6 +1,6 @@
 package com.aetherinsight.goldentomatoes.data.data.impl
 
-import com.aetherinsight.goldentomatoes.data.data.model.SearchMovieRemote
+import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.data.data.repositories.SearchMoviesRepository
 import com.aetherinsight.goldentomatoes.data.data.source.SearchMoviesSource
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +12,7 @@ class SearchMoviesRepositoryImpl @Inject constructor(
     private val remoteDataSource: SearchMoviesSource.Remote,
     private val localDataSource: SearchMoviesSource.Local
 ) : SearchMoviesRepository {
-    override suspend fun searchMovies(query: String): Flow<List<SearchMovieRemote>> = flow {
+    override suspend fun searchMovies(query: String): Flow<List<SearchMovie>> = flow {
         try {
             val resultRemote = remoteDataSource.searchMovies(query)
 
@@ -21,9 +21,11 @@ class SearchMoviesRepositoryImpl @Inject constructor(
 
             emit(
                 resultRemote.map { movieRemote ->
-                    SearchMovieRemote(
+                    SearchMovie(
                         id = movieRemote.id,
                         title = movieRemote.title,
+                        posterPath = movieRemote.posterPath ?: "",
+                        overview = movieRemote.overview,
                         favorite = resultLocal.any { it?.id == movieRemote.id }
                     )
                 }

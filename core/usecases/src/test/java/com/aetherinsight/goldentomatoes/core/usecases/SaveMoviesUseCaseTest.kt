@@ -1,6 +1,7 @@
 package com.aetherinsight.goldentomatoes.core.usecases
 
 import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.data.data.repositories.DetailsRepository
 import com.aetherinsight.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.RUN_UNIT_TEST
@@ -49,13 +50,13 @@ class SaveMoviesUseCaseTest {
         @MockK
         private lateinit var favoriteRepository: FavoriteRepository
 
-        private lateinit var saveMoviesUseCase: SaveMoviesUseCase
+        private lateinit var favoriteMovieUseCase: FavoriteMovieUseCase
 
         override fun setup() {
             MockKAnnotations.init(this, relaxUnitFun = true)
 
-            saveMoviesUseCase =
-                SaveMoviesUseCase(favoriteRepository)
+            favoriteMovieUseCase =
+                FavoriteMovieUseCase(favoriteRepository)
 
             coEvery {
                 favoriteRepository.addFavoriteMovie(any())
@@ -71,13 +72,13 @@ class SaveMoviesUseCaseTest {
         }
 
         suspend fun invokeUseCaseWithoutFavorite() {
-            saveMoviesUseCase.invoke(
+            favoriteMovieUseCase.invoke(
                 dumbMovieDetails1
             )
         }
 
         suspend fun invokeUseCaseWithFavorite() {
-            saveMoviesUseCase.invoke(
+            favoriteMovieUseCase.invoke(
                 dumbMovieDetails2
             )
         }
