@@ -2,8 +2,8 @@ package com.aetherinsight.goldentomatoes.feature.details.ui
 
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.feature.details.data.GetDetailsUseCase
-import com.aetherinsight.goldentomatoes.feature.details.data.SaveMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.details.data.ScheduleUseCase
+import com.aetherinsight.goldentomatoes.feature.details.data.toGlobalMovie
 import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import com.aetherinsight.goldentomatoes.feature.details.ui.DetailsViewModelTest.Robot.Companion.MOVIE_ID_1
 import com.aetherinsight.goldentomatoes.testutils.MainDispatcherRule
@@ -65,7 +65,7 @@ class DetailsViewModelTest {
         private lateinit var scheduleUseCase: ScheduleUseCase
 
         @MockK
-        private lateinit var saveMoviesUseCase: SaveMoviesUseCase
+        private lateinit var saveMoviesUseCase: com.aetherinsight.goldentomatoes.core.usecases.SaveMoviesUseCase
 
         private lateinit var detailsViewModel: DetailsViewModel
 
@@ -120,7 +120,9 @@ class DetailsViewModelTest {
         }
 
         suspend fun getSaveMoviesUseCase(movieId: Long) {
-            saveMoviesUseCase.invoke(dumbMovieDetails2)
+            saveMoviesUseCase.invoke(
+                dumbMovieDetails2.toGlobalMovie()
+            )
         }
 
         fun assertStateMovieDetailsIsUpdated(movieId: Long) {

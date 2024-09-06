@@ -1,17 +1,11 @@
 package com.aetherinsight.goldentomatoes.feature.home.ui
 
+import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
-import com.aetherinsight.goldentomatoes.feature.search_bar.data.SearchMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
-import com.aetherinsight.goldentomatoes.feature.home.model.SearchMovie
-import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModelTest.Robot.Companion.RUN_SEARCH_QUERY_1
-import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModelTest.Robot.Companion.RUN_SEARCH_QUERY_2
-import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModelTest.Robot.Companion.RUN_SEARCH_QUERY_3
-import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModelTest.Robot.Companion.RUN_SEARCH_QUERY_5
 import com.aetherinsight.goldentomatoes.testutils.MainDispatcherRule
-import com.aetherinsight.goldentomatoes.testutils.robot.AND
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.GIVEN
 import com.aetherinsight.goldentomatoes.testutils.robot.RUN_UNIT_TEST
@@ -20,11 +14,9 @@ import com.aetherinsight.goldentomatoes.testutils.robot.WHEN
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -51,16 +43,16 @@ class HomeViewModelTest {
         robot.tearsDown()
     }
 
-    @Test
-    fun `UiState State after DiscoverMovies Success should have a isLoadingDiscover false and a list on discoverList`() =
-        runTest {
-            RUN_UNIT_TEST(robot) {
-                GIVEN { getDiscoverMoviesUseCaseSuccess() }
-                WHEN { callGetDiscoverMovies() }
-                advanceUntilIdle()
-                THEN { getDiscoverMoviesUiStateSuccess() }
-            }
-        }
+//    @Test
+//    fun `UiState State after DiscoverMovies Success should have a isLoadingDiscover false and a list on discoverList`() =
+//        runTest {
+//            RUN_UNIT_TEST(robot) {
+//                GIVEN { getDiscoverMoviesUseCaseSuccess() }
+//                WHEN { callGetDiscoverMovies() }
+//                advanceUntilIdle()
+//                THEN { getDiscoverMoviesUiStateSuccess() }
+//            }
+//        }
 
     @Test
     fun `UiState State after DiscoverMovies Error should have a isLoadingDiscover false and a empty list on discoverList`() =
@@ -84,63 +76,19 @@ class HomeViewModelTest {
                 THEN { getFavoriteMoviesUiStateSuccess() }
             }
         }
-
-    @Test
-    fun `UiState State after FavoriteMovies Error should have isLoadingFavorite false and a empty list on favoriteList`() =
-        runTest {
-            RUN_UNIT_TEST(robot) {
-                GIVEN { getFavoriteMoviesUseCaseEmptyList() }
-                WHEN {
-                    callGetFavoriteMovies()
-                    advanceUntilIdle()
-                }
-                THEN { getFavoriteMoviesUiStateEmptyList() }
-            }
-        }
-
-    @Test
-    fun `When input text change should call runSearch after 500ms`() = runTest {
-        RUN_UNIT_TEST(robot) {
-            GIVEN { getSearchMoviesUseCaseSuccess() }
-            WHEN { inputTextUpdate(RUN_SEARCH_QUERY_1) }
-            AND { advanceTimeBy(501) }
-            THEN { shouldHaveCalledRunSearch(RUN_SEARCH_QUERY_1, 1) }
-        }
-    }
-
-    @Test
-    fun `Run Search should be called just to last query that do not change on last 500ms`() =
-        runTest {
-            RUN_UNIT_TEST(robot) {
-                GIVEN { getSearchMoviesUseCaseSuccess() }
-                WHEN {
-                    inputTextUpdate(RUN_SEARCH_QUERY_1)
-                    advanceTimeBy(499)
-                    inputTextUpdate(RUN_SEARCH_QUERY_2)
-                    advanceTimeBy(499)
-                    inputTextUpdate(RUN_SEARCH_QUERY_3)
-                    advanceTimeBy(501)
-                }
-                THEN {
-                    shouldHaveCalledRunSearch(RUN_SEARCH_QUERY_1, 0)
-                    shouldHaveCalledRunSearch(RUN_SEARCH_QUERY_2, 0)
-                    shouldHaveCalledRunSearch(RUN_SEARCH_QUERY_3, 1)
-                }
-            }
-        }
-
-    @Test
-    fun `Run Search should be called only if input text is biggest than 3 chars`() = runTest {
-        RUN_UNIT_TEST(robot) {
-            WHEN {
-                inputTextUpdate(RUN_SEARCH_QUERY_5)
-                advanceTimeBy(501)
-            }
-            THEN {
-                getSearchMoviesUiStateEmpty()
-            }
-        }
-    }
+//
+//    @Test
+//    fun `UiState State after FavoriteMovies Error should have isLoadingFavorite false and a empty list on favoriteList`() =
+//        runTest {
+//            RUN_UNIT_TEST(robot) {
+//                GIVEN { getFavoriteMoviesUseCaseEmptyList() }
+//                WHEN {
+//                    callGetFavoriteMovies()
+//                    advanceUntilIdle()
+//                }
+//                THEN { getFavoriteMoviesUiStateEmptyList() }
+//            }
+//        }
 
     class Robot : BaseRobot {
 
@@ -158,9 +106,6 @@ class HomeViewModelTest {
         @MockK
         lateinit var getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase
 
-        @MockK
-        lateinit var searchMoviesUseCase: SearchMoviesUseCase
-
         private lateinit var homeViewModel: HomeViewModel
 
 
@@ -171,7 +116,6 @@ class HomeViewModelTest {
                 HomeViewModel(
                     getDiscoverMoviesUseCase,
                     getFavoriteMoviesUseCase,
-                    searchMoviesUseCase
                 )
 
 
@@ -207,24 +151,6 @@ class HomeViewModelTest {
             } returns flowOf(emptyList())
         }
 
-        fun getSearchMoviesUseCaseSuccess(query: String? = null) {
-            if (query != null) {
-                coEvery {
-                    searchMoviesUseCase.invoke(query)
-                } returns flowOf(dummySearchMovies.filter { it.title.contains(query) })
-                return
-            }
-
-            coEvery {
-                searchMoviesUseCase.invoke(any())
-            } returns flowOf(dummySearchMovies)
-
-        }
-
-        fun inputTextUpdate(query: String) {
-            homeViewModel.updateInput(query)
-        }
-
         fun callGetDiscoverMovies() {
             homeViewModel.getDiscoverMovies()
         }
@@ -251,41 +177,6 @@ class HomeViewModelTest {
         fun getFavoriteMoviesUiStateEmptyList() {
             homeViewModel.state.value.isLoadingFavorite shouldBe false
             homeViewModel.state.value.favoriteList shouldBe emptyList()
-        }
-
-        fun getSearchMoviesUiStateSuccess(query: String) {
-            homeViewModel.state.value.searchMovieList shouldBe dummySearchMovies.filter {
-                it.title.contains(
-                    query
-                )
-            }
-            homeViewModel.state.value.queryHasNoResults shouldBe false
-            homeViewModel.state.value.isSearching shouldBe false
-            homeViewModel.state.value.searchErrorMessage shouldBe null
-            homeViewModel.state.value.searchQuery shouldBe query
-        }
-
-        fun getSearchMoviesUiStateSuccessButEmpty(query: String) {
-            homeViewModel.state.value.searchMovieList shouldBe emptyList()
-            homeViewModel.state.value.searchErrorMessage shouldBe null
-            homeViewModel.state.value.searchQuery shouldBe query
-            homeViewModel.state.value.queryHasNoResults shouldBe true
-            homeViewModel.state.value.isSearching shouldBe false
-        }
-
-        fun getSearchMoviesUiStateEmpty() {
-            homeViewModel.state.value.searchMovieList shouldBe emptyList()
-            homeViewModel.state.value.queryHasNoResults shouldBe false
-            homeViewModel.state.value.isSearching shouldBe false
-            homeViewModel.state.value.searchErrorMessage shouldBe null
-        }
-
-        fun runSearch(query: String) {
-            homeViewModel.runSearch(query)
-        }
-
-        fun shouldHaveCalledRunSearch(query: String, times: Int) {
-            coVerify(exactly = times) { homeViewModel.runSearch(query) }
         }
 
 

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
-import com.aetherinsight.goldentomatoes.feature.search_bar.data.SearchMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -16,8 +15,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch

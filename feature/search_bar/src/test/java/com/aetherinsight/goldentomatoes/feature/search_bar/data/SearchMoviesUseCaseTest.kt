@@ -1,10 +1,9 @@
-package com.aetherinsight.goldentomatoes.feature.home.data
+package com.aetherinsight.goldentomatoes.feature.search_bar.data
 
 import app.cash.turbine.test
+import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.data.data.model.SearchMovieRemote
 import com.aetherinsight.goldentomatoes.data.data.repositories.SearchMoviesRepository
-import com.aetherinsight.goldentomatoes.feature.home.model.SearchMovie
-import com.aetherinsight.goldentomatoes.feature.search_bar.data.SearchMoviesUseCase
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.GIVEN
 import com.aetherinsight.goldentomatoes.testutils.robot.RUN_UNIT_TEST

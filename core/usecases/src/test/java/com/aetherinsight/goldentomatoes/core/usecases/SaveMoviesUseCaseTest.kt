@@ -1,7 +1,7 @@
-package com.aetherinsight.goldentomatoes.feature.details.data
+package com.aetherinsight.goldentomatoes.core.usecases
 
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.repositories.FavoriteRepository
-import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.RUN_UNIT_TEST
 import com.aetherinsight.goldentomatoes.testutils.robot.THEN
@@ -49,13 +49,13 @@ class SaveMoviesUseCaseTest {
         @MockK
         private lateinit var favoriteRepository: FavoriteRepository
 
-        private lateinit var saveMoviesUseCase: com.aetherinsight.goldentomatoes.core.usecases.SaveMoviesUseCase
+        private lateinit var saveMoviesUseCase: SaveMoviesUseCase
 
         override fun setup() {
             MockKAnnotations.init(this, relaxUnitFun = true)
 
             saveMoviesUseCase =
-                com.aetherinsight.goldentomatoes.core.usecases.SaveMoviesUseCase(favoriteRepository)
+                SaveMoviesUseCase(favoriteRepository)
 
             coEvery {
                 favoriteRepository.addFavoriteMovie(any())
@@ -72,13 +72,13 @@ class SaveMoviesUseCaseTest {
 
         suspend fun invokeUseCaseWithoutFavorite() {
             saveMoviesUseCase.invoke(
-                dumbMovieDetails1.toGlobalMovie()
+                dumbMovieDetails1
             )
         }
 
         suspend fun invokeUseCaseWithFavorite() {
             saveMoviesUseCase.invoke(
-                dumbMovieDetails2.toGlobalMovie()
+                dumbMovieDetails2
             )
         }
 
@@ -87,7 +87,7 @@ class SaveMoviesUseCaseTest {
                 favoriteRepository.removeFavoriteMovie(dumbMovieDetails2.id)
             }
             coVerify(exactly = 0) {
-                favoriteRepository.addFavoriteMovie(dumbMovieDetails1.toGlobalMovie())
+                favoriteRepository.addFavoriteMovie(dumbMovieDetails1)
             }
         }
 
@@ -96,27 +96,29 @@ class SaveMoviesUseCaseTest {
                 favoriteRepository.removeFavoriteMovie(dumbMovieDetails2.id)
             }
             coVerify(exactly = 1) {
-                favoriteRepository.addFavoriteMovie(dumbMovieDetails1.toGlobalMovie())
+                favoriteRepository.addFavoriteMovie(dumbMovieDetails1)
             }
         }
 
 
-        private val dumbMovieDetails1 = MovieDetails(
-            id = 1L,
-            title = "Movie 1",
-            description = "Description 1",
-            posterPath = "/path/to/poster1.jpg",
-            favorite = false,
-            scheduled = false
-        )
+        private val dumbMovieDetails1 =
+            MovieGlobal(
+                id = 1L,
+                title = "Movie 1",
+                description = "Description 1",
+                posterPath = "/path/to/poster1.jpg",
+                favorite = false,
+                scheduled = false
+            )
 
-        private val dumbMovieDetails2 = MovieDetails(
-            id = 2L,
-            title = "Movie 2",
-            description = "Description 2",
-            posterPath = "/path/to/poster2.jpg",
-            favorite = true,
-            scheduled = true
-        )
+        private val dumbMovieDetails2 =
+            MovieGlobal(
+                id = 2L,
+                title = "Movie 2",
+                description = "Description 2",
+                posterPath = "/path/to/poster2.jpg",
+                favorite = true,
+                scheduled = true
+            )
     }
 }

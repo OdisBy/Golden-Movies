@@ -1,13 +1,13 @@
 package com.aetherinsight.goldentomatoes.feature.details.ui
 
-import androidx.compose.material3.TimePickerState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
+import com.aetherinsight.goldentomatoes.core.usecases.SaveMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.details.data.GetDetailsUseCase
 import com.aetherinsight.goldentomatoes.feature.details.data.ScheduleUseCase
-import com.aetherinsight.goldentomatoes.feature.details.data.SaveMoviesUseCase
+import com.aetherinsight.goldentomatoes.feature.details.data.toGlobalMovie
 import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -134,7 +134,7 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val movie = state.value.movieDetails ?: return@launch
-                saveMoviesUseCase.invoke(movie)
+                saveMoviesUseCase.invoke(movie.toGlobalMovie())
                 _state.update {
                     it.copy(movieDetails = movie.copy(favorite = !movie.favorite))
                 }
@@ -150,7 +150,7 @@ class DetailsViewModel @Inject constructor(
                 val movie = state.value.movieDetails ?: return@launch
 
                 if(!movie.favorite) {
-                    saveMoviesUseCase.invoke(movie)
+                    saveMoviesUseCase.invoke(movie.toGlobalMovie())
                 }
 
                 scheduleUseCase.invoke(movieDetails =  movie, minutesToSchedule = minutesToSchedule)
