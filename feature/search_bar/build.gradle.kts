@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aetherinsight.goldentomatoes.feature.home"
+    namespace = "com.aetherinsight.goldentomatoes.feature.search_bar"
     compileSdk = rootProject.extra.get("compileSdk") as Int
 
     defaultConfig {
@@ -33,13 +33,11 @@ android {
 }
 
 dependencies {
-
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
     implementation(project(":core:data"))
     implementation(project(":data:data"))
     implementation(project(":testutils"))
-    implementation(project(":feature:search_bar"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -52,33 +50,11 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.material3)
 
-    implementation(libs.androidx.lifecycle.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.window)
-    implementation(libs.androidx.window.core)
-
-    implementation(libs.navigation.compose)
-    implementation(libs.kotlinx.serialization.json)
-
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
-    implementation(libs.coil.compose)
-
     implementation(libs.timber)
 
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotest.assertions.core)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.turbine)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }

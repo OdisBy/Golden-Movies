@@ -1,7 +1,7 @@
-package com.aetherinsight.goldentomatoes.feature.home.data
+package com.aetherinsight.goldentomatoes.feature.search_bar.data
 
+import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.data.data.repositories.SearchMoviesRepository
-import com.aetherinsight.goldentomatoes.feature.home.model.SearchMovie
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

@@ -5,9 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
-import com.aetherinsight.goldentomatoes.feature.home.data.SearchMoviesUseCase
+import com.aetherinsight.goldentomatoes.feature.search_bar.data.SearchMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
-import com.aetherinsight.goldentomatoes.feature.home.model.SearchMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -30,21 +29,11 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
     private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
-    private val searchMoviesUseCase: SearchMoviesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
 
     val state: StateFlow<HomeUiState>
         get() = _state
-
-    /**
-     * Input Text flow to Search Bar
-     * It is decoupled from UiState because It has to handle debounce
-     */
-    private val _inputText: MutableStateFlow<String> =
-        MutableStateFlow("")
-
-    val inputText: StateFlow<String> = _inputText
 
     init {
         viewModelScope.launch {
@@ -53,18 +42,13 @@ class HomeViewModel @Inject constructor(
             }
 
             getDiscoverMovies()
-
-            // Collect Latest cancel last action when a new action is emitted
-            inputText.debounce(500).collectLatest { input ->
-                runSearch(input)
-            }
         }
     }
 
     fun getDiscoverMovies() = viewModelScope.launch {
         try {
             _state.update {
-                it.copy(searchErrorMessage = "")
+                it.copy(discoverMoviesError = null)
             }
 
             getDiscoverMoviesUseCase()
@@ -75,7 +59,7 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             isLoadingDiscover = false,
                             discoverList = persistentListOf(),
-                            searchErrorMessage = e.localizedMessage ?: "Error"
+                            discoverMoviesError = e.localizedMessage ?: "Error"
                         )
                     }
                 }
@@ -89,7 +73,7 @@ class HomeViewModel @Inject constructor(
                 it.copy(
                     isLoadingDiscover = false,
                     discoverList = persistentListOf(),
-                    searchErrorMessage = e.localizedMessage ?: "Error"
+                    discoverMoviesError = e.localizedMessage ?: "Error"
                 )
             }
         }
@@ -144,76 +128,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getSearchMovies(searchQuery: String) {
-        viewModelScope.launch {
-            try {
-                _state.value = _state.value.copy(isSearching = true, searchQuery = searchQuery)
-
-                searchMoviesUseCase.invoke(searchQuery)
-                    .flowOn(Dispatchers.Default)
-                    .catch { e ->
-                        Timber.e("Unexpected catch error ${e.message}")
-                        _state.value =
-                            _state.value.copy(
-                                searchMovieList = persistentListOf(),
-                                queryHasNoResults = false,
-                                isSearching = false,
-                                searchErrorMessage = e.localizedMessage ?: "Error"
-                            )
-                    }
-                    .collect {
-                        _state.value =
-                            _state.value.copy(
-                                searchMovieList = it.toPersistentList(),
-                                queryHasNoResults = it.isEmpty(),
-                                isSearching = false,
-                                searchErrorMessage = null
-                            )
-                    }
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        searchMovieList = persistentListOf(),
-                        queryHasNoResults = false,
-                        isSearching = false,
-                        searchErrorMessage = e.localizedMessage ?: "Error"
-                    )
-                }
-            }
-        }
-    }
-
-
-    fun runSearch(query: String) {
-        viewModelScope.launch {
-            if (query.length > 3) {
-                getSearchMovies(query)
-            } else {
-                _state.update {
-                    it.copy(
-                        searchMovieList = persistentListOf(),
-                        queryHasNoResults = false,
-                        isSearching = false,
-                        searchErrorMessage = null
-                    )
-                }
-            }
-        }
-    }
-
-    fun updateInput(inputText: String) {
-        _inputText.update { inputText }
-    }
+    data class HomeUiState(
+        val isLoadingDiscover: Boolean = false,
+        val isLoadingFavorite: Boolean = false,
+        val discoverList: ImmutableList<HomeMovie> = persistentListOf(),
+        val favoriteList: ImmutableList<HomeMovie> = persistentListOf(),
+        val discoverMoviesError: String? = null,
+    )
 }
-
-data class HomeUiState(
-    val isLoadingDiscover: Boolean = false,
-    val isLoadingFavorite: Boolean = false,
-    val discoverList: ImmutableList<HomeMovie> = persistentListOf(),
-    val favoriteList: ImmutableList<HomeMovie> = persistentListOf(),
-    val searchMovieList: ImmutableList<SearchMovie> = persistentListOf(),
-    val searchQuery: String = "",
-    val queryHasNoResults: Boolean = false,
-    val isSearching: Boolean = false,
-    val searchErrorMessage: String? = null,
-)

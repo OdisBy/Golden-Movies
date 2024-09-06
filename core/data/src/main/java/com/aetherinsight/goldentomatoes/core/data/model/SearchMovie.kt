@@ -1,4 +1,4 @@
-package com.aetherinsight.goldentomatoes.feature.home.model
+package com.aetherinsight.goldentomatoes.core.data.model
 
 data class SearchMovie(
     val id: Long,

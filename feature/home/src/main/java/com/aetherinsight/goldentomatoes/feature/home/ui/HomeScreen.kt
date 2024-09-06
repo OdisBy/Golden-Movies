@@ -39,7 +39,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,8 +53,9 @@ import com.aetherinsight.goldentomatoes.core.ui.theme.Primary900
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.home.R
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
-import com.aetherinsight.goldentomatoes.feature.home.ui.components.NoMoviesFounded
-import com.aetherinsight.goldentomatoes.feature.home.ui.components.SearchBarApp
+import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModel.HomeUiState
+import com.aetherinsight.goldentomatoes.feature.search_bar.ui.NoMoviesFounded
+import com.aetherinsight.goldentomatoes.feature.search_bar.ui.SearchBarRoot
 
 @Composable
 fun HomeRoot(
@@ -65,9 +65,8 @@ fun HomeRoot(
     hasInternetConnection: Boolean,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    
+
     val uiState by viewModel.state.collectAsStateWithLifecycle()
-    val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
 
     RepeatOnLifecycleEffect { viewModel.getFavoriteMovies() }
 
@@ -98,8 +97,6 @@ fun HomeRoot(
             uiState = uiState,
             discoverMoviesList = uiState.discoverList,
             favoriteMoviesList = uiState.favoriteList,
-            inputQuery = inputQuery,
-            onInputQueryChange = { viewModel.updateInput(it) },
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
             hasInternetConnection = hasInternetConnection,
@@ -115,8 +112,6 @@ fun HomeScreen(
     uiState: HomeUiState,
     discoverMoviesList: List<HomeMovie>,
     favoriteMoviesList: List<HomeMovie>,
-    inputQuery: String,
-    onInputQueryChange: (String) -> Unit,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
     hasInternetConnection: Boolean,
@@ -126,13 +121,10 @@ fun HomeScreen(
     var searchBarActive by remember { mutableStateOf(false) }
 
     Column {
-        SearchBarApp(
-            searchQuery = inputQuery,
+        SearchBarRoot(
             searchBarActive = searchBarActive,
-            uiState = uiState,
-            onChangeQuery = onInputQueryChange,
+            goToMovieDetails = goToMovieDetails,
             onChangeSearchBarActive = { searchBarActive = it },
-            onMovieClicked = goToMovieDetails
         )
         // carrosel loading surface
 
@@ -197,7 +189,11 @@ private fun DiscoverNewMovies(
         Spacer(modifier = Modifier.height(12.dp))
 
         if (homeMovies.isEmpty()) {
-            NoMoviesFounded(modifier = Modifier.height(200.dp))
+            NoMoviesFounded(
+                modifier = Modifier.height(
+                    200.dp
+                )
+            )
         } else {
             DiscoverCarousel(homeMovies, goToMovieDetails)
 
@@ -329,22 +325,4 @@ private fun RowTextAndGoButton(
             }
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    backgroundColor = 0xFF181818
-)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(
-        uiState = HomeUiState(),
-        discoverMoviesList = emptyList(),
-        favoriteMoviesList = emptyList(),
-        inputQuery = "",
-        onInputQueryChange = {},
-        navigateToMovieList = { },
-        hasInternetConnection = true,
-        goToMovieDetails = {}
-    )
 }

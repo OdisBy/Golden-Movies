@@ -1,4 +1,4 @@
-package com.aetherinsight.goldentomatoes.feature.home.ui.components
+package com.aetherinsight.goldentomatoes.feature.search_bar.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,31 +27,54 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColorAccent
-import com.aetherinsight.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.aetherinsight.goldentomatoes.core.ui.theme.Primary400
 import com.aetherinsight.goldentomatoes.core.ui.theme.Primary500
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
-import com.aetherinsight.goldentomatoes.feature.home.R
-import com.aetherinsight.goldentomatoes.feature.home.model.SearchMovie
-import com.aetherinsight.goldentomatoes.feature.home.ui.HomeUiState
+import com.aetherinsight.goldentomatoes.feature.search_bar.R
+import com.aetherinsight.goldentomatoes.feature.search_bar.ui.SearchBarViewModel.SearchBarState
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toPersistentList
+import kotlin.text.isNotBlank
+
+
+@Composable
+fun SearchBarRoot(
+    searchBarActive: Boolean,
+    onChangeSearchBarActive: (Boolean) -> Unit,
+    goToMovieDetails: (Long) -> Unit,
+    viewModel: SearchBarViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+
+
+    SearchBarComponent(
+        searchQuery = searchQuery,
+        searchBarActive = searchBarActive,
+        state = state,
+        onChangeQuery = { viewModel.onInputQueryChange(it) },
+        onChangeSearchBarActive = onChangeSearchBarActive,
+        onMovieClicked = goToMovieDetails,
+    )
+}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun SearchBarApp(
+fun SearchBarComponent(
     searchQuery: String,
     searchBarActive: Boolean,
-    uiState: HomeUiState,
+    state: SearchBarViewModel.SearchBarState,
     onChangeQuery: (String) -> Unit,
     onChangeSearchBarActive: (Boolean) -> Unit,
     onMovieClicked: (Long) -> Unit,
@@ -59,7 +82,9 @@ fun SearchBarApp(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(
-        if (searchBarActive) Modifier.fillMaxSize() else Modifier.padding(horizontal = 12.dp)
+        if (searchBarActive) Modifier.Companion.fillMaxSize() else Modifier.Companion.padding(
+            horizontal = 12.dp
+        )
     ) {
         SearchBar(
             query = searchQuery,
@@ -73,12 +98,14 @@ fun SearchBarApp(
             },
             active = searchBarActive,
             onActiveChange = { onChangeSearchBarActive(it) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.Companion.fillMaxWidth(),
             trailingIcon = {
                 if (searchQuery.isNotBlank() && searchBarActive) {
                     IconButton(onClick = { onChangeQuery("") }) {
                         Icon(
-                            painter = rememberVectorPainter(Icons.Default.Close),
+                            painter = rememberVectorPainter(
+                                Icons.Default.Close
+                            ),
                             tint = TextColor,
                             contentDescription = stringResource(R.string.clear_query)
                         )
@@ -97,26 +124,35 @@ fun SearchBarApp(
                 dividerColor = Primary500,
             )
         ) {
-            if (searchQuery.isBlank()) {
-                return@SearchBar
-            }
-            if (uiState.isSearching) {
-                SearchingItem(modifier = Modifier.align(Alignment.CenterHorizontally))
-                return@SearchBar
-            }
-            if (uiState.searchErrorMessage != null) {
-                ErrorItem(
-                    message = uiState.searchErrorMessage,
-                    modifier = Modifier.windowInsetsPadding(WindowInsets.ime)
-                )
-                return@SearchBar
-            }
-            if (uiState.queryHasNoResults) {
-                NoMoviesFounded(modifier = Modifier.windowInsetsPadding(WindowInsets.ime))
-                return@SearchBar
-            }
-            if (uiState.searchMovieList.isNotEmpty()) {
-                ListWithMovies(uiState.searchMovieList, onMovieClicked)
+            when (val uiState = state) {
+                SearchBarState.Idle -> {
+                    return@SearchBar
+                }
+
+                is SearchBarState.Error -> {
+                    ErrorItem(
+                        message = uiState.errorMessage,
+                        modifier = Modifier.Companion.windowInsetsPadding(WindowInsets.Companion.ime)
+                    )
+                }
+
+                SearchBarState.Searching -> {
+                    SearchingItem(modifier = Modifier.Companion.align(Alignment.Companion.CenterHorizontally))
+                }
+
+                is SearchBarState.SuccessfulSearch -> {
+
+                    if (uiState.searchMovieList.isEmpty()) {
+                        NoMoviesFounded(
+                            modifier = Modifier.Companion.windowInsetsPadding(
+                                WindowInsets.Companion.ime
+                            )
+                        )
+                        return@SearchBar
+                    }
+
+                    ListWithMovies(uiState.searchMovieList, onMovieClicked)
+                }
             }
         }
     }
@@ -131,22 +167,29 @@ fun SearchingItem(modifier: Modifier) {
 }
 
 @Composable
-fun NoMoviesFounded(modifier: Modifier = Modifier) {
+fun NoMoviesFounded(modifier: Modifier = Modifier.Companion) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Companion.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier.fillMaxSize()
     ) {
-        ErrorItem(message = stringResource(R.string.no_movies_founded))
+        ErrorItem(
+            message = stringResource(
+                R.string.no_movies_founded
+            )
+        )
     }
 }
 
 @Composable
-private fun ListWithMovies(movies: ImmutableList<SearchMovie>, onMovieClicked: (Long) -> Unit) {
+private fun ListWithMovies(
+    movies: ImmutableList<SearchMovie>,
+    onMovieClicked: (Long) -> Unit
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(16.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.Companion.fillMaxSize()
     ) {
         items(
             count = movies.size,
@@ -162,7 +205,7 @@ private fun ListWithMovies(movies: ImmutableList<SearchMovie>, onMovieClicked: (
 fun MovieSearchListItem(
     movie: SearchMovie,
     onMovieClicked: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.Companion
 ) {
     TextButton(
         onClick = {
@@ -173,14 +216,14 @@ fun MovieSearchListItem(
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            verticalAlignment = Alignment.Companion.CenterVertically,
+            modifier = Modifier.Companion.fillMaxWidth()
         ) {
             Text(
                 text = movie.title,
                 color = TextColor,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
+                modifier = Modifier.Companion
                     .weight(1f)
                     .padding(end = 16.dp)
             )
@@ -193,43 +236,5 @@ fun MovieSearchListItem(
                 tint = if (movie.favorite) Primary400 else TextColor
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun SearchBarAppPreview() {
-    GoldenTomatoesTheme {
-        SearchBarApp(
-            searchQuery = "",
-            onMovieClicked = {},
-            searchBarActive = false,
-            uiState = HomeUiState(),
-            onChangeQuery = {},
-            onChangeSearchBarActive = {}
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun SearchBarAppActivePreview() {
-    GoldenTomatoesTheme {
-        SearchBarApp(
-            searchQuery = "Meu malvado favorito numero 4 ou 5",
-            onMovieClicked = {},
-            searchBarActive = true,
-            uiState = HomeUiState(
-                searchMovieList = listOf(
-                    SearchMovie(
-                        id = 1,
-                        title = "Meu malvado favorito numero 4 ou 5 ou 6 ou 7 ou 8",
-                        favorite = true
-                    )
-                ).toPersistentList()
-            ),
-            onChangeQuery = {},
-            onChangeSearchBarActive = {}
-        )
     }
 }

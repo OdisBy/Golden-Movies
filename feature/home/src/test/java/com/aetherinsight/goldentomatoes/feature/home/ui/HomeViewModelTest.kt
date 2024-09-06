@@ -3,7 +3,7 @@ package com.aetherinsight.goldentomatoes.feature.home.ui
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
-import com.aetherinsight.goldentomatoes.feature.home.data.SearchMoviesUseCase
+import com.aetherinsight.goldentomatoes.feature.search_bar.data.SearchMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
 import com.aetherinsight.goldentomatoes.feature.home.model.SearchMovie
 import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModelTest.Robot.Companion.RUN_SEARCH_QUERY_1

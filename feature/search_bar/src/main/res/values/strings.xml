@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="clear_query">Limpar busca</string>
+    <string name="search_movie_placeholder">Procure por filmes</string>
+    <string name="no_movies_founded">Nenhum filme foi encontrado</string>
+
+</resources>
