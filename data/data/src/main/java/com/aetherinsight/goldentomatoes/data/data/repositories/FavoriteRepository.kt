@@ -4,7 +4,7 @@ import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import kotlinx.coroutines.flow.Flow
 
 interface FavoriteRepository {
-    suspend fun getFavoriteMovies(): Flow<List<MovieGlobal>>
+    fun getFavoriteMovies(): Flow<List<MovieGlobal>>
 
     suspend fun addFavoriteMovie(movie: MovieGlobal)
 

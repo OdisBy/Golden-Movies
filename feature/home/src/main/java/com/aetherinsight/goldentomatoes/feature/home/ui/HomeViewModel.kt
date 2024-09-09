@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,17 +26,25 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
-    private val getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
+    getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(HomeUiState())
 
     val state: StateFlow<HomeUiState>
         get() = _state
 
+    val favoriteMovies: StateFlow<List<HomeMovie>> =
+        getFavoriteMoviesUseCase()
+            .stateIn(
+                initialValue = emptyList<HomeMovie>(),
+                scope = viewModelScope,
+                started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000)
+            )
+
     init {
         viewModelScope.launch {
             _state.update {
-                it.copy(isLoadingDiscover = true, isLoadingFavorite = true)
+                it.copy(isLoadingDiscover = true)
             }
 
             getDiscoverMovies()
@@ -96,40 +105,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getFavoriteMovies() = viewModelScope.launch {
-        try {
-            getFavoriteMoviesUseCase()
-                .flowOn(Dispatchers.Default)
-                .catch { e ->
-                    Timber.e("Unexpected catch error ${e.message}")
-                    _state.value =
-                        _state.value.copy(
-                            isLoadingFavorite = false,
-                            favoriteList = persistentListOf(),
-                        )
-                }
-                .collect { result ->
-                    _state.value =
-                        _state.value.copy(
-                            favoriteList = result.toPersistentList(),
-                            isLoadingFavorite = false
-                        )
-                }
-
-        } catch (e: Exception) {
-            _state.value =
-                _state.value.copy(
-                    isLoadingFavorite = false,
-                    favoriteList = persistentListOf(),
-                )
-        }
-    }
 
     data class HomeUiState(
         val isLoadingDiscover: Boolean = false,
-        val isLoadingFavorite: Boolean = false,
         val discoverList: ImmutableList<HomeMovie> = persistentListOf(),
-        val favoriteList: ImmutableList<HomeMovie> = persistentListOf(),
         val discoverMoviesError: String? = null,
     )
 }

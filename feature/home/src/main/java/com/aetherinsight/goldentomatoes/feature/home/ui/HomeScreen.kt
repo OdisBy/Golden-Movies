@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.aetherinsight.goldentomatoes.core.ui.RepeatOnLifecycleEffect
 import com.aetherinsight.goldentomatoes.core.ui.common.TMDBAttribution
 import com.aetherinsight.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
@@ -68,7 +67,8 @@ fun HomeRoot(
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    RepeatOnLifecycleEffect { viewModel.getFavoriteMovies() }
+    val favoriteMovies by viewModel.favoriteMovies.collectAsStateWithLifecycle()
+
 
     Scaffold(
         modifier = Modifier
@@ -96,7 +96,7 @@ fun HomeRoot(
         HomeScreen(
             uiState = uiState,
             discoverMoviesList = uiState.discoverList,
-            favoriteMoviesList = uiState.favoriteList,
+            favoriteMoviesList = favoriteMovies,
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
             hasInternetConnection = hasInternetConnection,
@@ -147,15 +147,12 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
             }
-            if (uiState.isLoadingFavorite) {
-                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
-                FavoriteMovies(
-                    goToMovieDetails,
-                    navigateToMovieList,
-                    favoriteMoviesList
-                )
-            }
+
+            FavoriteMovies(
+                goToMovieDetails,
+                navigateToMovieList,
+                favoriteMoviesList
+            )
 
         }
     }
@@ -253,15 +250,6 @@ fun DiscoverCarousel(
     )
 }
 
-/*
-    Aqui tem um bug desse carousel no Compose, quando  se usa o rememberCarouselState
-
-    O bug é: quando a lista atualiza, e ele ainda não tem filmes...
-    o suficiente para preencher a tela o app crasha ou não atualiza.
-
-    Nesse caso então por exemplo se adicionarmos um filme, e o carousel não estiver preenchido e voltar ele não atualiza
-    Outro caso é caso tenha 1 filme adicionado, retira ele e volte, nesse caso ele crasha
- */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun MoviesCarousel(homeMovies: List<HomeMovie>, goToMovieDetails: (Long) -> Unit) {

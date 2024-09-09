@@ -9,10 +9,10 @@ import javax.inject.Inject
 class GetFavoriteMoviesUseCase @Inject constructor(
     private val favoriteRepository: FavoriteRepository
 ) {
-    suspend operator fun invoke(): Flow<List<HomeMovie>> =
-        favoriteRepository.getFavoriteMovies().map { listMovies ->
-            listMovies.map { movieGlobal ->
-                movieGlobal.toMovie()
+    operator fun invoke(): Flow<List<HomeMovie>> =
+            favoriteRepository.getFavoriteMovies().map { listMovies ->
+                listMovies.map { movieGlobal ->
+                    movieGlobal.toMovie()
+                }
             }
-        }
 }
