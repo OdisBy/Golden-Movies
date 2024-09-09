@@ -126,13 +126,21 @@ fun HomeScreen(
             goToMovieDetails = goToMovieDetails,
             onChangeSearchBarActive = { searchBarActive = it },
         )
-        // carrosel loading surface
 
         Column(
             modifier = modifier
                 .padding(horizontal = 12.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
+
+            FavoriteMovies(
+                goToMovieDetails,
+                navigateToMovieList,
+                favoriteMoviesList
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             if (hasInternetConnection) {
                 if (uiState.isLoadingDiscover) {
                     MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -144,15 +152,7 @@ fun HomeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
             }
-
-            FavoriteMovies(
-                goToMovieDetails,
-                navigateToMovieList,
-                favoriteMoviesList
-            )
 
         }
     }
