@@ -61,6 +61,7 @@ import coil.compose.AsyncImage
 import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.core.ui.common.DialDialog
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
+import com.aetherinsight.goldentomatoes.core.ui.common.shimmerBrush
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColorAccent
 import com.aetherinsight.goldentomatoes.core.ui.theme.Black_50
@@ -145,12 +146,13 @@ fun DetailsRoot(
         }
     ) { contentPadding ->
         if (uiState.isLoading) {
-            LoadingScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
+            Box {
+                ShimmerImage(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                )
+            }
             return@Scaffold
         }
         if (uiState.errorMessage != null) {
@@ -188,6 +190,42 @@ fun DetailsRoot(
                         .padding(contentPadding),
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ShimmerImage(modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+        AsyncImage(
+            model = "",
+            contentDescription = "",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .height(500.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .background(shimmerBrush(true))
+        )
+
+        Column(
+            modifier = modifier
+                .padding(horizontal = 12.dp)
+        ) {
+            Text(
+                "                 ",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.background(shimmerBrush(true))
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "                                                                                                                        ",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.background(shimmerBrush(true))
+            )
         }
     }
 }
@@ -468,12 +506,7 @@ private fun DetailsLoadingPreview() {
                 }
             }
         ) { contentPadding ->
-            LoadingScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
+            ShimmerImage(modifier = Modifier.fillMaxSize().padding(contentPadding))
         }
     }
 }
