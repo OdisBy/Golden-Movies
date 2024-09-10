@@ -1,6 +1,7 @@
 package com.aetherinsight.goldentomatoes.feature.movielist.data
 
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
+import com.aetherinsight.goldentomatoes.core.network.model.mapList
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
 import com.aetherinsight.goldentomatoes.data.data.repositories.DiscoverRepository
 import com.aetherinsight.goldentomatoes.data.data.repositories.FavoriteRepository
@@ -21,17 +22,14 @@ class GetListMoviesUseCase @Inject constructor(
     }
 
     private suspend fun getDiscoverMovies(): Flow<Resource<List<MovieListItem>>> {
-        return discoverRepository.getDiscoverMovies().map {
-            when (it) {
-                is Resource.Success -> Resource.Success(it.data.map { it.toMovieListItem() })
-                is Resource.Error -> Resource.Error(it.message)
-            }
+        return discoverRepository.getDiscoverMovies().map { resourceMovies ->
+            resourceMovies.mapList { it.toMovieListItem() }
         }
     }
 
-    private suspend fun getFavoriteMovies(): Flow<Resource<List<MovieListItem>>> {
-        return favoriteRepository.getFavoriteMovies().map {
-            Resource.Success(it.map { it.toMovieListItem() })
+    private fun getFavoriteMovies(): Flow<Resource<List<MovieListItem>>> {
+        return favoriteRepository.getFavoriteMovies().map { resource ->
+            resource.mapList { it.toMovieListItem() }
         }
     }
 }
