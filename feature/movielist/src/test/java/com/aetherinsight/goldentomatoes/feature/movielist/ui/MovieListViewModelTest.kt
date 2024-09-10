@@ -4,6 +4,7 @@ import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
 import com.aetherinsight.goldentomatoes.feature.movielist.data.GetListMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.movielist.model.MovieListItem
+import com.aetherinsight.goldentomatoes.testutils.MainDispatcherRule
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.GIVEN
 import com.aetherinsight.goldentomatoes.testutils.robot.RUN_UNIT_TEST
@@ -13,13 +14,20 @@ import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MovieListViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private val robot = Robot()
 
@@ -38,6 +46,7 @@ class MovieListViewModelTest {
         RUN_UNIT_TEST(robot) {
             GIVEN { getDiscoverMoviesUseCaseSuccess() }
             WHEN { invokeUseCase(ListTypes.DISCOVER) }
+            advanceUntilIdle()
             THEN { assertMoviesListIsUpdated() }
         }
     }
@@ -47,6 +56,7 @@ class MovieListViewModelTest {
         RUN_UNIT_TEST(robot) {
             GIVEN { getDiscoverMoviesUseCaseError() }
             WHEN { invokeUseCase(ListTypes.DISCOVER) }
+            advanceUntilIdle()
             THEN { assertErrorMessageContainsError() }
         }
     }

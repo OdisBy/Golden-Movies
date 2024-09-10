@@ -186,8 +186,8 @@ private fun DiscoverNewMovies(
                 )
             )
 
-            is Resource.Loading -> DiscoverCarousel(emptyList(), goToMovieDetails, true)
-            is Resource.Success -> DiscoverCarousel(homeMovies.data, goToMovieDetails, false)
+            is Resource.Loading -> ShimmerCarousel()
+            is Resource.Success -> DiscoverCarousel(homeMovies.data, goToMovieDetails)
         }
     }
 }
@@ -219,9 +219,9 @@ private fun FavoriteMovies(
 
         when (favoriteMovies) {
             is Resource.Error -> NoMoviesFavorite()
-            is Resource.Loading -> FavoriteCarousel(emptyList(), goToMovieDetails, true)
+            is Resource.Loading -> ShimmerCarousel()
             is Resource.Success -> {
-                FavoriteCarousel(favoriteMovies.data, goToMovieDetails, false)
+                FavoriteCarousel(favoriteMovies.data, goToMovieDetails)
             }
         }
     }
@@ -231,12 +231,10 @@ private fun FavoriteMovies(
 fun FavoriteCarousel(
     homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit,
-    shimmer: Boolean,
 ) {
     MoviesCarousel(
         homeMovies = homeMovies,
         goToMovieDetails = goToMovieDetails,
-        shimmer = shimmer,
     )
 }
 
@@ -244,12 +242,10 @@ fun FavoriteCarousel(
 fun DiscoverCarousel(
     homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit,
-    shimmer: Boolean
 ) {
     MoviesCarousel(
         homeMovies = homeMovies,
         goToMovieDetails = goToMovieDetails,
-        shimmer = shimmer,
     )
 }
 
@@ -258,17 +254,16 @@ fun DiscoverCarousel(
 private fun MoviesCarousel(
     homeMovies: List<HomeMovie>,
     goToMovieDetails: (Long) -> Unit,
-    shimmer: Boolean
 ) {
     HorizontalMultiBrowseCarousel(
-        state = CarouselState(itemCount = { if (shimmer) 5 else homeMovies.size }),
+        state = CarouselState(itemCount = { homeMovies.size }),
         modifier = Modifier
             .width(412.dp)
             .height(221.dp),
         preferredItemWidth = 186.dp,
         itemSpacing = 8.dp,
     ) { index ->
-        val movie = if (shimmer) HomeMovie(12, "", "", "", false) else homeMovies[index]
+        val movie = homeMovies[index]
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
             contentDescription = movie.title,
@@ -276,9 +271,35 @@ private fun MoviesCarousel(
             modifier = Modifier
                 .height(205.dp)
                 .maskClip(MaterialTheme.shapes.extraLarge)
-                .background(shimmerBrush(showShimmer = shimmer))
                 .clickable {
                     goToMovieDetails(movie.id)
+                },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShimmerCarousel(modifier: Modifier = Modifier) {
+    HorizontalMultiBrowseCarousel(
+        state = CarouselState(itemCount = { 5 }),
+        modifier = Modifier
+            .width(412.dp)
+            .height(221.dp),
+        preferredItemWidth = 186.dp,
+        itemSpacing = 8.dp,
+    ) {
+        val movie = HomeMovie(12, "", "", "", false)
+        AsyncImage(
+            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(205.dp)
+                .maskClip(MaterialTheme.shapes.extraLarge)
+                .background(shimmerBrush(showShimmer = true))
+                .clickable {
+
                 },
         )
     }
