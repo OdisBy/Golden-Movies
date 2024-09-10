@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--    Search Screen-->
-    <string name="search_movie_placeholder">Procure por filmes</string>
-    <string name="no_movies_founded">Nenhum filme foi encontrado</string>
-
-
     <!--    Content Descriptions-->
-    <!--    Serach Bar-->
-    <string name="clear_query">Limpar busca</string>
     <string name="home_fab_label">Descubra filmes aleatórios</string>
     <string name="favorite_movies_title">Filmes favoritos</string>
     <string name="discover_movies_title">Descubra novos filmes</string>

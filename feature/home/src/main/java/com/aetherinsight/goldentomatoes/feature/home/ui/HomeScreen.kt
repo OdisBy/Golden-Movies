@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -39,13 +38,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.aetherinsight.goldentomatoes.core.ui.RepeatOnLifecycleEffect
+import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.common.TMDBAttribution
+import com.aetherinsight.goldentomatoes.core.ui.common.shimmerBrush
 import com.aetherinsight.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
@@ -54,8 +53,8 @@ import com.aetherinsight.goldentomatoes.core.ui.theme.Primary900
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.home.R
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
-import com.aetherinsight.goldentomatoes.feature.home.ui.components.NoMoviesFounded
-import com.aetherinsight.goldentomatoes.feature.home.ui.components.SearchBarApp
+import com.aetherinsight.goldentomatoes.feature.search_bar.ui.NoMoviesFounded
+import com.aetherinsight.goldentomatoes.feature.search_bar.ui.SearchBarRoot
 
 @Composable
 fun HomeRoot(
@@ -65,11 +64,11 @@ fun HomeRoot(
     hasInternetConnection: Boolean,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    val inputQuery by viewModel.inputText.collectAsStateWithLifecycle()
+    val discoverMovies by viewModel.discoverMovies.collectAsStateWithLifecycle()
 
-    RepeatOnLifecycleEffect { viewModel.getFavoriteMovies() }
+    val favoriteMovies by viewModel.favoriteMovies.collectAsStateWithLifecycle()
+
 
     Scaffold(
         modifier = Modifier
@@ -95,11 +94,8 @@ fun HomeRoot(
         }
     ) { contentPadding ->
         HomeScreen(
-            uiState = uiState,
-            discoverMoviesList = uiState.discoverList,
-            favoriteMoviesList = uiState.favoriteList,
-            inputQuery = inputQuery,
-            onInputQueryChange = { viewModel.updateInput(it) },
+            discoverMovies = discoverMovies,
+            favoriteMovies = favoriteMovies,
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
             hasInternetConnection = hasInternetConnection,
@@ -112,11 +108,8 @@ fun HomeRoot(
 
 @Composable
 fun HomeScreen(
-    uiState: HomeUiState,
-    discoverMoviesList: List<HomeMovie>,
-    favoriteMoviesList: List<HomeMovie>,
-    inputQuery: String,
-    onInputQueryChange: (String) -> Unit,
+    discoverMovies: Resource<List<HomeMovie>>,
+    favoriteMovies: Resource<List<HomeMovie>>,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
     hasInternetConnection: Boolean,
@@ -125,83 +118,76 @@ fun HomeScreen(
 
     var searchBarActive by remember { mutableStateOf(false) }
 
+
     Column {
-        // Search bar should have max size, so I'll have to break this in two Columns zzzz
-        SearchBarApp(
-            searchQuery = inputQuery,
+        SearchBarRoot(
             searchBarActive = searchBarActive,
-            uiState = uiState,
-            onChangeQuery = onInputQueryChange,
+            goToMovieDetails = goToMovieDetails,
             onChangeSearchBarActive = { searchBarActive = it },
-            onMovieClicked = goToMovieDetails
         )
-        // carrosel loading surface
 
         Column(
             modifier = modifier
                 .padding(horizontal = 12.dp)
         ) {
             Spacer(modifier = Modifier.height(24.dp))
+
+            FavoriteMovies(
+                goToMovieDetails,
+                navigateToMovieList,
+                favoriteMovies
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             if (hasInternetConnection) {
-                if (uiState.isLoadingDiscover) {
-                    MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-                } else {
-                    DiscoverNewMovies(
-                        goToMovieDetails,
-                        navigateToMovieList,
-                        discoverMoviesList
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-            }
-            if (uiState.isLoadingFavorite) {
-                MoviesListLoading(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
-                FavoriteMovies(
+                DiscoverNewMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    favoriteMoviesList
+                    discoverMovies,
                 )
             }
+
+            TMDBAttribution()
 
         }
     }
 }
 
-@Composable
-fun MoviesListLoading(modifier: Modifier) {
-    CircularProgressIndicator(modifier = modifier)
-}
 
 @Composable
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    homeMovies: List<HomeMovie>,
+    homeMovies: Resource<List<HomeMovie>>,
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .semantics { isTraversalGroup = true }
     ) {
-
+        // Title
         RowTextAndGoButton(
             text = stringResource(R.string.discover_movies_title),
             onButtonClick = {
                 navigateToMovieList(ListTypes.DISCOVER)
             },
-            buttonVisible = homeMovies.size > 3
+            buttonVisible = homeMovies is Resource.Success && homeMovies.data.size > 3
         )
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (homeMovies.isEmpty()) {
-            NoMoviesFounded(modifier = Modifier.height(200.dp))
-        } else {
-            DiscoverCarousel(homeMovies, goToMovieDetails)
+        when (homeMovies) {
+            is Resource.Error -> NoMoviesFounded(
+                modifier = Modifier.height(
+                    200.dp
+                )
+            )
 
+            is Resource.Loading -> ShimmerCarousel()
+            is Resource.Success -> DiscoverCarousel(homeMovies.data, goToMovieDetails)
         }
     }
 }
@@ -210,7 +196,7 @@ private fun DiscoverNewMovies(
 private fun FavoriteMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    favoriteMovies: List<HomeMovie>,
+    favoriteMovies: Resource<List<HomeMovie>>,
 ) {
     Column(
         modifier = Modifier
@@ -218,60 +204,59 @@ private fun FavoriteMovies(
             .padding(horizontal = 16.dp)
             .semantics { isTraversalGroup = true }
     ) {
+        // Title
         RowTextAndGoButton(
             text = stringResource(R.string.favorite_movies_title),
             onButtonClick = {
                 navigateToMovieList(ListTypes.FAVORITE)
             },
-            buttonVisible = favoriteMovies.size > 3
+            buttonVisible = favoriteMovies is Resource.Success && favoriteMovies.data.size > 3
         )
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (favoriteMovies.isEmpty()) {
-            NoMoviesFavorite()
-        } else {
-            FavoriteCarousel(favoriteMovies, goToMovieDetails)
+        // Carrousel
+
+        when (favoriteMovies) {
+            is Resource.Error -> NoMoviesFavorite()
+            is Resource.Loading -> ShimmerCarousel()
+            is Resource.Success -> {
+                FavoriteCarousel(favoriteMovies.data, goToMovieDetails)
+            }
         }
-        TMDBAttribution()
     }
 }
 
 @Composable
 fun FavoriteCarousel(
     homeMovies: List<HomeMovie>,
-    goToMovieDetails: (Long) -> Unit
+    goToMovieDetails: (Long) -> Unit,
 ) {
     MoviesCarousel(
         homeMovies = homeMovies,
-        goToMovieDetails = goToMovieDetails
+        goToMovieDetails = goToMovieDetails,
     )
 }
 
 @Composable
 fun DiscoverCarousel(
     homeMovies: List<HomeMovie>,
-    goToMovieDetails: (Long) -> Unit
+    goToMovieDetails: (Long) -> Unit,
 ) {
     MoviesCarousel(
         homeMovies = homeMovies,
-        goToMovieDetails = goToMovieDetails
+        goToMovieDetails = goToMovieDetails,
     )
 }
 
-/*
-    Aqui tem um bug desse carousel no Compose, quando  se usa o rememberCarouselState
-
-    O bug é: quando a lista atualiza, e ele ainda não tem filmes...
-    o suficiente para preencher a tela o app crasha ou não atualiza.
-
-    Nesse caso então por exemplo se adicionarmos um filme, e o carousel não estiver preenchido e voltar ele não atualiza
-    Outro caso é caso tenha 1 filme adicionado, retira ele e volte, nesse caso ele crasha
- */
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun MoviesCarousel(homeMovies: List<HomeMovie>, goToMovieDetails: (Long) -> Unit) {
+private fun MoviesCarousel(
+    homeMovies: List<HomeMovie>,
+    goToMovieDetails: (Long) -> Unit,
+) {
     HorizontalMultiBrowseCarousel(
-        state = CarouselState(itemCount = { homeMovies.count() }),
+        state = CarouselState(itemCount = { homeMovies.size }),
         modifier = Modifier
             .width(412.dp)
             .height(221.dp),
@@ -288,6 +273,33 @@ private fun MoviesCarousel(homeMovies: List<HomeMovie>, goToMovieDetails: (Long)
                 .maskClip(MaterialTheme.shapes.extraLarge)
                 .clickable {
                     goToMovieDetails(movie.id)
+                },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShimmerCarousel(modifier: Modifier = Modifier) {
+    HorizontalMultiBrowseCarousel(
+        state = CarouselState(itemCount = { 5 }),
+        modifier = Modifier
+            .width(412.dp)
+            .height(221.dp),
+        preferredItemWidth = 186.dp,
+        itemSpacing = 8.dp,
+    ) {
+        val movie = HomeMovie(12, "", "", "", false)
+        AsyncImage(
+            model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(205.dp)
+                .maskClip(MaterialTheme.shapes.extraLarge)
+                .background(shimmerBrush(showShimmer = true))
+                .clickable {
+
                 },
         )
     }
@@ -330,22 +342,4 @@ private fun RowTextAndGoButton(
             }
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    backgroundColor = 0xFF181818
-)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(
-        uiState = HomeUiState(),
-        discoverMoviesList = emptyList(),
-        favoriteMoviesList = emptyList(),
-        inputQuery = "",
-        onInputQueryChange = {},
-        navigateToMovieList = { },
-        hasInternetConnection = true,
-        goToMovieDetails = {}
-    )
 }

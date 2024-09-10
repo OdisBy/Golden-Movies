@@ -2,7 +2,7 @@ package com.aetherinsight.goldentomatoes.data.data.impl
 
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.data.data.model.MovieEntity
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.model.MovieRemote
 
 fun MovieRemote.toMovieGlobal(): MovieGlobal {
@@ -10,7 +10,7 @@ fun MovieRemote.toMovieGlobal(): MovieGlobal {
         id = this.id,
         title = this.title,
         description = this.overview,
-        posterPath = this.posterPath,
+        posterPath = this.posterPath ?: "",
         favorite = false,
         scheduled = false
     )
@@ -31,5 +31,6 @@ fun Resource<List<MovieRemote>>.toMovieGlobal(): Resource<List<MovieGlobal>> {
     return when (this) {
         is Resource.Success -> Resource.Success(data.map { it.toMovieGlobal() })
         is Resource.Error -> Resource.Error(message)
+        is Resource.Loading -> Resource.Loading()
     }
 }

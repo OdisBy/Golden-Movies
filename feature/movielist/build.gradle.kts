@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -13,6 +16,15 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+    }
+
+    composeCompiler {
+        includeSourceInformation = true
+
+        featureFlags = setOf(
+            ComposeFeatureFlag.StrongSkipping,
+            ComposeFeatureFlag.OptimizeNonSkippingGroups
+        )
     }
 
     buildFeatures {
@@ -35,6 +47,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:network"))
+    implementation(project(":core:data"))
     implementation(project(":data:data"))
     implementation(project(":testutils"))
 

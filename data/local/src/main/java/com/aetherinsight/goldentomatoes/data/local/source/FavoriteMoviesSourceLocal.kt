@@ -1,9 +1,11 @@
 package com.aetherinsight.goldentomatoes.data.local.source
 
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.model.MovieEntity
-import com.aetherinsight.goldentomatoes.data.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.data.data.source.FavoriteMoviesSource
 import com.aetherinsight.goldentomatoes.data.local.db.FavoriteMoviesDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FavoriteMoviesSourceLocal @Inject constructor(
@@ -12,9 +14,8 @@ class FavoriteMoviesSourceLocal @Inject constructor(
 
     private val dao = db.getMoviesFavoriteDao()
 
-    override suspend fun getFavoriteMovies(): List<MovieGlobal> {
-        return dao.getQuantity(5).toMovieGlobal()
-    }
+    override fun getFavoriteMovies(): Flow<List<MovieGlobal>> =
+        dao.getQuantity(5).map { it.toMovieGlobal() }
 
     override suspend fun addFavoriteMovie(movie: MovieGlobal) {
         dao.insert(movie.toMovieEntity())

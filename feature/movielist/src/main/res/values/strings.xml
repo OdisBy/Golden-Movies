@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="cant_load_movies_list">Não foi possível carregar a lista de filmes</string>
+    <string name="discover_movies_title">Descobrir Filmes</string>
+    <string name="scheduled_movies_title">Filmes Agendados</string>
 </resources>

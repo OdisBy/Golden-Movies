@@ -58,15 +58,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import com.aetherinsight.goldentomatoes.core.ui.common.DialDialog
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
+import com.aetherinsight.goldentomatoes.core.ui.common.shimmerBrush
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColorAccent
 import com.aetherinsight.goldentomatoes.core.ui.theme.Black_50
 import com.aetherinsight.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.details.R
-import com.aetherinsight.goldentomatoes.feature.details.model.MovieDetails
 import com.aetherinsight.goldentomatoes.feature.details.utils.calculateMinutesDifference
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -145,12 +146,13 @@ fun DetailsRoot(
         }
     ) { contentPadding ->
         if (uiState.isLoading) {
-            LoadingScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
+            Box {
+                ShimmerImage(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                )
+            }
             return@Scaffold
         }
         if (uiState.errorMessage != null) {
@@ -193,6 +195,42 @@ fun DetailsRoot(
 }
 
 @Composable
+fun ShimmerImage(modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+        AsyncImage(
+            model = "",
+            contentDescription = "",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .height(500.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .background(shimmerBrush(true))
+        )
+
+        Column(
+            modifier = modifier
+                .padding(horizontal = 12.dp)
+        ) {
+            Text(
+                "                 ",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.background(shimmerBrush(true))
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "                                                                                                                        ",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.background(shimmerBrush(true))
+            )
+        }
+    }
+}
+
+@Composable
 fun LoadingScreen(modifier: Modifier) {
     CircularProgressIndicator(modifier)
 }
@@ -204,7 +242,7 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 fun DetailsScreen(
-    movieDetails: MovieDetails,
+    movieDetails: MovieGlobal,
     onNextMovieClick: () -> Unit,
     onFavoriteButtonClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -349,7 +387,7 @@ private fun DetailsScreenPreview() {
             }
         ) { contentPadding ->
             DetailsScreen(
-                movieDetails = MovieDetails(
+                movieDetails = MovieGlobal(
                     1,
                     "Title",
                     "Description",
@@ -468,12 +506,7 @@ private fun DetailsLoadingPreview() {
                 }
             }
         ) { contentPadding ->
-            LoadingScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
+            ShimmerImage(modifier = Modifier.fillMaxSize().padding(contentPadding))
         }
     }
 }

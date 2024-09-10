@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -20,7 +21,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,15 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
+import com.aetherinsight.goldentomatoes.core.ui.common.shimmerBrush
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
 import com.aetherinsight.goldentomatoes.core.ui.theme.GoldenTomatoesTheme
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.movielist.R
 import com.aetherinsight.goldentomatoes.feature.movielist.model.MovieListItem
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +65,7 @@ fun MovieListRoot(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val movieListState by viewModel.movieListState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.getDiscoverMovies(listType)
@@ -73,14 +73,14 @@ fun MovieListRoot(
 
     val screenTitle = when (listType) {
         ListTypes.DISCOVER -> {
-            "Descobrir Filmes"
+            stringResource(R.string.discover_movies_title)
         }
 
         ListTypes.FAVORITE -> {
-            "Filmes Agendados"
+            stringResource(R.string.scheduled_movies_title)
         }
 
-        else -> "Descobrir Filmes"
+        else -> stringResource(R.string.discover_movies_title)
     }
 
     Scaffold(
@@ -117,38 +117,35 @@ fun MovieListRoot(
             )
         }
     ) { contentPadding ->
-        if (uiState.isLoading) {
-            LoadingScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
-            return@Scaffold
-        }
-        if (uiState.errorMessage != null) {
-            ErrorScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
-            return@Scaffold
-        }
+        when (val state = movieListState) {
+            is Resource.Success -> {
+                MovieListScreen(
+                    movies = state.data,
+                    navigateToDetailsScreen = navigateToDetailsScreen,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding),
+                )
+            }
 
-        MovieListScreen(
-            movies = uiState.moviesList,
-            navigateToDetailsScreen = navigateToDetailsScreen,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        )
+            is Resource.Error -> {
+                ErrorScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                        .windowInsetsPadding(WindowInsets.ime)
+                )
+            }
+
+            is Resource.Loading -> {
+                ShimmerList(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                )
+            }
+        }
     }
-}
-
-@Composable
-fun LoadingScreen(modifier: Modifier) {
-    CircularProgressIndicator(modifier)
 }
 
 @Composable
@@ -158,7 +155,7 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 private fun MovieListScreen(
-    movies: ImmutableList<MovieListItem>,
+    movies: List<MovieListItem>,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier
 ) {
@@ -166,36 +163,88 @@ private fun MovieListScreen(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        MovieListGrid(movies, navigateToDetailsScreen)
+    }
+}
+
+@Composable
+fun MovieListGrid(
+    movies: List<MovieListItem>,
+    navigateToDetailsScreen: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Adaptive(110.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalItemSpacing = 16.dp,
+    ) {
+        items(
+            count = movies.size,
+            key = { index -> movies[index].id },
+        ) {
+            val movie = movies[it]
+            Column {
+                AsyncImage(
+                    model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clickable(
+                            onClick = {
+                                navigateToDetailsScreen(movie.id)
+                            }
+                        )
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = movie.title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShimmerList(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Adaptive(110.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalItemSpacing = 16.dp,
         ) {
-            items(
-                count = movies.size,
-                key = { index -> movies[index].id },
-            ) {
-                val movie = movies[it]
+            items(30) {
                 Column {
                     AsyncImage(
-                        model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
+                        model = "https://image.tmdb.org/t/p/w500/",
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .width(168.dp)
+                            .height(266.dp)
                             .wrapContentHeight()
+                            .background(shimmerBrush(showShimmer = true))
                             .clickable(
                                 onClick = {
-                                    navigateToDetailsScreen(movie.id)
+
                                 }
                             )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = movie.title,
+                        text = "                               ",
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.background(shimmerBrush(showShimmer = true))
                     )
                 }
             }
@@ -241,9 +290,7 @@ private fun MovieListScreenPreview() {
                 )
             }
         ) { contentPadding ->
-            MovieListScreen(
-                movies = emptyList<MovieListItem>().toImmutableList(),
-                navigateToDetailsScreen = { },
+            ShimmerList(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),
