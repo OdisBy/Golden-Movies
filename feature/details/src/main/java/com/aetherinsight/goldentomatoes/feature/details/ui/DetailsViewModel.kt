@@ -78,7 +78,7 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getRandomMovieDetails() = viewModelScope.launch {
+    private fun getRandomMovieDetails() = viewModelScope.launch {
         try {
             getDetailsUseCase.getRandomMovieDetails()
                 .flowOn(Dispatchers.Default)

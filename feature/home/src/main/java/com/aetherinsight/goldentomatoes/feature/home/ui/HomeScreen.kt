@@ -1,6 +1,5 @@
 package com.aetherinsight.goldentomatoes.feature.home.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.common.TMDBAttribution
 import com.aetherinsight.goldentomatoes.core.ui.common.shimmerBrush
 import com.aetherinsight.goldentomatoes.core.ui.constants.Constants.RANDOM_MOVIE_ID
@@ -53,7 +53,6 @@ import com.aetherinsight.goldentomatoes.core.ui.theme.Primary900
 import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.home.R
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
-import com.aetherinsight.goldentomatoes.feature.home.ui.HomeViewModel.HomeUiState
 import com.aetherinsight.goldentomatoes.feature.search_bar.ui.NoMoviesFounded
 import com.aetherinsight.goldentomatoes.feature.search_bar.ui.SearchBarRoot
 
@@ -66,7 +65,7 @@ fun HomeRoot(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val discoverMovies by viewModel.discoverMovies.collectAsStateWithLifecycle()
 
     val favoriteMovies by viewModel.favoriteMovies.collectAsStateWithLifecycle()
 
@@ -95,9 +94,8 @@ fun HomeRoot(
         }
     ) { contentPadding ->
         HomeScreen(
-            uiState = uiState,
-            discoverMoviesList = uiState.discoverList,
-            favoriteMoviesList = favoriteMovies,
+            discoverMovies = discoverMovies,
+            favoriteMovies = favoriteMovies,
             goToMovieDetails = navigateToDetailsScreen,
             navigateToMovieList = navigateToMovieList,
             hasInternetConnection = hasInternetConnection,
@@ -110,9 +108,8 @@ fun HomeRoot(
 
 @Composable
 fun HomeScreen(
-    uiState: HomeUiState,
-    discoverMoviesList: List<HomeMovie>,
-    favoriteMoviesList: List<HomeMovie>,
+    discoverMovies: Resource<List<HomeMovie>>,
+    favoriteMovies: Resource<List<HomeMovie>>,
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
     hasInternetConnection: Boolean,
@@ -138,7 +135,7 @@ fun HomeScreen(
             FavoriteMovies(
                 goToMovieDetails,
                 navigateToMovieList,
-                favoriteMoviesList
+                favoriteMovies
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -147,8 +144,7 @@ fun HomeScreen(
                 DiscoverNewMovies(
                     goToMovieDetails,
                     navigateToMovieList,
-                    discoverMoviesList,
-                    isLoading = uiState.isLoadingDiscover
+                    discoverMovies,
                 )
             }
 
@@ -163,8 +159,7 @@ fun HomeScreen(
 private fun DiscoverNewMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    homeMovies: List<HomeMovie>,
-    isLoading: Boolean,
+    homeMovies: Resource<List<HomeMovie>>,
 ) {
 
     Column(
@@ -173,30 +168,27 @@ private fun DiscoverNewMovies(
             .padding(horizontal = 16.dp)
             .semantics { isTraversalGroup = true }
     ) {
-
+        // Title
         RowTextAndGoButton(
             text = stringResource(R.string.discover_movies_title),
             onButtonClick = {
                 navigateToMovieList(ListTypes.DISCOVER)
             },
-            buttonVisible = homeMovies.size > 3
+            buttonVisible = homeMovies is Resource.Success && homeMovies.data.size > 3
         )
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (isLoading) {
-            DiscoverCarousel(homeMovies, goToMovieDetails, true)
-        } else {
-            if (homeMovies.isEmpty()) {
-                NoMoviesFounded(
-                    modifier = Modifier.height(
-                        200.dp
-                    )
+        when (homeMovies) {
+            is Resource.Error -> NoMoviesFounded(
+                modifier = Modifier.height(
+                    200.dp
                 )
-            } else {
-                DiscoverCarousel(homeMovies, goToMovieDetails, false)
-            }
-        }
+            )
 
+            is Resource.Loading -> DiscoverCarousel(emptyList(), goToMovieDetails, true)
+            is Resource.Success -> DiscoverCarousel(homeMovies.data, goToMovieDetails, false)
+        }
     }
 }
 
@@ -204,7 +196,7 @@ private fun DiscoverNewMovies(
 private fun FavoriteMovies(
     goToMovieDetails: (Long) -> Unit,
     navigateToMovieList: (ListTypes) -> Unit,
-    favoriteMovies: List<HomeMovie>,
+    favoriteMovies: Resource<List<HomeMovie>>,
 ) {
     Column(
         modifier = Modifier
@@ -212,19 +204,25 @@ private fun FavoriteMovies(
             .padding(horizontal = 16.dp)
             .semantics { isTraversalGroup = true }
     ) {
+        // Title
         RowTextAndGoButton(
             text = stringResource(R.string.favorite_movies_title),
             onButtonClick = {
                 navigateToMovieList(ListTypes.FAVORITE)
             },
-            buttonVisible = favoriteMovies.size > 3
+            buttonVisible = favoriteMovies is Resource.Success && favoriteMovies.data.size > 3
         )
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        if (favoriteMovies.isEmpty()) {
-            NoMoviesFavorite()
-        } else {
-            FavoriteCarousel(favoriteMovies, goToMovieDetails, shimmer = false)
+        // Carrousel
+
+        when (favoriteMovies) {
+            is Resource.Error -> NoMoviesFavorite()
+            is Resource.Loading -> FavoriteCarousel(emptyList(), goToMovieDetails, true)
+            is Resource.Success -> {
+                FavoriteCarousel(favoriteMovies.data, goToMovieDetails, false)
+            }
         }
     }
 }
@@ -270,7 +268,7 @@ private fun MoviesCarousel(
         preferredItemWidth = 186.dp,
         itemSpacing = 8.dp,
     ) { index ->
-        val movie = if(shimmer) HomeMovie(12, "", "", "", false) else homeMovies[index]
+        val movie = if (shimmer) HomeMovie(12, "", "", "", false) else homeMovies[index]
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w500/${movie.posterPath}",
             contentDescription = movie.title,
