@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import java.io.IOException
 import java.util.Properties
 
@@ -5,6 +6,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -16,6 +18,15 @@ android {
 
         buildConfigField("String", "API_KEY", getApiKey())
 
+    }
+
+    composeCompiler {
+        includeSourceInformation = true
+
+        featureFlags = setOf(
+            ComposeFeatureFlag.StrongSkipping,
+            ComposeFeatureFlag.OptimizeNonSkippingGroups
+        )
     }
 
     buildFeatures {
