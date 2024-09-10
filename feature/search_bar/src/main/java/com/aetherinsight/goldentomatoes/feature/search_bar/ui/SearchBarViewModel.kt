@@ -86,7 +86,7 @@ class SearchBarViewModel @Inject constructor(
         }
     }
 
-    suspend fun runSearch(query: String) {
+    private suspend fun runSearch(query: String) {
         _state.update { SearchBarState.Searching }
 
         searchMoviesUseCase.invoke(query)

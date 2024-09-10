@@ -1,5 +1,6 @@
 package com.aetherinsight.goldentomatoes.feature.search_bar.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
+import com.aetherinsight.goldentomatoes.core.ui.common.shimmerBrush
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColorAccent
 import com.aetherinsight.goldentomatoes.core.ui.theme.Primary400
 import com.aetherinsight.goldentomatoes.core.ui.theme.Primary500
@@ -45,7 +47,6 @@ import com.aetherinsight.goldentomatoes.core.ui.theme.TextColor
 import com.aetherinsight.goldentomatoes.feature.search_bar.R
 import com.aetherinsight.goldentomatoes.feature.search_bar.ui.SearchBarViewModel.SearchBarState
 import kotlinx.collections.immutable.ImmutableList
-import kotlin.text.isNotBlank
 
 
 @Composable
@@ -126,25 +127,25 @@ fun SearchBarComponent(
                 dividerColor = Primary500,
             )
         ) {
-            when (val uiState = state) {
+            when (state) {
                 SearchBarState.Idle -> {
                     return@SearchBar
                 }
 
                 is SearchBarState.Error -> {
                     ErrorItem(
-                        message = uiState.errorMessage,
+                        message = state.errorMessage,
                         modifier = Modifier.Companion.windowInsetsPadding(WindowInsets.Companion.ime)
                     )
                 }
 
                 SearchBarState.Searching -> {
-                    SearchingItem(modifier = Modifier.Companion.align(Alignment.Companion.CenterHorizontally))
+                    ShimmerList()
                 }
 
                 is SearchBarState.SuccessfulSearch -> {
 
-                    if (uiState.searchMovieList.isEmpty()) {
+                    if (state.searchMovieList.isEmpty()) {
                         NoMoviesFounded(
                             modifier = Modifier.Companion.windowInsetsPadding(
                                 WindowInsets.Companion.ime
@@ -153,7 +154,7 @@ fun SearchBarComponent(
                         return@SearchBar
                     }
 
-                    ListWithMovies(uiState.searchMovieList, onMovieClicked, onFavoriteClicked)
+                    ListWithMovies(state.searchMovieList, onMovieClicked, onFavoriteClicked)
                 }
             }
         }
@@ -198,7 +199,11 @@ private fun ListWithMovies(
             count = movies.size,
             key = { index -> movies[index].id },
             itemContent = { index ->
-                MovieSearchListItem(movie = movies[index], onMovieClicked = onMovieClicked, onFavoriteClicked = onFavoriteClicked)
+                MovieSearchListItem(
+                    movie = movies[index],
+                    onMovieClicked = onMovieClicked,
+                    onFavoriteClicked = onFavoriteClicked
+                )
             }
         )
     }
@@ -244,5 +249,36 @@ fun MovieSearchListItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ShimmerList(modifier: Modifier = Modifier) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.Companion
+            .fillMaxSize()
+    ) {
+        items(
+            count = 4,
+            itemContent = {
+                TextButton(
+                    onClick = {
+
+                    },
+                    contentPadding = PaddingValues(24.dp),
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .background(shimmerBrush(showShimmer = true))
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Companion.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {}
+                }
+            }
+        )
     }
 }

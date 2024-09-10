@@ -7,51 +7,43 @@ import com.aetherinsight.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCa
 import com.aetherinsight.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-@OptIn(FlowPreview::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
+    getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase,
     getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase,
 ) : ViewModel() {
 
-    private val _discoverMovies = MutableStateFlow<Resource<List<HomeMovie>>>(Resource.Loading())
-    val discoverMovies: StateFlow<Resource<List<HomeMovie>>> = _discoverMovies.asStateFlow()
-
-    val favoriteMovies: StateFlow<Resource<List<HomeMovie>>> =
-        getFavoriteMoviesUseCase()
+    val discoverMovies: StateFlow<Resource<List<HomeMovie>>> =
+        getDiscoverMoviesUseCase()
+            .distinctUntilChanged()
+            .catch { e ->
+                Timber.e("Unexpected catch error ${e.message}")
+                emit(Resource.Error(e.message))
+            }
             .stateIn(
                 initialValue = Resource.Loading(),
                 scope = viewModelScope,
-                started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000)
+                started = WhileSubscribed(5000)
             )
 
-    init {
-        getDiscoverMovies()
-    }
-
-    fun getDiscoverMovies() = viewModelScope.launch {
-        _discoverMovies.value = Resource.Loading()
-
-        getDiscoverMoviesUseCase()
-            .flowOn(Dispatchers.Default)
+    val favoriteMovies: StateFlow<Resource<List<HomeMovie>>> =
+        getFavoriteMoviesUseCase()
+            .distinctUntilChanged()
             .catch { e ->
                 Timber.e("Unexpected catch error ${e.message}")
-                _discoverMovies.value = Resource.Error(e.localizedMessage ?: "Error")
+                emit(Resource.Error(e.message))
             }
-            .collect {
-                _discoverMovies.value = it
-            }
-    }
+            .stateIn(
+                initialValue = Resource.Loading(),
+                scope = viewModelScope,
+                started = WhileSubscribed(5000)
+            )
 }

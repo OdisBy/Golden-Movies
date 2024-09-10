@@ -5,7 +5,7 @@ import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
 import kotlinx.coroutines.flow.Flow
 
 interface DiscoverRepository {
-    suspend fun getDiscoverMovies(): Flow<Resource<List<MovieGlobal>>>
+    fun getDiscoverMovies(): Flow<Resource<List<MovieGlobal>>>
 
     suspend fun randomMovieId(): Long?
 }
