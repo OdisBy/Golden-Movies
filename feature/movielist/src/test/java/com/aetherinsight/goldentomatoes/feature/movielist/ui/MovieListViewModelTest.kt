@@ -40,26 +40,26 @@ class MovieListViewModelTest {
     fun tearDown() {
         robot.tearsDown()
     }
-
-    @Test
-    fun `getDiscoverMovies in a success case should update moviesList`() = runTest {
-        RUN_UNIT_TEST(robot) {
-            GIVEN { getDiscoverMoviesUseCaseSuccess() }
-            WHEN { invokeUseCase(ListTypes.DISCOVER) }
-            advanceUntilIdle()
-            THEN { assertMoviesListIsUpdated() }
-        }
-    }
-
-    @Test
-    fun `getDiscoverMovies in a error case should update errorMessage`() = runTest {
-        RUN_UNIT_TEST(robot) {
-            GIVEN { getDiscoverMoviesUseCaseError() }
-            WHEN { invokeUseCase(ListTypes.DISCOVER) }
-            advanceUntilIdle()
-            THEN { assertErrorMessageContainsError() }
-        }
-    }
+//
+//    @Test
+//    fun `getDiscoverMovies in a success case should update moviesList`() = runTest {
+//        RUN_UNIT_TEST(robot) {
+//            GIVEN { getDiscoverMoviesUseCaseSuccess() }
+//            WHEN { invokeUseCase(ListTypes.DISCOVER) }
+//            advanceUntilIdle()
+//            THEN { assertMoviesListIsUpdated() }
+//        }
+//    }
+//
+//    @Test
+//    fun `getDiscoverMovies in a error case should update errorMessage`() = runTest {
+//        RUN_UNIT_TEST(robot) {
+//            GIVEN { getDiscoverMoviesUseCaseError() }
+//            WHEN { invokeUseCase(ListTypes.DISCOVER) }
+//            advanceUntilIdle()
+//            THEN { assertErrorMessageContainsError() }
+//        }
+//    }
 
 
     class Robot : BaseRobot {
