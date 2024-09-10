@@ -31,5 +31,6 @@ fun Resource<List<MovieRemote>>.toMovieGlobal(): Resource<List<MovieGlobal>> {
     return when (this) {
         is Resource.Success -> Resource.Success(data.map { it.toMovieGlobal() })
         is Resource.Error -> Resource.Error(message)
+        is Resource.Loading -> Resource.Loading()
     }
 }

@@ -21,10 +21,11 @@ class GetListMoviesUseCase @Inject constructor(
     }
 
     private suspend fun getDiscoverMovies(): Flow<Resource<List<MovieListItem>>> {
-        return discoverRepository.getDiscoverMovies().map {
-            when (it) {
-                is Resource.Success -> Resource.Success(it.data.map { it.toMovieListItem() })
-                is Resource.Error -> Resource.Error(it.message)
+        return discoverRepository.getDiscoverMovies().map { resourceMovies ->
+            when (resourceMovies) {
+                is Resource.Success -> Resource.Success(resourceMovies.data.map { it.toMovieListItem() })
+                is Resource.Error -> Resource.Error(resourceMovies.message)
+                is Resource.Loading -> Resource.Loading()
             }
         }
     }

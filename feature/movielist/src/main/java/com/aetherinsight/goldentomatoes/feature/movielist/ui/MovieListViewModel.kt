@@ -28,12 +28,6 @@ class MovieListViewModel @Inject constructor(
     val state: StateFlow<MovieListUiState>
         get() = _state
 
-    init {
-        _state.update {
-            it.copy(isLoading = true, errorMessage = null)
-        }
-    }
-
     fun getDiscoverMovies(type: ListTypes) = runBlocking {
         try {
             getListMoviesUseCase.invoke(type)
@@ -75,6 +69,12 @@ class MovieListViewModel @Inject constructor(
                         errorMessage = resource.message,
                         isLoading = false
                     )
+                }
+            }
+
+            is Resource.Loading -> {
+                _state.update {
+                    it.copy(isLoading = true)
                 }
             }
         }

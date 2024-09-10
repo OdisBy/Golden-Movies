@@ -11,10 +11,11 @@ class GetDiscoverMoviesUseCase @Inject constructor(
     private val discoverRepository: DiscoverRepository
 ) {
     suspend operator fun invoke(): Flow<Resource<List<HomeMovie>>> =
-        discoverRepository.getDiscoverMovies().map {
-            when (it) {
-                is Resource.Success -> Resource.Success(it.data.map { it.toMovie() })
-                is Resource.Error -> Resource.Error(it.message)
+        discoverRepository.getDiscoverMovies().map { resourceMovies ->
+            when (resourceMovies) {
+                is Resource.Success -> Resource.Success(resourceMovies.data.map { it.toHomeMovie() })
+                is Resource.Error -> Resource.Error(resourceMovies.message)
+                is Resource.Loading -> Resource.Loading()
             }
         }
 }

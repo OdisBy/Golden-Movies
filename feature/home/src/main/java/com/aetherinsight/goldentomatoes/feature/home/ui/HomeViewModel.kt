@@ -42,19 +42,13 @@ class HomeViewModel @Inject constructor(
             )
 
     init {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(isLoadingDiscover = true)
-            }
-
-            getDiscoverMovies()
-        }
+        getDiscoverMovies()
     }
 
     fun getDiscoverMovies() = viewModelScope.launch {
         try {
             _state.update {
-                it.copy(discoverMoviesError = null)
+                it.copy(discoverMoviesError = null, isLoadingDiscover = true)
             }
 
             getDiscoverMoviesUseCase()
@@ -100,6 +94,14 @@ class HomeViewModel @Inject constructor(
                     _state.value.copy(
                         discoverList = persistentListOf(),
                         isLoadingDiscover = false
+                    )
+            }
+
+            is Resource.Loading -> {
+                _state.value =
+                    _state.value.copy(
+                        discoverList = persistentListOf(),
+                        isLoadingDiscover = true
                     )
             }
         }

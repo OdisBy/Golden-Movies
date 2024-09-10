@@ -31,12 +31,6 @@ class DetailsViewModel @Inject constructor(
     val state: StateFlow<DetailsUiState>
         get() = _state
 
-    init {
-        _state.update {
-            it.copy(isLoading = true, errorMessage = null)
-        }
-    }
-
     /**
      * Usually We would use the savedStateHandler, get the movieId
      * but It is not supported with Compose Type Safety Navigation
@@ -121,6 +115,10 @@ class DetailsViewModel @Inject constructor(
                         errorMessage = resource.message ?: "Error",
                         isLoading = false
                     )
+            }
+
+            is Resource.Loading -> {
+                _state.value = _state.value.copy(isLoading = true)
             }
         }
     }

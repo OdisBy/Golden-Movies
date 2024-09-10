@@ -12,7 +12,7 @@ class GetFavoriteMoviesUseCase @Inject constructor(
     operator fun invoke(): Flow<List<HomeMovie>> =
             favoriteRepository.getFavoriteMovies().map { listMovies ->
                 listMovies.map { movieGlobal ->
-                    movieGlobal.toMovie()
+                    movieGlobal.toHomeMovie()
                 }
             }
 }

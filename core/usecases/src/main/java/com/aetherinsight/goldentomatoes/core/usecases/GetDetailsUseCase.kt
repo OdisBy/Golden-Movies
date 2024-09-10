@@ -18,6 +18,7 @@ class GetDetailsUseCase @Inject constructor(
             when (resource) {
                 is Resource.Success -> Resource.Success(resource.data)
                 is Resource.Error -> Resource.Error(resource.message)
+                is Resource.Loading -> Resource.Loading()
             }
         }
 
