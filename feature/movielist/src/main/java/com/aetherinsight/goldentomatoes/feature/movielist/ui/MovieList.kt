@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.ui.common.ErrorItem
 import com.aetherinsight.goldentomatoes.core.ui.constants.ListTypes
 import com.aetherinsight.goldentomatoes.core.ui.theme.BackgroundColor
@@ -65,7 +66,7 @@ fun MovieListRoot(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val movieListState by viewModel.movieListState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.getDiscoverMovies(listType)
@@ -73,14 +74,14 @@ fun MovieListRoot(
 
     val screenTitle = when (listType) {
         ListTypes.DISCOVER -> {
-            "Descobrir Filmes"
+            stringResource(R.string.discover_movies_title)
         }
 
         ListTypes.FAVORITE -> {
-            "Filmes Agendados"
+            stringResource(R.string.scheduled_movies_title)
         }
 
-        else -> "Descobrir Filmes"
+        else -> stringResource(R.string.discover_movies_title)
     }
 
     Scaffold(
@@ -117,32 +118,33 @@ fun MovieListRoot(
             )
         }
     ) { contentPadding ->
-        if (uiState.isLoading) {
-            LoadingScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
-            return@Scaffold
+        when (val state = movieListState) {
+            is Resource.Success -> {
+                MovieListScreen(
+                    movies = state.data,
+                    navigateToDetailsScreen = navigateToDetailsScreen,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding),
+                )
+            }
+            is Resource.Error -> {
+                ErrorScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                        .windowInsetsPadding(WindowInsets.ime)
+                )
+            }
+            is Resource.Loading -> {
+                LoadingScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding)
+                        .windowInsetsPadding(WindowInsets.ime)
+                )
+            }
         }
-        if (uiState.errorMessage != null) {
-            ErrorScreen(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-                    .windowInsetsPadding(WindowInsets.ime)
-            )
-            return@Scaffold
-        }
-
-        MovieListScreen(
-            movies = uiState.moviesList,
-            navigateToDetailsScreen = navigateToDetailsScreen,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        )
     }
 }
 
@@ -158,7 +160,7 @@ fun ErrorScreen(modifier: Modifier) {
 
 @Composable
 private fun MovieListScreen(
-    movies: ImmutableList<MovieListItem>,
+    movies: List<MovieListItem>,
     navigateToDetailsScreen: (Long) -> Unit,
     modifier: Modifier
 ) {

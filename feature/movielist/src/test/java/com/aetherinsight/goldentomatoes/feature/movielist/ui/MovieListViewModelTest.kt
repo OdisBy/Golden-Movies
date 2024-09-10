@@ -9,6 +9,7 @@ import com.aetherinsight.goldentomatoes.testutils.robot.GIVEN
 import com.aetherinsight.goldentomatoes.testutils.robot.RUN_UNIT_TEST
 import com.aetherinsight.goldentomatoes.testutils.robot.THEN
 import com.aetherinsight.goldentomatoes.testutils.robot.WHEN
+import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -88,11 +89,11 @@ class MovieListViewModelTest {
         }
 
         fun assertMoviesListIsUpdated() {
-            assert(movieListViewModel.state.value.moviesList == dumbDiscoverMovieList)
+            (movieListViewModel.movieListState.value as Resource.Success).data shouldBe dumbDiscoverMovieList
         }
 
         fun assertErrorMessageContainsError() {
-            assert(movieListViewModel.state.value.errorMessage == ERROR_MESSAGE)
+            (movieListViewModel.movieListState.value as Resource.Error).message shouldBe ERROR_MESSAGE
         }
 
 
