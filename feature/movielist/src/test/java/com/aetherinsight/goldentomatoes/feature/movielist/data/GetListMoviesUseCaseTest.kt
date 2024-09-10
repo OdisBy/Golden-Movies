@@ -79,7 +79,7 @@ internal class GetListMoviesUseCaseTest {
 
             coEvery {
                 favoriteRepository.getFavoriteMovies()
-            } returns flowOf(dumbMovieFavorite)
+            } returns flowOf(Resource.Success(dumbMovieDiscover))
         }
 
         suspend fun invokeWithType(type: ListTypes) {

@@ -1,6 +1,5 @@
 package com.aetherinsight.goldentomatoes.feature.home.ui
 
-import com.aetherinsight.goldentomatoes.core.data.model.SearchMovie
 import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.feature.home.data.GetDiscoverMoviesUseCase
 import com.aetherinsight.goldentomatoes.feature.home.data.GetFavoriteMoviesUseCase
@@ -17,6 +16,7 @@ import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -43,52 +43,28 @@ class HomeViewModelTest {
         robot.tearsDown()
     }
 
-//    @Test
-//    fun `UiState State after DiscoverMovies Success should have a isLoadingDiscover false and a list on discoverList`() =
-//        runTest {
-//            RUN_UNIT_TEST(robot) {
-//                GIVEN { getDiscoverMoviesUseCaseSuccess() }
-//                WHEN { callGetDiscoverMovies() }
-//                advanceUntilIdle()
-//                THEN { getDiscoverMoviesUiStateSuccess() }
-//            }
-//        }
+    @Test
+    fun `Success Discover Movies useCase should update Discover Ui State to Success`() =
+        runTest(UnconfinedTestDispatcher()) {
+            RUN_UNIT_TEST(robot) {
+                GIVEN { getDiscoverMoviesUseCaseSuccess() }
+                WHEN { callGetDiscoverMovies() }
+                advanceUntilIdle()
+                THEN { discoverStateSuccess() }
+            }
+        }
 
     @Test
-    fun `UiState State after DiscoverMovies Error should have a isLoadingDiscover false and a empty list on discoverList`() =
-        runTest {
+    fun `Error Discover Movies useCase should update Discover Ui State to Error`() =
+        runTest(UnconfinedTestDispatcher()) {
             RUN_UNIT_TEST(robot) {
                 GIVEN { getDiscoverMoviesUseCaseError() }
                 WHEN { callGetDiscoverMovies() }
                 advanceUntilIdle()
-                THEN { getDiscoverMoviesUiStateError() }
+                THEN { discoverStateError() }
             }
         }
 
-
-    @Test
-    fun `UiState State after FavoriteMovies Success should have isLoadingFavorite false and a list on favoriteList`() =
-        runTest {
-            RUN_UNIT_TEST(robot) {
-                GIVEN { getFavoriteMoviesUseCaseWithData() }
-                WHEN { callGetFavoriteMovies() }
-                advanceUntilIdle()
-                THEN { getFavoriteMoviesUiStateSuccess() }
-            }
-        }
-//
-//    @Test
-//    fun `UiState State after FavoriteMovies Error should have isLoadingFavorite false and a empty list on favoriteList`() =
-//        runTest {
-//            RUN_UNIT_TEST(robot) {
-//                GIVEN { getFavoriteMoviesUseCaseEmptyList() }
-//                WHEN {
-//                    callGetFavoriteMovies()
-//                    advanceUntilIdle()
-//                }
-//                THEN { getFavoriteMoviesUiStateEmptyList() }
-//            }
-//        }
 
     class Robot : BaseRobot {
 
@@ -103,7 +79,7 @@ class HomeViewModelTest {
         @MockK
         lateinit var getDiscoverMoviesUseCase: GetDiscoverMoviesUseCase
 
-        @MockK
+        @MockK(relaxed = true)
         lateinit var getFavoriteMoviesUseCase: GetFavoriteMoviesUseCase
 
         private lateinit var homeViewModel: HomeViewModel
@@ -142,41 +118,25 @@ class HomeViewModelTest {
         fun getFavoriteMoviesUseCaseWithData() {
             coEvery {
                 getFavoriteMoviesUseCase.invoke()
-            } returns flowOf(dummyHomeMovies)
+            } returns flowOf(Resource.Success(dummyHomeMovies))
         }
 
         fun getFavoriteMoviesUseCaseEmptyList() {
             coEvery {
                 getFavoriteMoviesUseCase.invoke()
-            } returns flowOf(emptyList())
+            } returns flowOf(Resource.Success(emptyList()))
         }
 
         fun callGetDiscoverMovies() {
             homeViewModel.getDiscoverMovies()
         }
 
-        fun callGetFavoriteMovies() {
-            homeViewModel.getFavoriteMovies()
+        fun discoverStateSuccess() {
+            homeViewModel.discoverMovies.value::class shouldBe Resource.Success::class
         }
 
-        fun getDiscoverMoviesUiStateSuccess() {
-            homeViewModel.state.value.isLoadingDiscover shouldBe false
-            homeViewModel.state.value.discoverList shouldBe dummyHomeMovies
-        }
-
-        fun getDiscoverMoviesUiStateError() {
-            homeViewModel.state.value.isLoadingDiscover shouldBe false
-            homeViewModel.state.value.discoverList shouldBe emptyList()
-        }
-
-        fun getFavoriteMoviesUiStateSuccess() {
-            homeViewModel.state.value.isLoadingFavorite shouldBe false
-            homeViewModel.state.value.favoriteList shouldBe dummyHomeMovies
-        }
-
-        fun getFavoriteMoviesUiStateEmptyList() {
-            homeViewModel.state.value.isLoadingFavorite shouldBe false
-            homeViewModel.state.value.favoriteList shouldBe emptyList()
+        fun discoverStateError() {
+            homeViewModel.discoverMovies.value::class shouldBe Resource.Error::class
         }
 
 

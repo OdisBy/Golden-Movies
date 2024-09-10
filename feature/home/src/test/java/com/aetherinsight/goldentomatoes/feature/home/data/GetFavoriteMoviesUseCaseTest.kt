@@ -2,6 +2,7 @@ package com.aetherinsight.goldentomatoes.feature.home.data
 
 import app.cash.turbine.test
 import com.aetherinsight.goldentomatoes.core.data.model.MovieGlobal
+import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.data.data.repositories.FavoriteRepository
 import com.aetherinsight.goldentomatoes.feature.home.model.HomeMovie
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
@@ -69,13 +70,13 @@ internal class GetFavoriteMoviesUseCaseTest {
 
         fun favoriteRepositorySuccessList() {
             coEvery { favoriteRepository.getFavoriteMovies() } returns flowOf(
-                dummyGlobalMovies
+                Resource.Success(dummyGlobalMovies)
             )
         }
 
         fun favoriteRepositoryEmptyList() {
             coEvery { favoriteRepository.getFavoriteMovies() } returns flowOf(
-                emptyList<MovieGlobal>()
+                Resource.Success(emptyList())
             )
         }
 
@@ -83,7 +84,7 @@ internal class GetFavoriteMoviesUseCaseTest {
             getFavoriteMoviesUseCase.invoke().test {
                 val result = awaitItem()
 
-                result shouldBe dummyHomeMovies
+                (result as Resource.Success).data shouldBe dummyHomeMovies
 
                 awaitComplete()
             }
@@ -93,7 +94,7 @@ internal class GetFavoriteMoviesUseCaseTest {
             getFavoriteMoviesUseCase.invoke().test {
                 val result = awaitItem()
 
-                result shouldBe emptyList<HomeMovie>()
+                (result as Resource.Success).data shouldBe emptyList()
 
                 awaitComplete()
             }

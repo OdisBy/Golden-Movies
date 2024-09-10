@@ -14,13 +14,17 @@ import com.aetherinsight.goldentomatoes.testutils.robot.WHEN
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DetailsViewModelTest {
 
     @get:Rule
@@ -39,10 +43,13 @@ class DetailsViewModelTest {
     }
 
     @Test
-    fun `loadMovieDetails with movieId should update state with movie details`() = runTest {
+    fun `loadMovieDetails with movieId should update state with movie details`() = runTest(
+        UnconfinedTestDispatcher()
+    ) {
         RUN_UNIT_TEST(robot) {
             GIVEN { getMovieDetailsUseCaseSuccess(MOVIE_ID_1) }
             WHEN { loadMovieDetails(MOVIE_ID_1) }
+            advanceUntilIdle()
             THEN { assertStateMovieDetailsIsUpdated(MOVIE_ID_1) }
         }
     }
