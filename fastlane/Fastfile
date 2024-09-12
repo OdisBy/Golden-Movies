@@ -42,8 +42,8 @@ platform :android do
                   tag_match: "#{environment}/*",
               )
 
-              UI.important('Version name is #{version_name}')
-              UI.important('Changelog is #{changelog}')
+              UI.important("Version name is #{version_name}")
+              UI.important("Changelog is #{changelog}")
 
 
 #       version_code = ENV['GITHUB_RUNNER_NUMBER']
@@ -124,6 +124,7 @@ platform :android do
       [next_version, changelog]
     rescue StandardError => e
       UI.important("Lane failed on search version semantic")
+      raise e
     end
   end
 end
