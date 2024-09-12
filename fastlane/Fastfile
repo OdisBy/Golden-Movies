@@ -87,11 +87,11 @@ platform :android do
     begin
       set_github_release(
         repository_name: 'OdisBy/Golden-Movies',
-        api_token: '',
+        api_token: ENV['GITHUB_TOKEN'],
         name: "Debug #{version_name}",
         tag_name: "#{DEBUG}/#{version_name}",
         description: changelog,
-        commitish: 'main',
+        commitish: 'develop',
         upload_assets: ['./app/build/outputs/apk/debug/app-debug.apk']
       )
     rescue StandardError => e
