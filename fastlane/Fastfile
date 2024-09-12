@@ -125,7 +125,6 @@ platform :android do
     next_version = lane_context[SharedValues::RELEASE_NEXT_VERSION]
 
     changelog = conventional_changelog(
-      format: 'slack',
       title: "Android #{environment}",
       display_author: false,
       display_links: false,
