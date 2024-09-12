@@ -1,0 +1,130 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+DEBUG = "debug"
+
+platform :android do
+  desc 'Runs all the tests'
+  lane :test do
+    begin
+      gradle(
+        task: 'test assemble',
+        build_type: 'Debug',
+        print_command: true
+      )
+    rescue StandardError => e
+      raise e unless e.message.include?('FAILURE: Build failed with an exception.')
+      UI.important('Test Lane has failed on gradle task!')
+    end
+  end
+
+  desc 'Build Debug and Deploy to Github'
+  lane :build_debug do
+#     begin
+
+        environment = DEBUG
+
+        version_name, changelog = generate_changelog(
+                  tag_match: "#{environment}/*",
+              )
+
+              UI.important("Version name is #{version_name}")
+              UI.important("Changelog is #{changelog}")
+
+
+#       version_code = ENV['GITHUB_RUNNER_NUMBER']
+#       version_name = "Temp"
+#       api_key = ENV['DEBUG_API_KEY']
+#
+#       gradle_properties = {
+#         'CI_VERSION_NAME' => version_name,
+#         'CI_VERSION_CODE' => version_code
+#       }
+#
+#       api_key_properties = {
+#         'API_KEY' => api_key
+#       }
+#
+#       File.open('gradle.properties', 'a') do |file|
+#         gradle_properties.each do |key, value|
+#           file.puts("#{key}=#{value}")
+#         end
+#       end
+#
+#       File.open('apikey.properties', 'w') do |file|
+#         api_key_properties.each do |key, value|
+#           file.puts("#{key}=#{value}")
+#         end
+#       end
+#
+#     rescue StandardError => e
+#       UI.important('Debug lane has failed on create properties')
+#       raise e
+#     end
+#
+#     begin
+#       gradle(
+#         task: 'assemble',
+#         build_type: 'Debug',
+#         print_command: false
+#       )
+#     rescue StandardError => e
+#       raise e unless e.message.include?('FAILURE: Build failed with an exception.')
+#       UI.important('Debug lane has failed on gradle task')
+#       raise e
+#     end
+  end
+
+  desc 'Deploy a new version to the Google Play'
+  lane :deploy do
+    gradle(task: 'clean assembleRelease')
+    upload_to_play_store
+  end
+
+ desc "Generate tag and changelog by semantic versioning 2.0.0"
+  private_lane :generate_changelog do |options|
+    # Parameters:
+    #   :tag_match (String): The pattern to match tags.
+    # Output:
+    #   [String, String]: The next version and the changelog.
+    # Function:
+    #   This lane generates the next version and changelog based on semantic versioning.
+    begin
+      match = options[:tag_match]
+      git_pull(only_tags: true)
+
+      analyze_commits(
+          match: match,
+      )
+
+      next_version = lane_context[SharedValues::RELEASE_NEXT_VERSION]
+
+      changelog = conventional_changelog(
+          format: 'slack',
+          title: 'Android Alpha',
+          display_author: false,
+          display_links: false,
+          debug: false
+      )
+
+      [next_version, changelog]
+    rescue StandardError => e
+      UI.important("Lane failed on search version semantic")
+      raise e
+    end
+  end
+end
