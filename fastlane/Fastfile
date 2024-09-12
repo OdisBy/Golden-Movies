@@ -37,14 +37,14 @@ platform :android do
       environment = DEBUG
 
       version_name, changelog = generate_changelog(
-        tag_match: "#{environment}/*"
+        environment: environment
       )
 
       UI.important("Version name is #{version_name}")
       UI.important("Changelog is #{changelog}")
 
 
-      version_code = 100 # ENV['GITHUB_RUNNER_NUMBER']
+      version_code = 1 # ENV['GITHUB_RUNNER_NUMBER']
       api_key = 'fakeapikey' # ENV['DEBUG_API_KEY']
 
       local_properties = {
@@ -87,7 +87,7 @@ platform :android do
     begin
       set_github_release(
         repository_name: 'OdisBy/Golden-Movies',
-        api_token: ENV['GITHUB_TOKEN'],
+        api_token: '',
         name: "Debug #{version_name}",
         tag_name: "#{DEBUG}/#{version_name}",
         description: changelog,
@@ -109,31 +109,32 @@ platform :android do
   desc 'Generate tag and changelog by semantic versioning 2.0.0'
   private_lane :generate_changelog do |options|
     # Parameters:
-    #   :tag_match (String): The pattern to match tags.
+    #   :environment (String): The environment.
     # Output:
     #   [String, String]: The next version and the changelog.
     # Function:
     #   This lane generates the next version and changelog based on semantic versioning.
 
-    match = options[:tag_match]
+    environment = options[:environment]
     git_pull(only_tags: true)
 
     analyze_commits(
-      match: match
+      match: "#{environment}/*"
     )
 
     next_version = lane_context[SharedValues::RELEASE_NEXT_VERSION]
 
     changelog = conventional_changelog(
       format: 'slack',
-      title: 'Android Alpha',
+      title: "Android #{environment}",
       display_author: false,
       display_links: false,
       debug: false
     )
 
     [next_version, changelog]
-  rescue StandardError
+  rescue StandardError => e
     UI.important('Lane failed on search version semantic')
+    raise e
   end
 end
