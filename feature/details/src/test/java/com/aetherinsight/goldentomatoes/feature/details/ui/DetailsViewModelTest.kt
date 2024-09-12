@@ -5,6 +5,7 @@ import com.aetherinsight.goldentomatoes.core.network.model.Resource
 import com.aetherinsight.goldentomatoes.core.usecases.GetDetailsUseCase
 import com.aetherinsight.goldentomatoes.feature.details.data.ScheduleUseCase
 import com.aetherinsight.goldentomatoes.feature.details.ui.DetailsViewModelTest.Robot.Companion.MOVIE_ID_1
+import com.aetherinsight.goldentomatoes.feature.details.ui.DetailsViewModelTest.Robot.Companion.MOVIE_ID_2
 import com.aetherinsight.goldentomatoes.testutils.MainDispatcherRule
 import com.aetherinsight.goldentomatoes.testutils.robot.BaseRobot
 import com.aetherinsight.goldentomatoes.testutils.robot.GIVEN
@@ -50,7 +51,7 @@ class DetailsViewModelTest {
             GIVEN { getMovieDetailsUseCaseSuccess(MOVIE_ID_1) }
             WHEN { loadMovieDetails(MOVIE_ID_1) }
             advanceUntilIdle()
-            THEN { assertStateMovieDetailsIsUpdated(MOVIE_ID_1) }
+            THEN { assertStateMovieDetailsIsUpdated(MOVIE_ID_2) }
         }
     }
 
