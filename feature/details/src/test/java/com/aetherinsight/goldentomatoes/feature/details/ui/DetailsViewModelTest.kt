@@ -51,7 +51,7 @@ class DetailsViewModelTest {
             GIVEN { getMovieDetailsUseCaseSuccess(MOVIE_ID_1) }
             WHEN { loadMovieDetails(MOVIE_ID_1) }
             advanceUntilIdle()
-            THEN { assertStateMovieDetailsIsUpdated(MOVIE_ID_2) }
+            THEN { assertStateMovieDetailsIsUpdated(MOVIE_ID_1) }
         }
     }
 
