@@ -44,8 +44,8 @@ platform :android do
       UI.important("Changelog is #{changelog}")
 
 
-      version_code = 1 # ENV['GITHUB_RUNNER_NUMBER']
-      api_key = 'fakeapikey' # ENV['DEBUG_API_KEY']
+      version_code = ENV['GITHUB_RUNNER_NUMBER']
+      api_key = ENV['DEBUG_API_KEY']
 
       local_properties = {
         'CI_VERSION_NAME' => version_name,
