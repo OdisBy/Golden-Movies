@@ -25,14 +25,18 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - uses: gradle/actions/setup-gradle@v3
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.3
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Create local.properties
-        run: echo "" >> local.properties
-
-      - name: Test
+      - name: Add current platform to Bundler lockfile
         run: |
-          ./gradlew testDebugUnit --stacktrace
+          bundle lock --add-platform ruby
+          bundle lock --add-platform x86_64-linux
+
+      - name: Install Gems
+        run: bundle install
+
+      - name: Run Tests
+        run: bundle exec fastlane test
