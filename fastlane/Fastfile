@@ -15,78 +15,89 @@
 
 default_platform(:android)
 
-DEBUG = "debug"
+DEBUG = 'debug'
 
 platform :android do
   desc 'Runs all the tests'
   lane :test do
-    begin
-      gradle(
-        task: 'test assemble',
-        build_type: 'Debug',
-        print_command: true
-      )
-    rescue StandardError => e
-      raise e unless e.message.include?('FAILURE: Build failed with an exception.')
-      UI.important('Test Lane has failed on gradle task!')
-    end
+    gradle(
+      task: 'test assemble',
+      build_type: 'Debug',
+      print_command: true
+    )
+  rescue StandardError => e
+    raise e unless e.message.include?('FAILURE: Build failed with an exception.')
+
+    UI.important('Test Lane has failed on gradle task!')
   end
 
   desc 'Build Debug and Deploy to Github'
   lane :build_debug do
-#     begin
+    begin
+      environment = DEBUG
 
-        environment = DEBUG
+      version_name, changelog = generate_changelog(
+        environment: environment
+      )
 
-        version_name, changelog = generate_changelog(
-                  tag_match: "#{environment}/*",
-              )
-
-              UI.important("Version name is #{version_name}")
-              UI.important("Changelog is #{changelog}")
+      UI.important("Version name is #{version_name}")
+      UI.important("Changelog is #{changelog}")
 
 
-#       version_code = ENV['GITHUB_RUNNER_NUMBER']
-#       version_name = "Temp"
-#       api_key = ENV['DEBUG_API_KEY']
-#
-#       gradle_properties = {
-#         'CI_VERSION_NAME' => version_name,
-#         'CI_VERSION_CODE' => version_code
-#       }
-#
-#       api_key_properties = {
-#         'API_KEY' => api_key
-#       }
-#
-#       File.open('gradle.properties', 'a') do |file|
-#         gradle_properties.each do |key, value|
-#           file.puts("#{key}=#{value}")
-#         end
-#       end
-#
-#       File.open('apikey.properties', 'w') do |file|
-#         api_key_properties.each do |key, value|
-#           file.puts("#{key}=#{value}")
-#         end
-#       end
-#
-#     rescue StandardError => e
-#       UI.important('Debug lane has failed on create properties')
-#       raise e
-#     end
-#
-#     begin
-#       gradle(
-#         task: 'assemble',
-#         build_type: 'Debug',
-#         print_command: false
-#       )
-#     rescue StandardError => e
-#       raise e unless e.message.include?('FAILURE: Build failed with an exception.')
-#       UI.important('Debug lane has failed on gradle task')
-#       raise e
-#     end
+      version_code = ENV['GITHUB_RUNNER_NUMBER']
+      api_key = ENV['DEBUG_API_KEY']
+
+      local_properties = {
+        'CI_VERSION_NAME' => version_name,
+        'CI_VERSION_CODE' => version_code
+      }
+
+      api_key_properties = {
+        'API_KEY' => api_key
+      }
+
+      File.open('./local.properties', 'a') do |file|
+        local_properties.each do |key, value|
+          file.puts("#{key}=#{value}")
+        end
+      end
+
+      File.open('./apikey.properties', 'w') do |file|
+        api_key_properties.each do |key, value|
+          file.puts("#{key}=#{value}")
+        end
+      end
+    rescue StandardError => e
+      UI.important('Debug lane has failed on create properties')
+      raise e
+    end
+
+    begin
+      gradle(
+        task: 'assemble',
+        build_type: 'Debug',
+        print_command: false
+      )
+    rescue StandardError => e
+      raise e unless e.message.include?('FAILURE: Build failed with an exception.')
+
+      UI.important('Debug lane has failed on gradle task')
+    end
+
+    begin
+      set_github_release(
+        repository_name: 'OdisBy/Golden-Movies',
+        api_token: ENV['GITHUB_TOKEN'],
+        name: "Debug #{version_name}",
+        tag_name: "#{DEBUG}/#{version_name}",
+        description: changelog,
+        commitish: 'develop',
+        upload_assets: ['./app/build/outputs/apk/debug/app-debug.apk']
+      )
+    rescue StandardError => e
+      UI.important('Failed to publish it to Github')
+      raise e
+    end
   end
 
   desc 'Deploy a new version to the Google Play'
@@ -95,36 +106,34 @@ platform :android do
     upload_to_play_store
   end
 
- desc "Generate tag and changelog by semantic versioning 2.0.0"
+  desc 'Generate tag and changelog by semantic versioning 2.0.0'
   private_lane :generate_changelog do |options|
     # Parameters:
-    #   :tag_match (String): The pattern to match tags.
+    #   :environment (String): The environment.
     # Output:
     #   [String, String]: The next version and the changelog.
     # Function:
     #   This lane generates the next version and changelog based on semantic versioning.
-    begin
-      match = options[:tag_match]
-      git_pull(only_tags: true)
 
-      analyze_commits(
-          match: match,
-      )
+    environment = options[:environment]
+    git_pull(only_tags: true)
 
-      next_version = lane_context[SharedValues::RELEASE_NEXT_VERSION]
+    analyze_commits(
+      match: "#{environment}/*"
+    )
 
-      changelog = conventional_changelog(
-          format: 'slack',
-          title: 'Android Alpha',
-          display_author: false,
-          display_links: false,
-          debug: false
-      )
+    next_version = lane_context[SharedValues::RELEASE_NEXT_VERSION]
 
-      [next_version, changelog]
-    rescue StandardError => e
-      UI.important("Lane failed on search version semantic")
-      raise e
-    end
+    changelog = conventional_changelog(
+      title: "Android #{environment}",
+      display_author: false,
+      display_links: false,
+      debug: false
+    )
+
+    [next_version, changelog]
+  rescue StandardError => e
+    UI.important('Lane failed on search version semantic')
+    raise e
   end
 end
