@@ -38,5 +38,8 @@ jobs:
       - name: Install Gems
         run: bundle install
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Run Tests
         run: bundle exec fastlane test
