@@ -16,6 +16,7 @@
 default_platform(:android)
 
 DEBUG = 'debug'
+RELEASE = 'release'
 
 platform :android do
   desc 'Runs all the tests'
@@ -101,9 +102,104 @@ platform :android do
   end
 
   desc 'Deploy a new version to the Google Play'
-  lane :deploy do
-    gradle(task: 'clean assembleRelease')
-    upload_to_play_store
+  lane :build_release do
+    begin
+      environment = RELEASE
+
+      version_name, changelog = generate_changelog(
+        environment: environment
+      )
+
+      UI.important("Version name is #{version_name}")
+      UI.important("Changelog is #{changelog}")
+
+
+      version_code = ENV['GITHUB_RUNNER_NUMBER']
+      api_key = ENV['DEBUG_API_KEY']
+
+      local_properties = {
+        'CI_VERSION_NAME' => version_name,
+        'CI_VERSION_CODE' => version_code
+      }
+
+      api_key_properties = {
+        'API_KEY' => api_key
+      }
+
+      File.open('../local.properties', 'a') do |file|
+        local_properties.each do |key, value|
+          file.puts("#{key}=#{value}")
+        end
+      end
+
+      File.open('../apikey.properties', 'w') do |file|
+        api_key_properties.each do |key, value|
+          file.puts("#{key}=#{value}")
+        end
+      end
+    rescue StandardError => e
+      UI.important('Release lane has failed on create properties')
+      raise e
+    end
+
+    begin
+      gradle(
+        task: 'bundle',
+        build_type: 'Release',
+        print_command: false
+      )
+    rescue StandardError => e
+      raise e unless e.message.include?('FAILURE: Build failed with an exception.')
+
+      UI.important('Release lane has failed on bundle gradle task')
+    end
+
+    bundle_path = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    bundle_mapping_path = Actions.lane_context[SharedValues::GRADLE_MAPPING_TXT_OUTPUT_PATH]
+
+    begin
+      gradle(
+        task: 'assemble',
+        build_type: 'Release',
+        print_command: false
+      )
+    rescue StandardError => e
+      raise e unless e.message.include?('FAILURE: Build failed with an exception.')
+
+      UI.important('Release lane has failed on assemble gradle task')
+    end
+
+    apk_path = Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+
+    begin
+      set_github_release(
+        repository_name: 'OdisBy/Golden-Movies',
+        api_bearer: ENV['GITHUB_TOKEN'],
+        name: "Release #{version_name}",
+        tag_name: "#{RELEASE}/#{version_name}",
+        description: changelog,
+        commitish: 'main',
+        upload_assets: apk_path
+      )
+    rescue StandardError => e
+      UI.important('Failed to publish it to Github')
+      raise e
+    end
+
+    begin
+      upload_to_play_store(
+        package_name: 'com.aetherinsight.goldentomatoes',
+        track: 'internal',
+        version_name: version_name,
+        version_code: version_code,
+        mapping: bundle_mapping_path,
+        apk: bundle_path,
+        json_key: 'app/play_store.json'
+      )
+    rescue StandardError => e
+      UI.important('Failed to publish it to Github')
+      raise e
+    end
   end
 
   desc 'Generate tag and changelog by semantic versioning 2.0.0'
