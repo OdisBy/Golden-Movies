@@ -13,7 +13,6 @@ jobs:
     permissions:
       contents: write
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,27 +25,8 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - uses: gradle/actions/setup-gradle@v3
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-
-      - name: Increment version
-        id: increment-version
-        uses: RichardInnocent/semantic-versioning-git@v0.0.1
-        with:
-          version-prefix: v
-
-      - name: Create local.properties
-        run: |
-          echo "CI_VERSION_NAME=${{ env.new_version }}" >> local.properties
-          echo "CI_VERSION_CODE=${{ github.run_number }}" >> local.properties
-        env:
-          new_version: ${{ steps.increment-version.outputs.new-version }}
-
-      - name: Create apikey.properties
-        run: |
-          echo "API_KEY=${{ secrets.RELEASE_API_KEY }}" >> apikey.properties
 
       - name: Decode Keystore
         env:
@@ -58,56 +38,16 @@ jobs:
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > keystore.jks
 
-      - name: Release Bundle
-        run: ./gradlew bundleRelease
+      - name: Decode Play Services Json
+        env:
+          ENCODED_STRING: ${{ secrets.PLAY_SERVICES_RELEASE }}
+        run: |
+          echo $ENCODED_STRING > play_services-b64.txt
+          base64 -d play_services-b64.txt > app/google-services.json
+
+      - name: Run Fastlane Deploy
+        run: bundle exec fastlane build_release
         env:
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-
-      - name: Release Build
-        run: ./gradlew assembleRelease
-        env:
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-
-      - name: Upload Release APK at Github
-        uses: actions/upload-artifact@v4
-        with:
-          name: golden-tomatoes.apk
-          path: app/build/outputs/apk/release/app-release.apk
-
-      - name: Create Release at Github
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          new_version: ${{ steps.increment-version.outputs.new-version }}
-        with:
-          tag_name: ${{ env.new_version }}
-          release_name: Release ${{ env.new_version }}
-          body: Versão de Release ${{ env.new_version }}
-          draft: false
-          prerelease: false
-
-      - name: Upload APK to new Release at Github
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./app/build/outputs/apk/release/app-release.apk
-          asset_name: golden-tomatoes.apk
-          asset_content_type: application/zip
-
-      - name: Upload Bundle to Play Console
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.aetherinsight.goldentomatoes
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: production
-          status: draft
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
