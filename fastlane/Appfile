@@ -1,2 +1,2 @@
-json_key_file("../app/google-services.json")
+json_key_file("app/google-services.json")
 package_name("com.aetherinsight.goldentomatoes")

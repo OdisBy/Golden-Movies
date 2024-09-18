@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: Deploy Release
     runs-on: ubuntu-latest
     concurrency: ci-${{ github.ref }}
     permissions:
