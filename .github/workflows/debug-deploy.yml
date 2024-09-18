@@ -26,6 +26,9 @@ jobs:
           git config --global user.email "ruliam.oliveira@gmail.com"
           git config --global user.name "Ruliam Oliveira"
 
+      - name: Fetch all tags
+        run: git fetch --all --tags
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
