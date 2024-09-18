@@ -48,8 +48,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build and Deploy Debug
-        run: bundle exec fastlane build_debug
-        env:
-          DEBUG_API_KEY: ${{ secrets.DEBUG_API_KEY }}
-          GITHUB_RUNNER_NUMBER: ${{ github.run_number }}
+#      - name: Build and Deploy Debug
+#        run: bundle exec fastlane build_debug
+#        env:
+#          DEBUG_API_KEY: ${{ secrets.DEBUG_API_KEY }}
+#          GITHUB_RUNNER_NUMBER: ${{ github.run_number }}
+      - name: Testing tags
+        run: bundle exec fastlane run analyze_commits match:"debug/*"
