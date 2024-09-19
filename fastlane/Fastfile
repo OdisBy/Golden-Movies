@@ -193,7 +193,7 @@ platform :android do
         version_name: version_name,
         version_code: version_code,
         mapping: bundle_mapping_path,
-        apk: bundle_path,
+        aab: bundle_path,
         json_key: 'app/play_store.json'
       )
     rescue StandardError => e
