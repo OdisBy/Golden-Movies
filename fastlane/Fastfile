@@ -193,6 +193,7 @@ platform :android do
         version_name: version_name,
         version_code: version_code,
         mapping: bundle_mapping_path,
+        skip_upload_apk: true,
         aab: bundle_path,
         json_key: 'app/google-services.json'
       )
