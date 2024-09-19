@@ -5,9 +5,9 @@ on:
     branches:
       - main
 
-
 jobs:
   build:
+    name: Deploy Release
     runs-on: ubuntu-latest
     concurrency: ci-${{ github.ref }}
     permissions:
@@ -25,9 +25,6 @@ jobs:
           distribution: 'zulu'
           java-version: 17
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
       - name: Decode Keystore
         env:
           ENCODED_STRING: ${{ secrets.RELEASE_KEYSTORE }}
@@ -44,6 +41,22 @@ jobs:
         run: |
           echo $ENCODED_STRING > play_services-b64.txt
           base64 -d play_services-b64.txt > app/google-services.json
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.3
+
+      - name: Add current platform to Bundler lockfile
+        run: |
+          bundle lock --add-platform ruby
+          bundle lock --add-platform x86_64-linux
+
+      - name: Install Gems
+        run: bundle install
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Run Fastlane Deploy
         run: bundle exec fastlane build_release
