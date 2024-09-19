@@ -194,7 +194,7 @@ platform :android do
         version_code: version_code,
         mapping: bundle_mapping_path,
         aab: bundle_path,
-        json_key: 'app/play_store.json'
+        json_key: 'app/google-services.json'
       )
     rescue StandardError => e
       UI.important('Failed to publish it to Github')
