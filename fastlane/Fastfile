@@ -115,7 +115,7 @@ platform :android do
 
 
       version_code = ENV['GITHUB_RUNNER_NUMBER']
-      api_key = ENV['DEBUG_API_KEY']
+      api_key = ENV['RELEASE_API_KEY']
 
       local_properties = {
         'CI_VERSION_NAME' => version_name,
